@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 수정</title>
+    <link rel="stylesheet" th:href="@{/css/editForm.css}" href="../css/editForm.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>상품 수정 폼</h2>
+    </div>
+
+    <form action="item.html" th:action="@{/product/items/{itemId}/edit(itemId=${item.id})}" th:object="${item}" method="post">
+        <!-- 상품 ID -->
+        <div>
+            <label for="id">상품 ID</label>
+            <input type="text" id="id" th:field="*{id}" readonly>
+        </div>
+        <!-- 상품명 -->
+        <div>
+            <label for="itemName">상품명</label>
+            <input type="text" id="itemName" th:field="*{itemName}">
+        </div>
+        <!-- 가격 -->
+        <div>
+            <label for="price">가격</label>
+            <input type="text" id="price" th:field="*{price}">
+        </div>
+        <!-- 수량 -->
+        <div>
+            <label for="quantity">수량</label>
+            <input type="text" id="quantity" th:field="*{quantity}">
+        </div>
+
+        <hr>
+        <!-- 판매 여부 -->
+        <div class="form-group">
+            <label>판매 여부</label>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" th:id="'open_checkbox'" th:field="*{open}"
+                       th:checked="${item.open != null and item.open}" />
+                <label th:for="'open_checkbox'">판매 오픈</label>
+            </div>
+        </div>
+
+
+        <!-- 등록 지역 -->
+        <div class="form-group">
+            <label>등록 지역</label>
+            <div class="checkbox-group">
+                <div th:each="region : ${regions}">
+                    <!-- 체크박스 -->
+                    <input type="checkbox"
+                           th:value="${region.code}"
+                           th:name="regions"
+                    th:id="'regions_' + ${region.code}"
+                    th:checked="${item.regions != null and item.regions.contains(region)}" />
+                    <label th:for="'regions_' + ${region.code}" th:text="${region.displayName}"></label>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 상품 종류 -->
+        <div class="form-group">
+            <label>상품 종류</label>
+            <div class="radio-group">
+                <div th:each="type : ${itemTypes}">
+                    <input type="radio" th:value="${type.code}" th:name="itemType"
+                           th:checked="${item.itemType != null and item.itemType.code == type.code}"
+                           th:id="'itemType_' + ${type.code}" />
+                    <label th:for="'itemType_' + ${type.code}" th:text="${type.description}"></label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 배송 방식 -->
+        <div class="form-group">
+            <label>배송 방식</label>
+            <select th:field="*{deliveryCode}">
+                <option value="">==배송 방식 선택==</option>
+                <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                        th:text="${deliveryCode.displayName}"
+                        th:selected="${item.deliveryCode == deliveryCode.code}"></option>
+            </select>
+        </div>
+
+        <hr>
+
+        <div>
+            <button type="submit">저장</button>
+            <a th:href="@{/product/items/{itemId}(itemId=${item.id})}" class="btn-cancel">취소</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* 컨테이너 스타일 */
+.container {
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 폼 요소 스타일 */
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form input[type="number"],
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* 판매 여부 체크박스 스타일 */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 등록 지역 체크박스 그룹 */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 상품 종류 라디오 버튼 그룹 */
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 버튼 스타일 */
+form button[type="submit"],
+form a.btn-cancel {
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    border-radius: 5px;
+    font-size: 1em;
+    text-decoration: none;
+    color: white;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+form button[type="submit"] {
+    background-color: #28a745;
+    border: none;
+}
+
+form button[type="submit"]:hover {
+    background-color: #1e7e34;
+}
+
+form a.btn-cancel {
+    background-color: #dc3545;
+}
+
+form a.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+/* 제목 스타일 */
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}

@@ -1,0 +1,94 @@
+### HELP Documentation ###
+HELP.md
+
+### Build Directories ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Spring Tool Suite (STS) ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Java 및 Spring Boot ###
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+/.mvn/
+.gradle/
+build/
+*.log
+*.war
+*.jar
+*.ear
+/application.properties
+/application.yml
+/secrets/
+/config/
+/lombok.config
+
+### Python ###
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+/venv/
+/env/
+/*.env
+*.csv
+*.xls
+*.xlsx
+*.db
+*.h5
+/requirements.txt
+/Pipfile
+/Pipfile.lock
+*.ipynb_checkpoints
+
+### Oracle DB ###
+*.dmp
+*.log
+*.dat
+
+### IDE 및 OS 관련 ###
+/.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### 분석 결과 및 시각화 ###
+/results/
+*.png
+*.svg
+
+### 기타 민감 정보 ###
+/config/secrets.json
+/config/db_passwords.yml

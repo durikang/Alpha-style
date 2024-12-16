@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" th:href="@{/css/addForm.css}" href="../css/addForm.css">
+    <title>상품 등록</title>
+    <style>
+        /* 공통 폼 그룹 스타일 */
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* 라벨 스타일 */
+        .form-group label {
+            margin-right: 10px;
+            width: 120px; /* 라벨 고정 너비 */
+        }
+
+        /* 에러 메시지 스타일 */
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        /* 체크박스 및 라디오 버튼 정렬 */
+        .form-check,
+        .checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-grid div,
+        .form-check-label {
+            margin-right: 10px;
+        }
+
+        /* 드롭다운 (배송 방식) */
+        select {
+            margin-left: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<main>
+
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2>상품 등록 폼</h2>
+        </div>
+
+        <form action="item.html" th:action th:object="${item}" method="post">
+            <!-- 상품명 -->
+            <div>
+                <label for="itemName">상품명</label>
+                <input type="text" id="itemName" th:field="*{itemName}" placeholder="이름을 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('itemName')}" th:text="${#fields.errors('itemName')}"></span>
+            </div>
+
+            <!-- 가격 -->
+            <div>
+                <label for="price">가격</label>
+                <input type="text" id="price" th:field="*{price}" placeholder="가격을 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('price')}" th:text="${#fields.errors('price')}"></span>
+            </div>
+
+            <!-- 수량 -->
+            <div>
+                <label for="quantity">수량</label>
+                <input type="text" id="quantity" th:field="*{quantity}" placeholder="수량을 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('quantity')}" th:text="${#fields.errors('quantity')}"></span>
+            </div>
+
+            <hr>
+
+            <!-- 판매 여부 -->
+            <div class="form-group">
+                <label>판매 여부</label>
+                <div class="form-check">
+                    <input type="checkbox" id="open" th:field="*{open}">
+                    <label for="open" class="form-check-label">판매 오픈</label>
+                </div>
+            </div>
+
+            <!-- 등록 지역 -->
+            <div class="form-group">
+                <label>등록 지역</label>
+
+                <div class="checkbox-grid">
+                    <div th:each="region : ${regions}">
+                        <input type="checkbox" th:name="regions" th:value="${region.code}" th:id="'region_' + ${region.code}">
+                        <label th:for="'region_' + ${region.code}" th:text="${region.displayName}"></label>
+                    </div>
+                </div>
+                <span class="error" th:if="${#fields.hasErrors('regions')}" th:text="${#fields.errors('regions')}"></span>
+            </div>
+
+            <!-- 상품 종류 -->
+            <div class="form-group">
+                <label>상품 종류</label>
+
+                <div>
+                    <div th:each="type : ${itemTypes}">
+                        <input type="radio" th:name="itemType" th:value="${type.code}" th:id="'itemType_' + ${type.code}">
+                        <label th:for="'itemType_' + ${type.code}" th:text="${type.description}"></label>
+                    </div>
+                </div>
+                <span class="error" th:if="${#fields.hasErrors('itemType')}" th:text="${#fields.errors('itemType')}"></span>
+            </div>
+
+            <!-- 배송 방식 -->
+            <div class="form-group">
+                <label>배송 방식</label>
+
+                <select th:field="*{deliveryCode}">
+                    <option value="">==배송 방식 선택==</option>
+                    <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                            th:text="${deliveryCode.displayName}"></option>
+                </select>
+                <span class="error" th:if="${#fields.hasErrors('deliveryCode')}" th:text="${#fields.errors('deliveryCode')}"></span>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col">
+                    <button class="btn-lg" type="submit">상품 등록</button>
+                </div>
+                <div class="col">
+                    <a href="#" class="btn-cancel" th:href="@{/templates/user/items}">취소</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</main>
+</body>
+</html>

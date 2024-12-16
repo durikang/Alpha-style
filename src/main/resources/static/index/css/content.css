@@ -1,0 +1,16 @@
+/* content.css */
+main {
+    max-width: 1620px;
+    min-width: 1200px;
+    min-height: 100vh;
+    margin: 0 auto;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.5em;
+    color: #333;
+}

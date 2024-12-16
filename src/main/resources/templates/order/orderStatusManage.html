@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>주문 상태 관리</title>
+    <style>
+        .filter-form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px; /* 필터 요소 간 간격 */
+        }
+
+        .filter-form label {
+            font-weight: bold;
+        }
+
+        .filter-form select {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .filter-form button {
+            padding: 5px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filter-form button:hover {
+            background-color: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            color: #555;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .actions {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<main>
+    <h1>주문 상태 관리</h1>
+    <form class="filter-form" th:action="@{/orders/statusFilter}" method="get">
+        <label for="statusFilter">주문 상태 필터</label>
+        <select id="statusFilter" name="status">
+            <option value="전체" th:selected="${status == '전체'}">전체</option>
+            <option value="주문완료" th:selected="${status == '주문완료'}">주문완료</option>
+            <option value="배송중" th:selected="${status == '배송중'}">배송중</option>
+            <option value="배송완료" th:selected="${status == '배송완료'}">배송완료</option>
+        </select>
+        <button type="submit">필터 적용</button>
+    </form>
+    <form th:action="@{/orders/changeMultipleStatus}" method="post">
+        <div th:replace="~{common/fragments/order/orderTable :: orderTable(${orders}, '', true, true, false)}"></div>
+        <div class="actions">
+            <button type="submit">선택된 주문 상태 변경</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

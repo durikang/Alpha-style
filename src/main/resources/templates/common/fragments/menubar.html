@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="head">
+
+<header th:fragment="menu">
+    <!-- 네비게이션 메뉴 -->
+    <nav>
+        <ul>
+            <!-- 관리자 페이지 링크 -->
+            <li>
+                <a th:href="@{/}" href="/">관리자 페이지</a>
+            </li>
+            <li>상품 관리
+                <ul>
+                    <li><a th:href="@{/product/items}" href="/form/text-basic">상품 조회</a></li>
+                </ul>
+            </li>
+            <li>사용자 관리
+                <ul>
+                    <li><a th:href="@{/user/users}" href="/pages/variable">회원 정보 조회</a></li>
+                </ul>
+            </li>
+            <li>주문 관리
+                <ul>
+                    <li><a th:href="@{/orders/list}" href="/pages/variable">주문 조회</a></li>
+                    <li><a th:href="@{/orders/statusFilter}" href="/pages/variable">주문 상태 관리</a></li>
+                </ul>
+            </li>
+            <li>판매 관리
+                <ul>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 등록</a></li>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 조회</a></li>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 분석</a></li>
+                </ul>
+            </li>
+            <li>재무 관리
+                <ul>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">재무 데이터 조회</a></li>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">재무 데이터 분석</a></li>
+                </ul>
+            </li>
+            <li>
+                <a th:href="@{/logout}" href="/">로그아웃</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+</html>

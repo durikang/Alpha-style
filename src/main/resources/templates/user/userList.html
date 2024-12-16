@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 리스트 조회</title>
+  <style>
+    .actions {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-register {
+      background: #007bff;
+      color: white;
+      padding: 8px 15px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .btn-register:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-delete:hover {
+      background-color: #a71d2a;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h2>회원 리스트 조회</h2>
+
+  <!-- 상단 등록 버튼 -->
+  <div class="actions">
+    <a href="/user/users/add" class="btn btn-register">회원 등록</a>
+    <button class="btn btn-delete" id="deleteSelected">회원 삭제</button>
+  </div>
+
+  <table>
+    <thead>
+    <tr>
+      <th><input type="checkbox" id="selectAll"></th>
+      <th>회원 번호</th>
+      <th>아이디</th>
+      <th>이름</th>
+      <th>이메일</th>
+      <th>전화번호</th>
+      <th>역할</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 데이터가 없는 경우 -->
+    <tr th:if="${#lists.isEmpty(members)}">
+      <td colspan="7" class="no-data">등록된 회원이 없습니다.</td>
+    </tr>
+
+    <!-- 데이터가 있는 경우 -->
+    <tr th:each="member : ${members}" th:data-id="${member.userNo}"
+        th:data-details-url="@{/user/users/}"
+        class="clickable-row">
+      <td><input type="checkbox" th:value="${member.userNo}" class="select-checkbox"></td>
+      <td th:text="${member.userNo}">1</td>
+      <td th:text="${member.userId}">exampleUser</td>
+      <td th:text="${member.username}">홍길동</td>
+      <td th:text="${member.email}">example@example.com</td>
+      <td th:text="${member.mobilePhone}">010-1234-5678</td>
+      <td th:text="${member.role}">customer</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

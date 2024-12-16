@@ -1,0 +1,38 @@
+/* table-details.css */
+table {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    table-layout: auto;
+    word-wrap: break-word;
+}
+
+table th, table td {
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f9fafb;
+    color: #555;
+    font-weight: bold;
+}
+
+table tbody tr:nth-child(even), table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+th {
+    font-weight: bold;
+    color: #444;
+}
+
+td {
+    font-size: 14px;
+    color: #333;
+}

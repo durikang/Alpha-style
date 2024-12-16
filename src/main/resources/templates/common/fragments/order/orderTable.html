@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- common/fragments/orderTable.html -->
+<div th:fragment="orderTable(orders, detailsUrl, showCheckbox, showStatusSelect, enableRowClick)">
+    <table>
+        <thead>
+        <tr>
+            <th th:if="${showCheckbox}">
+                <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes(this)">
+            </th>
+            <th>주문 번호</th>
+            <th>사용자 번호</th>
+            <th>주문 날짜</th>
+            <th>총 금액</th>
+            <th>배송 상태</th>
+            <th th:if="${showStatusSelect}">상태 변경</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}" th:data-id="${order.orderNo}"
+            th:data-details-url="${enableRowClick ? detailsUrl : ''}"
+            th:classappend="${enableRowClick ? 'clickable-row' : ''}">
+            <td th:if="${showCheckbox}">
+                <input type="checkbox" name="selectedOrders" th:value="${order.orderNo}">
+            </td>
+            <td th:text="${order.orderNo}">주문 번호</td>
+            <td th:text="${order.userNo}">사용자 번호</td>
+            <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">주문 날짜</td>
+            <td th:text="${order.totalAmount}">총 금액</td>
+            <td th:text="${order.displayName}">배송 상태</td>
+            <td th:if="${showStatusSelect}">
+                <select name="status_${order.orderNo}">
+                    <option th:each="status : ${statuses}"
+                            th:value="${status.code}"
+                            th:selected="${status.code == order.delivaryStatus}"
+                            th:text="${status.displayName}">
+                    </option>
+                </select>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    // 전체 선택/해제
+    function toggleAllCheckboxes(source) {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name="selectedOrders"]');
+        checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+    }
+</script>
+</html>

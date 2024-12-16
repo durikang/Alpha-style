@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / FooterFragment 임을 선언-->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="alertBar">
+
+<!-- 알림 바 -->
+<script th:src="@{/alert/js/alertEvent.js}" defer></script>
+<link th:inline="css" rel="stylesheet" th:href = "@{/alert/css/alert.css}" />
+
+<div th:if="${alert != null and alert.status}" class="alert-bar">
+    <p th:text="${alert.title}">알림 메시지</p>
+    <button class="close-btn">×</button>
+</div>
+
+
+</html>

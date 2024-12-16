@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <link th:inline="css" rel="stylesheet" th:href = "@{/index/css/table-list.css}"href="./index/css/responsive.css" />
+    <title>주문 목록</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            color: #555;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>주문 목록</h1>
+    <!-- detailsUrl을 매개변수로 명확히 전달 -->
+    <div th:replace="~{common/fragments/order/orderTable :: orderTable(${orders}, ${detailsUrl}, false, false, true)}"></div>
+</main>
+
+</body>
+</html>
