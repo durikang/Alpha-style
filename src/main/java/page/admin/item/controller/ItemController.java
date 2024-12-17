@@ -2,6 +2,7 @@ package page.admin.item.controller;
 
 import page.admin.item.domain.Item;
 import page.admin.item.domain.dto.ItemSaveForm;
+import page.admin.member.domain.Member;
 import page.admin.utils.Alert;
 import page.admin.item.service.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +44,20 @@ public class ItemController {
     @PostMapping("/add")
     public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form,
                           BindingResult bindingResult,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          @SessionAttribute(name = "loginMember", required = false) Member loginMember) {
+
         if (bindingResult.hasErrors()) {
             return "product/addForm";
         }
 
+        if (loginMember == null) {
+            bindingResult.reject("loginRequired", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
         try {
-            itemService.saveItem(form);
+            itemService.saveItem(form, loginMember); // 로그인 사용자 정보 전달
             redirectAttributes.addFlashAttribute("message", "상품이 등록되었습니다.");
             return "redirect:/product/items";
         } catch (Exception e) {

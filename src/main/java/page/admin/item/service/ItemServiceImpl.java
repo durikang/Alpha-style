@@ -2,6 +2,7 @@ package page.admin.item.service;
 
 import org.springframework.context.annotation.Primary;
 import page.admin.item.domain.dto.ItemSaveForm;
+import page.admin.member.domain.Member;
 import page.admin.utils.file.FileStore;
 import page.admin.item.domain.*;
 import page.admin.item.repository.DeliveryCodeRepository;
@@ -28,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
     private final FileStore fileStore;
 
     @Override
-    public Item saveItem(ItemSaveForm form) throws IOException {
+    public Item saveItem(ItemSaveForm form, Member seller) throws IOException {
         UploadFile mainImage = fileStore.storeFile(form.getMainImage());
         List<UploadFile> thumbnails = fileStore.storeFiles(form.getThumbnails());
 
@@ -39,15 +40,16 @@ public class ItemServiceImpl implements ItemService {
         DeliveryCode deliveryCode = deliveryCodeRepository.findByCode(form.getDeliveryCode())
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 DeliveryCode입니다."));
 
-        // Item 객체 생성
+        // Item 객체 생성 (판매자 추가)
         Item item = new Item(
                 form.getItemName(), form.getPrice(), form.getQuantity(),
                 form.getOpen(), regions, itemType, deliveryCode,
-                mainImage, thumbnails
+                mainImage, thumbnails, seller // 판매자 추가
         );
 
         return itemRepository.save(item);
     }
+
 
     @Override
     public Item getItem(Long id) {
