@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="page.mapper.ItemMapper">
+
+    <!-- 저장 -->
+    <insert id="save" parameterType="page.admin.item.domain.Item">
+        INSERT INTO item (item_name, price, quantity, open)
+        VALUES (#{itemName}, #{price}, #{quantity}, #{open})
+    </insert>
+
+    <!-- 단건 조회 -->
+    <select id="findById" parameterType="long" resultType="page.admin.item.domain.Item">
+        SELECT * FROM item WHERE id = #{id}
+    </select>
+
+    <!-- 전체 조회 -->
+    <select id="findAll" resultType="page.admin.item.domain.Item">
+        SELECT * FROM item
+    </select>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="page.admin.item.domain.Item">
+        UPDATE item
+        SET item_name = #{itemName},
+            price = #{price},
+            quantity = #{quantity},
+            open = #{open}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM item WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -47,7 +47,9 @@
     </tr>
     <tr>
       <th>주소</th>
-      <td th:text="${member.address + ' ' + member.secondaryAddress}">서울시 강남구 테헤란로 123</td>
+      <td th:text="${member.address + ' ' + #strings.defaultString(member.secondaryAddress, '')}">
+        서울시 강남구 테헤란로 123
+      </td>
     </tr>
     <tr>
       <th>우편번호</th>

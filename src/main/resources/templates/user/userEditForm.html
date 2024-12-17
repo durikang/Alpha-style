@@ -96,41 +96,55 @@
     <h2>회원 수정</h2>
 
     <div class="form-container">
-        <form th:action="@{/user/users/{userNo}/edit(userNo=${member.userNo})}" method="post">
+        <form th:action="@{/user/users/{userNo}/edit(userNo=${updateForm.userNo != null ? updateForm.userNo : ''})}"
+              method="post"
+              th:object="${updateForm}">
             <div class="form-group">
                 <label for="userId">아이디</label>
-                <input type="text" id="userId" name="userId" th:value="${member.userId}" required>
+                <input type="text" id="userId" th:field="*{userId}" readonly>
             </div>
             <div class="form-group">
                 <label for="username">이름</label>
-                <input type="text" id="username" name="username" th:value="${member.username}" required>
-            </div>
-            <div class="form-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" name="password" th:value="${member.password}" required>
+                <input type="text" id="username" th:field="*{username}" required>
+                <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="email">이메일</label>
-                <input type="email" id="email" name="email" th:value="${member.email}" required>
+                <input type="email" id="email" th:field="*{email}" required>
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" th:field="*{password}">
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="mobilePhone">휴대전화</label>
-                <input type="text" id="mobilePhone" name="mobilePhone" th:value="${member.mobilePhone}" required>
+                <input type="text" id="mobilePhone" th:field="*{mobilePhone}" required>
+                <div th:if="${#fields.hasErrors('mobilePhone')}" th:errors="*{mobilePhone}" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="address">주소</label>
-                <input type="text" id="address" name="address" th:value="${member.address}" required>
+                <input type="text" id="address" th:field="*{address}" required>
+                <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="secondaryAddress">상세 주소</label>
+                <input type="text" id="secondaryAddress" th:field="*{secondaryAddress}">
+                <div th:if="${#fields.hasErrors('secondaryAddress')}" th:errors="*{secondaryAddress}" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="zipCode">우편번호</label>
-                <input type="text" id="zipCode" name="zipCode" th:value="${member.zipCode}" required>
+                <input type="text" id="zipCode" th:field="*{zipCode}" required>
+                <div th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="role">역할</label>
-                <select id="role" name="role" th:value="${member.role}" required>
-                    <option value="customer" th:selected="${member.role == 'customer'}">Customer</option>
-                    <option value="admin" th:selected="${member.role == 'admin'}">Admin</option>
+                <select id="role" th:field="*{role}" required>
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
                 </select>
+                <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}" class="error-message"></div>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-save">수정</button>
