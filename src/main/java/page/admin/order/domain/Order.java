@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import page.admin.common.BaseEntity;
+import page.admin.member.domain.Member;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +23,9 @@ public class Order extends BaseEntity {
     @SequenceGenerator(name = "order_seq_generator", sequenceName = "order_seq", allocationSize = 1)
     private Long orderNo; // 주문 번호 (PK)
 
-    private Long userNo; // 사용자 번호
+    @ManyToOne
+    @JoinColumn(name = "user_no", referencedColumnName = "userNo", nullable = false)
+    private Member user; // 사용자 (FK)
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date orderDate; // 주문 날짜

@@ -52,8 +52,8 @@ public class Item extends BaseEntity {
 
     // 판매자 (Member와 다대일 관계)
     @ManyToOne
-    @JoinColumn(name = "seller_id") // 외래 키 컬럼 이름 설정
-    private Member seller;
+    @JoinColumn(name = "user_no", referencedColumnName = "userNo") // Member의 userNo와 매핑
+    private Member seller; // 판매자
 
     public Item(String itemName, Long price, Integer quantity, Boolean open,
                 List<Region> regions, ItemType itemType, DeliveryCode deliveryCode,

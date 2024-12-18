@@ -18,7 +18,7 @@ public class OrderDetail {
     private Long orderDetailNo; // 주문 상세 번호 (PK)
 
     @ManyToOne
-    @JoinColumn(name = "order_no", nullable = false)
+    @JoinColumn(name = "order_no", referencedColumnName = "orderNo", nullable = false)
     private Order order; // 주문 번호 (FK)
 
     @ManyToOne
@@ -29,7 +29,7 @@ public class OrderDetail {
 
     private Long subtotal; // 소계 (계산된 금액)
 
-    // 소계 계산 메서드 (값만 설정, 비즈니스 로직은 서비스에서 수행)
+    // 소계 계산 메서드
     public void calculateSubtotal() {
         if (item != null) {
             long price = item.getPrice() != null ? item.getPrice() : 0;

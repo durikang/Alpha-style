@@ -2,6 +2,7 @@ package page.admin.item.service;
 
 import page.admin.item.domain.Item;
 import page.admin.item.domain.dto.ItemSaveForm;
+import page.admin.member.domain.Member;
 import page.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class ItemServiceMyBatisImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public Item saveItem(ItemSaveForm form) {
+    public Item saveItem(ItemSaveForm form, Member member) {
         // DTO -> Entity 변환
         Item item = new Item();
         item.setItemName(form.getItemName());
