@@ -3,13 +3,15 @@ package page.admin.item.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import page.admin.common.BaseEntity;
+import page.admin.member.domain.Member;
 
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Item {
+public class Item extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq_generator")
@@ -48,6 +50,11 @@ public class Item {
     @JoinColumn(name = "delivery_code_id")
     private DeliveryCode deliveryCode;
 
+    // 판매자 (Member와 다대일 관계)
+    @ManyToOne
+    @JoinColumn(name = "seller_id") // 외래 키 컬럼 이름 설정
+    private Member seller;
+
     public Item(String itemName, Long price, Integer quantity, Boolean open,
                 List<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
                 UploadFile mainImage, List<UploadFile> thumbnails) {
@@ -60,5 +67,19 @@ public class Item {
         this.deliveryCode = deliveryCode;
         this.mainImage = mainImage;
         this.thumbnails = thumbnails;
+    }
+    public Item(String itemName, Long price, Integer quantity, Boolean open,
+                List<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
+                UploadFile mainImage, List<UploadFile> thumbnails,Member seller) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+        this.open = open;
+        this.regions = regions;
+        this.itemType = itemType;
+        this.deliveryCode = deliveryCode;
+        this.mainImage = mainImage;
+        this.thumbnails = thumbnails;
+        this.seller = seller;
     }
 }

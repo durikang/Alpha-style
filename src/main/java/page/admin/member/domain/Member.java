@@ -3,14 +3,17 @@ package page.admin.member.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import page.admin.common.BaseEntity;
+import page.admin.item.domain.Item;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "members") // 테이블 이름 설정
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_seq_generator")
@@ -52,4 +55,8 @@ public class Member {
 
     @Column(nullable = false)
     private String role; // 역할 (admin, customer)
+
+    // 등록한 상품들 (양방향 매핑)
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items;
 }
