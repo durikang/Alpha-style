@@ -19,7 +19,6 @@ public class FileStore {
 
     private static final int MAX_THUMBNAILS = 4; // 최대 썸네일 수
 
-
     // 파일 저장 경로 반환
     public String getFullPath(String filename) {
         return fileDir + filename;
@@ -57,8 +56,12 @@ public class FileStore {
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
 
+        // 저장 디렉토리 확인 및 생성
+        ensureDirectoryExists();
+
         // 실제 파일 저장
-        multipartFile.transferTo(new File(getFullPath(storeFileName)));
+        File targetFile = new File(getFullPath(storeFileName));
+        multipartFile.transferTo(targetFile);
 
         // 저장된 파일 정보 반환
         return new UploadFile(originalFilename, storeFileName);
@@ -84,5 +87,19 @@ public class FileStore {
     private String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
+    }
+
+    /**
+     * 저장 디렉토리 확인 및 생성
+     * 파일 저장 경로가 없을 경우 디렉토리를 생성합니다.
+     */
+    private void ensureDirectoryExists() {
+        File directory = new File(fileDir);
+        if (!directory.exists()) {
+            boolean isCreated = directory.mkdirs();
+            if (!isCreated) {
+                throw new RuntimeException("파일 저장 디렉토리를 생성할 수 없습니다: " + fileDir);
+            }
+        }
     }
 }

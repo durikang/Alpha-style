@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderDetailDTO convertToDTO(Order order, OrderDetail detail) {
         OrderDetailDTO dto = new OrderDetailDTO();
         dto.setOrderNo(order.getOrderNo());
-        dto.setProductId(detail.getItem() != null ? detail.getItem().getId() : null);
+        dto.setProductId(detail.getItem() != null ? detail.getItem().getItemId() : null);
         dto.setItemName(detail.getItem() != null ? detail.getItem().getItemName() : "상품 없음");
         dto.setItemPrice(detail.getItem() != null ? detail.getItem().getPrice() : 0L);
         dto.setQuantity(detail.getQuantity());

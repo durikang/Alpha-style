@@ -1,10 +1,10 @@
 package page.admin.order.domain;
 
-import page.admin.item.domain.Item;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import page.admin.item.domain.Item;
 
 @Entity
 @Getter
@@ -15,28 +15,22 @@ public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_detail_seq_generator")
     @SequenceGenerator(name = "order_detail_seq_generator", sequenceName = "order_detail_seq", allocationSize = 1)
-    private Long orderDetailNo; // 주문 상세 번호 (PK)
+    private Long orderDetailNo;
 
     @ManyToOne
-    @JoinColumn(name = "order_no", referencedColumnName = "orderNo", nullable = false)
-    private Order order; // 주문 번호 (FK)
+    @JoinColumn(name = "order_no", nullable = false)
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_no", nullable = false)
-    private Item item; // 상품 정보 (FK)
+    private Item item;
 
-    private Integer quantity; // 수량
+    private Integer quantity;
+    private Long subtotal;
 
-    private Long subtotal; // 소계 (계산된 금액)
-
-    // 소계 계산 메서드
     public void calculateSubtotal() {
         if (item != null) {
-            long price = item.getPrice() != null ? item.getPrice() : 0;
-            int qty = quantity != null ? quantity : 0;
-            this.subtotal = price * qty;
-        } else {
-            this.subtotal = 0L;
+            this.subtotal = (item.getPrice() != null ? item.getPrice() : 0) * (quantity != null ? quantity : 0);
         }
     }
 }

@@ -51,11 +51,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${items}" th:data-id="${item.id}"
+            <tr th:each="item : ${items}" th:data-id="${item.itemId}"
                 th:data-details-url="@{/product/items/}"
                 class="clickable-row">
 
-                <td th:text="${item.id}">1</td>
+                <td th:text="${item.itemId}">1</td>
                 <td th:text="${item.itemName}">상품명</td>
                 <td th:text="${item.price}">10000</td>
                 <td th:text="${item.quantity}">10</td>

@@ -12,7 +12,7 @@ public class Region {
     @SequenceGenerator(name = "region_seq_generator", sequenceName = "region_seq", allocationSize = 1)
     private Long id;
 
-    private String code;          // 지역 코드
-    private String displayName;   // 화면 표시 이름
-    private Boolean active;       // 활성 상태 여부
+    private String code;
+    private String displayName;
+    private Boolean active;
 }

@@ -1,5 +1,6 @@
 package page.admin.aop;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import page.admin.common.BaseEntity;
 import page.admin.log.domain.SystemLog;
 import page.admin.log.repository.SystemLogRepository;
+import page.admin.member.domain.Member;
 
 import java.time.LocalDateTime;
 
@@ -43,16 +45,23 @@ public class AuditLogAspect {
         String performedBy = "unknown"; // 기본값
         Long entityId = null;
 
-        // 엔티티 ID와 수행자 가져오기
-        if (result != null && result instanceof BaseEntity) {
-            BaseEntity entity = (BaseEntity) result;
-            entityId = entity.getId();
+        // 엔티티 ID 가져오기
+        if (result != null) {
+            try {
+                entityId = (Long) result.getClass().getMethod("getId").invoke(result);
+            } catch (Exception e) {
+                log.warn("Unable to retrieve ID from entity: {}", result.getClass().getSimpleName());
+            }
         }
 
         for (Object arg : joinPoint.getArgs()) {
-            if (arg instanceof String) { // 예: 세션에서 유저 정보
-                performedBy = (String) arg;
-                break;
+            if (arg instanceof HttpSession) {
+                HttpSession session = (HttpSession) arg;
+                Member loginUser = (Member) session.getAttribute("loginUser");
+                if (loginUser != null) {
+                    performedBy = loginUser.getUsername(); // 로그인 사용자 이름 또는 ID
+                    break;
+                }
             }
         }
 
@@ -67,4 +76,5 @@ public class AuditLogAspect {
         systemLogRepository.save(logEntry);
         log.info("SystemLog 저장 완료: {}", logEntry);
     }
+
 }

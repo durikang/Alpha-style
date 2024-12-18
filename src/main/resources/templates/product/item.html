@@ -12,21 +12,29 @@
 </head>
 <body>
 
-
-
 <!-- 상품 상세 레이아웃 -->
 <div class="product-container">
 
     <!-- 왼쪽: 이미지 섹션 -->
     <div class="image-section">
         <div class="main-image-wrapper">
-            <img src="https://via.placeholder.com/400x500.png?text=Main+Image" alt="상품 이미지" class="main-image">
+            <!-- 메인 이미지 -->
+            <img th:src="${item.mainImage != null ? '/file/' + item.mainImage.storeFileName : 'https://via.placeholder.com/400x500.png?text=Main+Image'}"
+                 alt="상품 메인 이미지" class="main-image">
         </div>
         <div class="thumbnail-gallery">
-            <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+1" alt="썸네일 1" class="thumbnail">
-            <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+2" alt="썸네일 2" class="thumbnail">
-            <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+3" alt="썸네일 3" class="thumbnail">
-            <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+4" alt="썸네일 4" class="thumbnail">
+            <!-- 썸네일 1 -->
+            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 0 ? '/file/' + item.thumbnails[0].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'}"
+                 alt="썸네일 1" class="thumbnail">
+            <!-- 썸네일 2 -->
+            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 1 ? '/file/' + item.thumbnails[1].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'}"
+                 alt="썸네일 2" class="thumbnail">
+            <!-- 썸네일 3 -->
+            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 2 ? '/file/' + item.thumbnails[2].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'}"
+                 alt="썸네일 3" class="thumbnail">
+            <!-- 썸네일 4 -->
+            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 3 ? '/file/' + item.thumbnails[3].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'}"
+                 alt="썸네일 4" class="thumbnail">
         </div>
     </div>
 
@@ -37,7 +45,7 @@
         <!-- 상품 ID -->
         <div class="detail-row">
             <label>상품 ID</label>
-            <p th:text="${item.id}">12345</p>
+            <p th:text="${item.itemId}">12345</p>
         </div>
 
         <!-- 상품명 -->
@@ -88,7 +96,7 @@
 
         <!-- 버튼 -->
         <div class="buttons">
-            <a th:href="@{/product/items/{itemId}/edit(itemId=${item.id})}" class="btn-edit">상품 수정</a>
+            <a th:href="@{/product/items/{itemId}/edit(itemId=${item.itemId})}" class="btn-edit">상품 수정</a>
             <a th:href="@{/product/items}" class="btn-back">목록으로</a>
         </div>
     </div>

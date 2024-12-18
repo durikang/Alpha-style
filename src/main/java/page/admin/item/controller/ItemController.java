@@ -1,7 +1,14 @@
 package page.admin.item.controller;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import page.admin.item.domain.Item;
+import page.admin.item.domain.dto.ItemDetailForm;
 import page.admin.item.domain.dto.ItemSaveForm;
+import page.admin.item.domain.dto.ItemUpdateForm;
+import page.admin.item.service.DeliveryCodeService;
+import page.admin.item.service.ItemTypeService;
+import page.admin.item.service.RegionService;
 import page.admin.member.domain.Member;
 import page.admin.utils.Alert;
 import page.admin.item.service.ItemService;
@@ -21,6 +28,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ItemController {
 
     private final ItemService itemService;
+    private final RegionService regionService;        // 추가
+    private final ItemTypeService itemTypeService;    // 추가
+    private final DeliveryCodeService deliveryCodeService; // 추가
 
     @GetMapping
     public String items(Model model) {
@@ -30,7 +40,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable("itemId") Long itemId, @ModelAttribute("alert") Alert alert, Model model) {
-        Item item = itemService.getItem(itemId);
+        ItemDetailForm item = itemService.getItem(itemId);
         model.addAttribute("item", item);
         return "product/item";
     }
@@ -69,13 +79,40 @@ public class ItemController {
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable("itemId") Long itemId, Model model) {
-        model.addAttribute("item", itemService.getItem(itemId));
+        // ItemUpdateForm으로 데이터 매핑
+        ItemUpdateForm itemUpdateForm = itemService.getItemForUpdate(itemId);
+
+
+        System.out.println("itemUpdateForm : " + itemUpdateForm);
+
+
+        model.addAttribute("itemUpdateForm", itemUpdateForm);
+
+        // 연관 데이터 추가
+        model.addAttribute("regions", regionService.getAllRegions());
+        model.addAttribute("itemTypes", itemTypeService.getAllItemTypes());
+        model.addAttribute("deliveryCodes", deliveryCodeService.getAllDeliveryCodes());
+
         return "product/editForm";
     }
 
+
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable("itemId") Long itemId, @ModelAttribute Item item) {
-        itemService.updateItem(itemId, item);
+    public String updateItem(@PathVariable("itemId") Long itemId,
+                             @Valid @ModelAttribute("itemUpdateForm") ItemUpdateForm form,
+                             BindingResult bindingResult,
+                             HttpSession session,Model model) {
+        // 유효성 검증 실패 시
+        if (bindingResult.hasErrors()) {
+            // 에러 메시지와 함께 폼으로 리다이렉트
+            model.addAttribute("errors", bindingResult.getAllErrors());
+            return "product/editForm"; // 수정 폼 뷰로 반환
+        }
+
+        // 서비스 호출 (IOException은 서비스에서 처리됨)
+        itemService.updateItem(itemId, form);
+
         return "redirect:/product/items/" + itemId;
     }
+
 }

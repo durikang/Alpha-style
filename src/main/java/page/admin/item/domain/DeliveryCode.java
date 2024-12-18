@@ -12,6 +12,6 @@ public class DeliveryCode {
     @SequenceGenerator(name = "delivery_code_seq_generator", sequenceName = "delivery_code_seq", allocationSize = 1)
     private Long id;
 
-    private String code;          // 배송 상태 코드
-    private String displayName;   // 화면 표시 이름
+    private String code;
+    private String displayName;
 }
