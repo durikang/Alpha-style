@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import page.admin.member.domain.dto.LoginForm;
+import page.admin.member.domain.dto.LoginSessionInfo;
 import page.admin.member.service.MemberService;
 
 @Controller
@@ -20,16 +21,20 @@ public class BaseController {
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
-        String loggedInUser = (String) session.getAttribute("username");
-        String userRole = (String) session.getAttribute("role");
+        // 세션에서 LoginSessionInfo 객체를 가져옴
+        LoginSessionInfo sessionInfo = (LoginSessionInfo) session.getAttribute("loginMember");
 
-        if (loggedInUser != null && "admin".equals(userRole)) {
-            model.addAttribute("username", loggedInUser);
-            return "home";
+        // 로그인된 사용자 정보 확인
+        if (sessionInfo != null && "admin".equals(sessionInfo.getRole())) {
+            model.addAttribute("username", sessionInfo.getUsername());
+            return "home"; // 관리자를 위한 홈 화면
         }
+
+        // 로그인되지 않은 경우
         model.addAttribute("loginMember", new LoginForm());
-        return "index";
+        return "index"; // 로그인 페이지
     }
+
 
     @PostMapping("/login")
     public String login(
@@ -47,8 +52,15 @@ public class BaseController {
         var member = memberService.findByUserIdAndPassword(loginForm.getUserId(), loginForm.getPassword());
 
         if (member.isPresent() && "admin".equals(member.get().getRole())) {
-            session.setAttribute("username", member.get().getUsername());
-            session.setAttribute("role", member.get().getRole());
+            // 세션에 DTO 객체 저장
+            LoginSessionInfo sessionInfo = new LoginSessionInfo(
+                    member.get().getUserNo(),  // 사용자 번호 (PK)
+                    member.get().getUserId(),  // 로그인 ID
+                    member.get().getUsername(),// 사용자 이름
+                    member.get().getRole(),    // 역할
+                    member.get().getEmail()    // 이메일
+            );
+            session.setAttribute("loginMember", sessionInfo);
             return "redirect:/";
         }
 
@@ -57,6 +69,7 @@ public class BaseController {
         model.addAttribute("loginMember", loginForm);
         return "index";
     }
+
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {

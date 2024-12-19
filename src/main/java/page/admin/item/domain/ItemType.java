@@ -12,6 +12,6 @@ public class ItemType {
     @SequenceGenerator(name = "item_type_seq_generator", sequenceName = "item_type_seq", allocationSize = 1)
     private Long id;
 
-    private String code;          // 아이템 종류 코드
-    private String description;   // 설명
+    private String code;
+    private String description;
 }

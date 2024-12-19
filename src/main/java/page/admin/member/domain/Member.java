@@ -3,53 +3,59 @@ package page.admin.member.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import page.admin.common.BaseEntity;
+import page.admin.item.domain.Item;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "members") // 테이블 이름 설정
-public class Member {
+@Table(name = "members")
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_seq_generator")
     @SequenceGenerator(name = "member_seq_generator", sequenceName = "member_seq", allocationSize = 1)
-    private Long userNo; // 사용자 번호 (PK)
+    private Long userNo;
 
     @Column(nullable = false, unique = true)
-    private String userId; // 사용자 ID
+    private String userId;
 
     @Column(nullable = false)
-    private String username; // 사용자 이름
+    private String username;
 
     @Column(nullable = false)
-    private String password; // 비밀번호
+    private String password;
 
     @Column(nullable = false)
-    private String email; // 이메일
+    private String email;
 
     @Column(name = "mobile_phone")
-    private String mobilePhone; // 휴대전화
+    private String mobilePhone;
 
     @Column(nullable = false)
-    private String address; // 기본 주소
+    private String address;
 
     @Column(name = "zip_code")
-    private String zipCode; // 우편번호
+    private String zipCode;
 
     @Column(name = "secondary_address")
-    private String secondaryAddress; // 상세 주소 (나머지 주소)
+    private String secondaryAddress;
 
     @Column(name = "birth_date")
-    private LocalDate birthDate; // 생년월일
+    private LocalDate birthDate;
 
     @Column(name = "security_question")
-    private String securityQuestion; // 비밀번호 확인 질문
+    private String securityQuestion;
 
     @Column(name = "security_answer")
-    private String securityAnswer; // 비밀번호 확인 답변
+    private String securityAnswer;
 
     @Column(nullable = false)
-    private String role; // 역할 (admin, customer)
+    private String role;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true) // 연관된 Item 삭제
+    private List<Item> items;
 }

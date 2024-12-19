@@ -9,98 +9,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 수정</title>
     <link rel="stylesheet" th:href="@{/css/editForm.css}" href="../css/editForm.css">
+
+    <style>
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            margin-right: 10px;
+            width: 120px;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .image-preview {
+            width: 400px;
+            height: 500px;
+            margin-bottom: 10px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .image-preview:hover {
+            background-color: #e9f5ff;
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumbnail-preview {
+            width: 80px;
+            height: 100px;
+            border: 1px dashed #ccc;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .thumbnail-preview:hover {
+            background-color: #e9f5ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-
 <div class="container">
+    <h2>상품 수정 폼</h2>
+    <form th:action="@{/product/items/{itemId}/edit(itemId=${itemUpdateForm.itemId})}"
+          th:object="${itemUpdateForm}" method="post" enctype="multipart/form-data">
 
-    <div class="py-5 text-center">
-        <h2>상품 수정 폼</h2>
-    </div>
-
-    <form action="item.html" th:action="@{/product/items/{itemId}/edit(itemId=${item.id})}" th:object="${item}" method="post">
         <!-- 상품 ID -->
-        <div>
+        <div class="form-group">
             <label for="id">상품 ID</label>
-            <input type="text" id="id" th:field="*{id}" readonly>
+            <input type="text" id="id" th:field="*{itemId}" readonly>
         </div>
+
         <!-- 상품명 -->
-        <div>
+        <div class="form-group">
             <label for="itemName">상품명</label>
             <input type="text" id="itemName" th:field="*{itemName}">
-        </div>
-        <!-- 가격 -->
-        <div>
-            <label for="price">가격</label>
-            <input type="text" id="price" th:field="*{price}">
-        </div>
-        <!-- 수량 -->
-        <div>
-            <label for="quantity">수량</label>
-            <input type="text" id="quantity" th:field="*{quantity}">
+            <span class="error" th:if="${#fields.hasErrors('itemName')}" th:text="${#fields.errors('itemName')}"></span>
         </div>
 
-        <hr>
+        <!-- 가격 -->
+        <div class="form-group">
+            <label for="price">가격</label>
+            <input type="number" id="price" th:field="*{price}">
+            <span class="error" th:if="${#fields.hasErrors('price')}" th:text="${#fields.errors('price')}"></span>
+        </div>
+
+        <!-- 수량 -->
+        <div class="form-group">
+            <label for="quantity">수량</label>
+            <input type="number" id="quantity" th:field="*{quantity}">
+            <span class="error" th:if="${#fields.hasErrors('quantity')}" th:text="${#fields.errors('quantity')}"></span>
+        </div>
+
         <!-- 판매 여부 -->
         <div class="form-group">
-            <label>판매 여부</label>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" th:id="'open_checkbox'" th:field="*{open}"
-                       th:checked="${item.open != null and item.open}" />
-                <label th:for="'open_checkbox'">판매 오픈</label>
-            </div>
+            <label for="open">판매 여부</label>
+            <input type="checkbox" id="open" th:field="*{open}">
         </div>
-
 
         <!-- 등록 지역 -->
         <div class="form-group">
             <label>등록 지역</label>
-            <div class="checkbox-group">
+            <div>
                 <div th:each="region : ${regions}">
-                    <!-- 체크박스 -->
                     <input type="checkbox"
                            th:value="${region.code}"
-                           th:name="regions"
-                    th:id="'regions_' + ${region.code}"
-                    th:checked="${item.regions != null and item.regions.contains(region)}" />
+                           th:name="regionCodes"
+                           th:checked="${itemUpdateForm.regionCodes.contains(region.code)}"
+                           th:id="'regions_' + ${region.code}" />
                     <label th:for="'regions_' + ${region.code}" th:text="${region.displayName}"></label>
                 </div>
             </div>
         </div>
 
-
         <!-- 상품 종류 -->
         <div class="form-group">
             <label>상품 종류</label>
-            <div class="radio-group">
-                <div th:each="type : ${itemTypes}">
-                    <input type="radio" th:value="${type.code}" th:name="itemType"
-                           th:checked="${item.itemType != null and item.itemType.code == type.code}"
-                           th:id="'itemType_' + ${type.code}" />
-                    <label th:for="'itemType_' + ${type.code}" th:text="${type.description}"></label>
-                </div>
+            <div th:each="type : ${itemTypes}">
+                <input type="radio" th:id="'type_' + ${type.code}"
+                       th:value="${type.code}" th:field="*{itemType}">
+                <label th:for="'type_' + ${type.code}" th:text="${type.description}"></label>
             </div>
         </div>
 
         <!-- 배송 방식 -->
         <div class="form-group">
-            <label>배송 방식</label>
-            <select th:field="*{deliveryCode}">
+            <label for="deliveryCode">배송 방식</label>
+            <select id="deliveryCode" th:field="*{deliveryCode}">
                 <option value="">==배송 방식 선택==</option>
-                <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
-                        th:text="${deliveryCode.displayName}"
-                        th:selected="${item.deliveryCode == deliveryCode.code}"></option>
+                <option th:each="deliveryCode : ${deliveryCodes}"
+                        th:value="${deliveryCode.code}"
+                        th:text="${deliveryCode.displayName}"></option>
             </select>
+            <span class="error" th:if="${#fields.hasErrors('deliveryCode')}" th:text="${#fields.errors('deliveryCode')}"></span>
         </div>
 
-        <hr>
-
-        <div>
-            <button type="submit">저장</button>
-            <a th:href="@{/product/items/{itemId}(itemId=${item.id})}" class="btn-cancel">취소</a>
+        <!-- 메인 이미지 -->
+        <div class="image-upload-container">
+            <label>메인 이미지</label>
+            <div class="image-preview" id="mainImagePreview" onclick="document.getElementById('mainImageInput').click();">
+                <img th:if="${itemUpdateForm.mainImage != null}"
+                     th:src="@{'/' + ${itemUpdateForm.mainImage.storeFileName}}"
+                     alt="메인 이미지">
+                <p th:if="${itemUpdateForm.mainImage == null}">이미지를 클릭하여 업로드</p>
+            </div>
+            <input type="file" id="mainImageInput" name="mainImage" accept="image/*">
         </div>
+
+        <!-- 썸네일 이미지 -->
+        <div class="image-upload-container">
+            <label>썸네일 이미지</label>
+            <div class="thumbnail-gallery" id="thumbnailGallery">
+                <!-- 썸네일 1 -->
+                <div class="thumbnail-preview" id="thumb1Preview" onclick="document.getElementById('thumbnailInput').click();">
+                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 0}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[0].storeFileName}}"
+                         alt="썸네일 1" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <!-- 썸네일 2 -->
+                <div class="thumbnail-preview" id="thumb2Preview" onclick="document.getElementById('thumbnailInput').click();">
+                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 1}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[1].storeFileName}}"
+                         alt="썸네일 2" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <!-- 썸네일 3 -->
+                <div class="thumbnail-preview" id="thumb3Preview" onclick="document.getElementById('thumbnailInput').click();">
+                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 2}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[2].storeFileName}}"
+                         alt="썸네일 3" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <!-- 썸네일 4 -->
+                <div class="thumbnail-preview" id="thumb4Preview" onclick="document.getElementById('thumbnailInput').click();">
+                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 3}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[3].storeFileName}}"
+                         alt="썸네일 4" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+            <!-- 썸네일 업로드 버튼 -->
+            <input type="file" id="thumbnailInput" name="thumbnails" accept="image/*" multiple>
+            <button type="button" class="upload-btn" onclick="document.getElementById('thumbnailInput').click();">
+                썸네일 업로드
+            </button>
+            <span class="error" th:if="${#fields.hasErrors('thumbnails')}" th:text="${#fields.errors('thumbnails')}"></span>
+        </div>
+
+        <button class="btn-lg" type="submit">상품 수정</button>
     </form>
-
 </div>
+<script>
+    const mainImageInput = document.getElementById('mainImageInput');
+    const mainImagePreview = document.getElementById('mainImagePreview');
+    const thumbnailInput = document.getElementById('thumbnailInput');
+
+    mainImageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                mainImagePreview.innerHTML = `<img src="${e.target.result}" alt="메인 이미지">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    thumbnailInput.addEventListener('change', function () {
+        const gallery = document.getElementById('thumbnailGallery');
+        gallery.innerHTML = '';
+        Array.from(this.files).slice(0, 4).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'thumbnail-preview';
+                thumbnail.innerHTML = `<img src="${e.target.result}" alt="썸네일 ${index + 1}">`;
+                gallery.appendChild(thumbnail);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
 </body>
 </html>

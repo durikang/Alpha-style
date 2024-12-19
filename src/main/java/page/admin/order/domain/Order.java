@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import page.admin.common.BaseEntity;
+import page.admin.member.domain.Member;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,28 +15,30 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "orders") // 테이블 이름을 'orders'로 변경
-public class Order {
+@Table(name = "orders")
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq_generator")
     @SequenceGenerator(name = "order_seq_generator", sequenceName = "order_seq", allocationSize = 1)
-    private Long orderNo; // 주문 번호 (PK)
+    private Long orderNo;
 
-    private Long userNo; // 사용자 번호
+    @ManyToOne
+    @JoinColumn(name = "user_no", nullable = false)
+    private Member user;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date orderDate; // 주문 날짜
+    private Date orderDate;
 
-    private Double totalAmount; // 총 금액
+    private Double totalAmount;
 
-    private String deliveryStatus; // 배송 상태
+    private String deliveryStatus;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true) // 부모 삭제 시 자식도 삭제
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     public void addOrderDetail(OrderDetail detail) {
-        detail.setOrder(this); // 연관관계 설정
+        detail.setOrder(this);
         this.orderDetails.add(detail);
     }
 }

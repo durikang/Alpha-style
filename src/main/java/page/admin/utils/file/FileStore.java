@@ -1,6 +1,7 @@
 package page.admin.utils.file;
 
 import page.admin.item.domain.UploadFile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class FileStore {
 
@@ -19,18 +21,12 @@ public class FileStore {
 
     private static final int MAX_THUMBNAILS = 4; // 최대 썸네일 수
 
-
     // 파일 저장 경로 반환
     public String getFullPath(String filename) {
         return fileDir + filename;
     }
 
-    /**
-     * 다중 파일 저장
-     * @param multipartFiles 업로드된 파일 리스트
-     * @return 저장된 파일 리스트
-     * @throws IOException 파일 저장 중 예외 발생
-     */
+    // 다중 파일 저장
     public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
         List<UploadFile> storeFileResult = new ArrayList<>();
         for (int i = 0; i < Math.min(multipartFiles.size(), MAX_THUMBNAILS); i++) {
@@ -42,12 +38,7 @@ public class FileStore {
         return storeFileResult;
     }
 
-    /**
-     * 단일 파일 저장
-     * @param multipartFile 업로드된 파일
-     * @return 저장된 파일 정보
-     * @throws IOException 파일 저장 중 예외 발생
-     */
+    // 단일 파일 저장
     public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
@@ -57,32 +48,56 @@ public class FileStore {
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
 
+        // 저장 디렉토리 확인 및 생성
+        ensureDirectoryExists();
+
         // 실제 파일 저장
-        multipartFile.transferTo(new File(getFullPath(storeFileName)));
+        File targetFile = new File(getFullPath(storeFileName));
+        multipartFile.transferTo(targetFile);
 
         // 저장된 파일 정보 반환
         return new UploadFile(originalFilename, storeFileName);
     }
 
-    /**
-     * 파일명 생성
-     * UUID 기반으로 저장용 파일명을 생성
-     * @param originalFilename 원본 파일명
-     * @return 저장용 파일명
-     */
-    private String createStoreFileName(String originalFilename) {
-        String ext = extractExt(originalFilename); // 확장자 추출
-        String uuid = UUID.randomUUID().toString(); // UUID 생성
-        return uuid + "." + ext; // UUID.확장자 형태로 저장
+    // 파일 삭제
+    public void deleteFile(String storeFileName) {
+        if (storeFileName == null || storeFileName.isEmpty()) {
+            return;
+        }
+        File file = new File(getFullPath(storeFileName));
+        if (file.exists()) {
+            if (file.delete()) {
+                log.info("파일 삭제 성공: {}", file.getAbsolutePath());
+            } else {
+                log.warn("파일 삭제 실패: {}", file.getAbsolutePath());
+            }
+        } else {
+            log.warn("파일이 존재하지 않아 삭제할 수 없음: {}", file.getAbsolutePath());
+        }
     }
 
-    /**
-     * 확장자 추출
-     * @param originalFilename 원본 파일명
-     * @return 확장자 (예: png, jpg)
-     */
+    // 파일명 생성
+    private String createStoreFileName(String originalFilename) {
+        String ext = extractExt(originalFilename);
+        String uuid = UUID.randomUUID().toString();
+        return uuid + "." + ext;
+    }
+
+    // 확장자 추출
     private String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
+    }
+
+    // 저장 디렉토리 확인 및 생성
+    private void ensureDirectoryExists() {
+        File directory = new File(fileDir);
+        if (!directory.exists()) {
+            boolean isCreated = directory.mkdirs();
+            log.info("디렉토리 생성: {}", directory.getPath());
+            if (!isCreated) {
+                throw new RuntimeException("파일 저장 디렉토리를 생성할 수 없습니다: " + fileDir);
+            }
+        }
     }
 }
