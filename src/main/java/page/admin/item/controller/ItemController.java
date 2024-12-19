@@ -65,10 +65,14 @@ public class ItemController {
     public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form,
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes,
-                          @SessionAttribute(name = "loginMember", required = false) LoginSessionInfo loginSessionInfo) {
+                          @SessionAttribute(name = "loginMember", required = false) LoginSessionInfo loginSessionInfo,
+                          Model model) {
 
         // 유효성 검사 오류가 있는 경우 다시 등록 폼으로
         if (bindingResult.hasErrors()) {
+            model.addAttribute("regions", regionService.getAllRegions());
+            model.addAttribute("itemTypes", itemTypeService.getAllItemTypes());
+            model.addAttribute("deliveryCodes", deliveryCodeService.getAllDeliveryCodes());
             return "product/addForm";
         }
 

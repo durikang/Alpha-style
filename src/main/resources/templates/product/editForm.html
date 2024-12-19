@@ -148,7 +148,7 @@
             <label>메인 이미지</label>
             <div class="image-preview" id="mainImagePreview" onclick="document.getElementById('mainImageInput').click();">
                 <img th:if="${itemUpdateForm.mainImage != null}"
-                     th:src="@{'/uploaded/' + ${itemUpdateForm.mainImage.storeFileName}}"
+                     th:src="@{'/' + ${itemUpdateForm.mainImage.storeFileName}}"
                      alt="메인 이미지">
                 <p th:if="${itemUpdateForm.mainImage == null}">이미지를 클릭하여 업로드</p>
             </div>
@@ -162,25 +162,25 @@
                 <!-- 썸네일 1 -->
                 <div class="thumbnail-preview" id="thumb1Preview" onclick="document.getElementById('thumbnailInput').click();">
                     <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 0}"
-                         th:src="@{'/uploaded/' + ${itemUpdateForm.thumbnails[0].storeFileName}}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[0].storeFileName}}"
                          alt="썸네일 1" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 2 -->
                 <div class="thumbnail-preview" id="thumb2Preview" onclick="document.getElementById('thumbnailInput').click();">
                     <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 1}"
-                         th:src="@{'/uploaded/' + ${itemUpdateForm.thumbnails[1].storeFileName}}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[1].storeFileName}}"
                          alt="썸네일 2" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 3 -->
                 <div class="thumbnail-preview" id="thumb3Preview" onclick="document.getElementById('thumbnailInput').click();">
                     <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 2}"
-                         th:src="@{'/uploaded/' + ${itemUpdateForm.thumbnails[2].storeFileName}}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[2].storeFileName}}"
                          alt="썸네일 3" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 4 -->
                 <div class="thumbnail-preview" id="thumb4Preview" onclick="document.getElementById('thumbnailInput').click();">
                     <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 3}"
-                         th:src="@{'/uploaded/' + ${itemUpdateForm.thumbnails[3].storeFileName}}"
+                         th:src="@{'/' + ${itemUpdateForm.thumbnails[3].storeFileName}}"
                          alt="썸네일 4" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
             </div>
