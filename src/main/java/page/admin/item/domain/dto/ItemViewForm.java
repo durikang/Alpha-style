@@ -13,7 +13,7 @@ import java.util.Locale;
 
 @Getter
 @Setter
-public class ItemDetailForm {
+public class ItemViewForm {
     private Long itemId;             // 상품 ID
     private String itemName;         // 상품명
     private Long price;              // 가격

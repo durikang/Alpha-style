@@ -134,8 +134,8 @@
                 <label>등록 지역</label>
                 <div class="checkbox-grid">
                     <div th:each="region : ${regions}">
-                        <input type="checkbox" th:name="regions" th:value="${region.code}" th:id="'region_' + ${region.code}">
-                        <label th:for="'region_' + ${region.code}" th:text="${region.displayName}"></label>
+                        <input type="checkbox" th:name="regions" th:value="${region.id}" th:id="'region_' + ${region.id}">
+                        <label th:for="'region_' + ${region.id}" th:text="${region.displayName}"></label>
                     </div>
                 </div>
                 <span class="error" th:if="${#fields.hasErrors('regions')}" th:text="${#fields.errors('regions')}"></span>
