@@ -2,10 +2,18 @@ package page.admin.member.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import page.admin.member.domain.Member;
+import page.admin.member.domain.dto.MemberList;
 import page.admin.member.domain.dto.UpdateForm;
+import page.admin.member.exception.DuplicateMemberException;
+import page.admin.member.exception.MemberNotFoundException;
+import page.admin.member.mapper.MemberMapper;
 import page.admin.member.repository.MemberRepository;
 
 import java.util.List;
@@ -18,6 +26,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberMapper memberMapper;
 
     @Override
     public Optional<Member> findByUserIdAndPassword(String userId, String password) {
@@ -30,20 +39,66 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member getMemberById(Long userNo) {
-        return memberRepository.findById(userNo)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. ID: " + userNo));
+    public Page<Member> searchMembers(String keyword, Pageable pageable) {
+        String formattedKeyword = (keyword == null || keyword.isEmpty()) ? "%" : "%" + keyword + "%";
+        int startRow = (int) pageable.getOffset();
+        int endRow = startRow + pageable.getPageSize();
+        String sortField = pageable.getSort().isSorted() ?
+                pageable.getSort().iterator().next().getProperty() : "userNo";
+        String sortDirection = pageable.getSort().isSorted() && pageable.getSort().iterator().next().isAscending() ?
+                "ASC" : "DESC";
+
+        // 데이터와 총 개수 조회
+        List<Member> members = memberMapper.searchMembersWithPagination(
+                formattedKeyword, startRow, endRow, sortField, sortDirection
+        );
+        int total = memberMapper.countMembers(formattedKeyword);
+
+        // Page 객체 반환
+        return new PageImpl<>(members, pageable, total);
     }
 
     @Override
+    public Member getMemberById(Long userNo) {
+        return memberRepository.findById(userNo)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. ID: " + userNo));
+    }
+
+
+    @Override
     public Member saveMember(Member member) {
+//         아이디 중복 검사
+         Optional<Member> existingMember = findByUserId(member.getUserId());
+        if (existingMember.isPresent()) {
+            throw new DuplicateMemberException("이미 존재하는 아이디입니다.");
+        }
+
+        // 이메일 중복 검사 (필요 시)
+        // Optional<Member> existingEmail = memberRepository.findByEmail(member.getEmail());
+        // if (existingEmail.isPresent()) {
+        //     throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        // }
+
+        // 비밀번호 암호화 (추후 적용)
+        // member.setPassword(passwordEncoder.encode(member.getPassword()));
+
         return memberRepository.save(member);
     }
 
     @Override
     public void deleteMember(Long userNo) {
-        memberRepository.deleteById(userNo);
+        Member member = memberRepository.findById(userNo)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        // 자식 데이터 확인
+        if (!member.getItems().isEmpty()) {
+            throw new IllegalStateException("회원이 등록한 제품이 존재합니다.");
+        }
+
+        // 삭제 진행
+        memberRepository.delete(member);
     }
+
 
     @Override
     public Optional<Member> findByUserId(String userId) {

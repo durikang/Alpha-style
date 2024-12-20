@@ -2,6 +2,7 @@ package page.admin.member.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import page.admin.common.BaseEntity;
 import page.admin.item.domain.Item;
@@ -9,6 +10,7 @@ import page.admin.item.domain.Item;
 import java.time.LocalDate;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @NoArgsConstructor

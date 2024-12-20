@@ -1,6 +1,9 @@
 package page.admin.member.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import page.admin.member.domain.Member;
+import page.admin.member.domain.dto.MemberList;
 import page.admin.member.domain.dto.UpdateForm;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +28,5 @@ public interface MemberService {
      */
     void editMemberInfo(Long userNo, UpdateForm updateForm);
 
+    Page<Member> searchMembers(String keyword, Pageable pageable);
 }

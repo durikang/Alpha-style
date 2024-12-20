@@ -6,12 +6,13 @@
 
 <!-- 알림 바 -->
 <script th:src="@{/alert/js/alertEvent.js}" defer></script>
-<link th:inline="css" rel="stylesheet" th:href = "@{/alert/css/alert.css}" />
+<link th:inline="css" rel="stylesheet" th:href="@{/alert/css/alert.css}" />
 
-<div th:if="${alert != null and alert.status}" class="alert-bar">
+<div th:if="${alert != null and alert.active}"
+     th:classappend="${alert.type == T(page.admin.utils.Alert.AlertType).SUCCESS} ? 'alert-success' : 'alert-error'"
+     class="alert-bar">
     <p th:text="${alert.title}">알림 메시지</p>
     <button class="close-btn">×</button>
 </div>
-
 
 </html>

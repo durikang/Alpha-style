@@ -4,8 +4,6 @@
     left: 0;
     width: 100%; /* 화면 전체 너비 */
     z-index: 1000;
-    background-color: #28a745;
-    color: white;
     padding: 15px 20px;
     text-align: center; /* 텍스트 가운데 정렬 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -14,16 +12,31 @@
     transition: transform 0.5s ease, opacity 0.5s ease; /* 부드러운 이동 및 페이드 */
 }
 
+/* 알림 활성화 상태 */
 .alert-bar.show {
     transform: translateY(0); /* 화면으로 내려옴 */
     opacity: 1; /* 불투명 */
 }
 
+/* 알림 비활성화 상태 */
 .alert-bar.fade-out {
     transform: translateY(-100%); /* 화면 위로 올라감 */
     opacity: 0; /* 투명 */
 }
 
+/* 성공 메시지 */
+.alert-success {
+    background-color: #28a745; /* 초록색 */
+    color: white;
+}
+
+/* 에러 메시지 */
+.alert-error {
+    background-color: #dc3545; /* 빨간색 */
+    color: white;
+}
+
+/* 닫기 버튼 */
 .alert-bar .close-btn {
     background: none;
     border: none;
