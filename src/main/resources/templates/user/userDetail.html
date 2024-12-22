@@ -75,7 +75,7 @@
 
   <div class="btn-container">
     <a th:href="@{/user/users/{userNo}/edit(userNo=${member.userNo})}" class="btn">수정</a>
-    <a th:href="@{/user/users}" class="btn btn-back">목록으로</a>
+    <a th:href="@{/user/users(page=${page - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}" class="btn btn-back">목록으로</a>
     <form th:action="@{/user/users/{userNo}/delete(userNo=${member.userNo})}" method="post" style="display:inline;">
       <button type="submit" class="btn btn-delete">삭제</button>
     </form>

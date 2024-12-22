@@ -106,8 +106,8 @@
     </thead>
     <tbody>
     <tr th:each="member : ${members}"
+        th:data-details-url="@{/user/users/{userNo}(userNo=${member.userNo}, page=${currentPage}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
         th:data-id="${member.userNo}"
-        th:data-details-url="@{/user/users/}"
         class="clickable-row">
       <td><input type="checkbox" th:value="${member.userNo}" class="select-checkbox"></td>
       <td th:text="${member.userNo}"></td>
@@ -120,12 +120,21 @@
     </tbody>
   </table>
 
-  <div class="pagination">
-    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-       th:href="@{/user/users(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
-       th:classappend="${currentPage == i} ? 'active' : ''"
-       th:text="${i}"></a>
-  </div>
+    <div class="pagination">
+      <a th:if="${startPage > 1}"
+         th:href="@{/user/users(page=${startPage - 2}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}">
+        &laquo;
+      </a>
+      <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
+         th:href="@{/user/users(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
+         th:classappend="${currentPage == i} ? 'active' : ''"
+         th:text="${i}"></a>
+      <a th:if="${endPage < totalPages}"
+         th:href="@{/user/users(page=${endPage}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}">
+        &raquo;
+      </a>
+    </div>
+
   </div>
 </main>
 </body>

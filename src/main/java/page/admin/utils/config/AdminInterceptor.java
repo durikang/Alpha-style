@@ -21,7 +21,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         // 세션에서 LoginSessionInfo 객체 가져오기
         LoginSessionInfo sessionInfo = (LoginSessionInfo) session.getAttribute("loginMember");
 
-        if (sessionInfo == null || !"admin".equals(sessionInfo.getRole())) {
+        if (sessionInfo == null || !"admin".equalsIgnoreCase(sessionInfo.getRole())) {
             response.sendRedirect("/"); // 관리자가 아니면 로그인 페이지로 리다이렉트
             return false;
         }

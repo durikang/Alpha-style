@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.member.domain.Member;
 import page.admin.member.domain.dto.AddForm;
-import page.admin.member.domain.dto.MemberList;
 import page.admin.member.domain.dto.UpdateForm;
 import page.admin.member.service.MemberService;
 import page.admin.utils.Alert;
@@ -32,25 +30,33 @@ public class MemberController {
 
     @GetMapping
     public String listUsers(
+            @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 기본값 0
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
             @RequestParam(value = "sort", required = false, defaultValue = "userNo") String sortField,
             @RequestParam(value = "direction", required = false, defaultValue = "ASC") String sortDirection,
-            @PageableDefault(size = 10) Pageable pageable,
             Model model) {
 
         // 정렬 설정
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
 
-        // 페이지 요청 생성 (정렬 적용)
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        // 페이지 요청 생성 (0-based index)
+        Pageable sortedPageable = PageRequest.of(page, 10, sort);
 
         // 검색 및 페이징 처리
         Page<Member> members = memberService.searchMembers(keyword, sortedPageable);
 
+        // 페이지네이션 범위 계산
+        int currentPage = page + 1; // 0-based index → 1-based index로 변환
+        int totalPages = members.getTotalPages();
+        int startPage = Math.max(1, (currentPage - 1) / 10 * 10 + 1);
+        int endPage = Math.min(startPage + 9, totalPages);
+
         // 모델에 데이터 추가
         model.addAttribute("members", members.getContent());
-        model.addAttribute("totalPages", members.getTotalPages());
-        model.addAttribute("currentPage", members.getNumber() + 1);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
@@ -58,15 +64,26 @@ public class MemberController {
         return "user/userList"; // 뷰 반환
     }
 
-
-
-
     @GetMapping("/{userNo}")
-    public String viewUser(@PathVariable("userNo") Long userNo, @ModelAttribute("alert") Alert alert, Model model) {
+    public String viewUser(
+            @PathVariable("userNo") Long userNo,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+            @RequestParam(value = "sort", required = false, defaultValue = "userNo") String sortField,
+            @RequestParam(value = "direction", required = false, defaultValue = "ASC") String sortDirection,
+            Model model) {
         Member member = memberService.getMemberById(userNo);
+
         model.addAttribute("member", member);
+        model.addAttribute("page", page); // 현재 페이지 값 유지
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+
         return "user/userDetail";
     }
+
+
 
     @GetMapping("/add")
     public String addForm(Model model) {

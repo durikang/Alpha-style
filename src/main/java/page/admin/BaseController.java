@@ -25,7 +25,7 @@ public class BaseController {
         LoginSessionInfo sessionInfo = (LoginSessionInfo) session.getAttribute("loginMember");
 
         // 로그인된 사용자 정보 확인
-        if (sessionInfo != null && "admin".equals(sessionInfo.getRole())) {
+        if (sessionInfo != null && "admin".equalsIgnoreCase(sessionInfo.getRole())) {
             model.addAttribute("username", sessionInfo.getUsername());
             return "home"; // 관리자를 위한 홈 화면
         }
@@ -51,7 +51,7 @@ public class BaseController {
         // 사용자 인증
         var member = memberService.findByUserIdAndPassword(loginForm.getUserId(), loginForm.getPassword());
 
-        if (member.isPresent() && "admin".equals(member.get().getRole())) {
+        if (member.isPresent() && "admin".equalsIgnoreCase(member.get().getRole())) {
             // 세션에 DTO 객체 저장
             LoginSessionInfo sessionInfo = new LoginSessionInfo(
                     member.get().getUserNo(),  // 사용자 번호 (PK)
