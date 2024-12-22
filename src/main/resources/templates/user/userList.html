@@ -11,6 +11,12 @@
   <script th:src="@{/user/js/listDelete.js}" th:inline="none"></script>
   <link rel="stylesheet" th:href="@{/user/css/userList.css}"/>
   <style>
+    .actions {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
     .pagination {
       display: flex;
       justify-content: center;
@@ -71,21 +77,21 @@
 <body>
 <main>
   <h2>회원 리스트 조회</h2>
+  <div class="container">
 
-  <!-- 상단 검색 및 등록 버튼 -->
-  <div class="actions">
+    <!-- 검색 및 정렬 -->
     <div class="search-bar">
       <form th:action="@{/user/users}" method="get">
         <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}">
         <button type="submit">검색</button>
       </form>
     </div>
-    <div>
+    <!-- 상단 등록 버튼 -->
+  <div class="actions">
       <a href="/user/users/add" class="btn btn-register">회원 등록</a>
-      <button class="btn btn-delete" id="deleteSelected">회원 삭제</button>
-    </div>
+    <button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>
   </div>
-
+    <!-- 테이블 -->
   <table>
     <thead>
     <tr>
@@ -99,14 +105,17 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="member : ${members}">
+    <tr th:each="member : ${members}"
+        th:data-id="${member.userNo}"
+        th:data-details-url="@{/user/users/}"
+        class="clickable-row">
       <td><input type="checkbox" th:value="${member.userNo}" class="select-checkbox"></td>
-      <td th:text="${member.userNo}">1</td>
-      <td th:text="${member.userId}">exampleUser</td>
-      <td th:text="${member.username}">홍길동</td>
-      <td th:text="${member.email}">example@example.com</td>
-      <td th:text="${member.mobilePhone}">010-1234-5678</td>
-      <td th:text="${member.role}">customer</td>
+      <td th:text="${member.userNo}"></td>
+      <td th:text="${member.userId}"></td>
+      <td th:text="${member.username}"></td>
+      <td th:text="${member.email}"></td>
+      <td th:text="${member.mobilePhone}"></td>
+      <td th:text="${member.role}"></td>
     </tr>
     </tbody>
   </table>
@@ -116,6 +125,7 @@
        th:href="@{/user/users(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
        th:classappend="${currentPage == i} ? 'active' : ''"
        th:text="${i}"></a>
+  </div>
   </div>
 </main>
 </body>

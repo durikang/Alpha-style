@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="list">
+    <div class="search-bar">
+        <form th:action="${searchUrl}" method="get">
+            <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}">
+            <button type="submit">검색</button>
+        </form>
+    </div>
+
+    <div class="actions">
+        <a th:href="${addUrl}" class="btn btn-register" th:text="${addText}"></a>
+        <button id="deleteSelected" data-delete-url="${deleteUrl}" th:text="${deleteText}"></button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th th:each="header : ${headers}" th:text="${header.name}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(dataList)}">
+            <td colspan="${#lists.size(headers)}" style="text-align: center;">등록된 데이터가 없습니다.</td>
+        </tr>
+        <tr th:each="data : ${dataList}">
+            <td><input type="checkbox" th:value="${data.id}" class="select-checkbox"></td>
+            <td th:each="field : ${headers}" th:text="${data[field.key]}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+           th:href="${pageUrl}(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})"
+           th:classappend="${currentPage == i} ? 'active' : ''"
+           th:text="${i}"></a>
+    </div>
+</div>
+</html>

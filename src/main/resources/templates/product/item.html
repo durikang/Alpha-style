@@ -9,6 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 상세</title>
     <link rel="stylesheet" th:href="@{/css/item.css}" href="../css/item.css">
+    <style>
+        .thumbnail {
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .thumbnail.active {
+            border-color: #007bff; /* 하이라이트 색상 */
+        }
+
+    </style>
 </head>
 <body>
 
@@ -102,6 +114,40 @@
     </div>
 
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const mainImage = document.querySelector(".main-image");
+        const thumbnails = document.querySelectorAll(".thumbnail");
+
+        let currentIndex = 0;
+
+        function updateMainImage() {
+            // 모든 썸네일의 하이라이트 제거
+            thumbnails.forEach(thumbnail => thumbnail.classList.remove("active"));
+
+            // 현재 썸네일을 메인 이미지로 설정
+            const currentThumbnail = thumbnails[currentIndex];
+            mainImage.src = currentThumbnail.src;
+
+            // 현재 썸네일 하이라이트 추가
+            currentThumbnail.classList.add("active");
+
+            // 다음 이미지로 이동 (마지막 이미지라면 첫 번째로 돌아감)
+            currentIndex = (currentIndex + 1) % thumbnails.length;
+        }
+
+        // 3초 간격으로 이미지 교체
+        setInterval(updateMainImage, 3000);
+
+        // 썸네일 클릭 시 해당 이미지를 메인 이미지로 설정
+        thumbnails.forEach((thumbnail, index) => {
+            thumbnail.addEventListener("click", () => {
+                currentIndex = index; // 클릭된 썸네일의 인덱스를 현재 이미지로 설정
+                updateMainImage();
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

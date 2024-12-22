@@ -75,8 +75,8 @@
 <body>
 <div class="container">
     <h2>상품 수정 폼</h2>
-    <form th:action="@{/product/items/{itemId}/edit(itemId=${itemUpdateForm.itemId})}"
-          th:object="${itemUpdateForm}" method="post" enctype="multipart/form-data">
+    <form th:action="@{/product/items/{itemId}/edit(itemId=${itemEditForm.itemId})}"
+          th:object="${itemEditForm}" method="post" enctype="multipart/form-data">
 
         <!-- 상품 ID -->
         <div class="form-group">
@@ -119,7 +119,7 @@
                     <input type="checkbox"
                            th:value="${region.code}"
                            th:name="regionCodes"
-                           th:checked="${itemUpdateForm.regionCodes.contains(region.code)}"
+                           th:checked="${itemEditForm.regionCodes.contains(region.code)}"
                            th:id="'regions_' + ${region.code}" />
                     <label th:for="'regions_' + ${region.code}" th:text="${region.displayName}"></label>
                 </div>
@@ -152,10 +152,10 @@
         <div class="image-upload-container">
             <label>메인 이미지</label>
             <div class="image-preview" id="mainImagePreview" onclick="document.getElementById('mainImageInput').click();">
-                <img th:if="${itemUpdateForm.mainImage != null}"
-                     th:src="@{'/' + ${itemUpdateForm.mainImage.storeFileName}}"
-                     alt="메인 이미지">
-                <p th:if="${itemUpdateForm.mainImage == null}">이미지를 클릭하여 업로드</p>
+                <img th:if="${itemEditForm.mainImage != null}"
+                     th:src="@{'/' + ${itemEditForm.mainImage.storeFileName}}"
+                     alt="메인 이미지" />
+                <p th:if="${itemEditForm.mainImage == null}">이미지를 클릭하여 업로드</p>
             </div>
             <input type="file" id="mainImageInput" name="mainImage" accept="image/*">
         </div>
@@ -166,26 +166,26 @@
             <div class="thumbnail-gallery" id="thumbnailGallery">
                 <!-- 썸네일 1 -->
                 <div class="thumbnail-preview" id="thumb1Preview" onclick="document.getElementById('thumbnailInput').click();">
-                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 0}"
-                         th:src="@{'/' + ${itemUpdateForm.thumbnails[0].storeFileName}}"
+                    <img th:if="${itemEditForm.thumbnails != null and itemEditForm.thumbnails.size() > 0}"
+                         th:src="@{'/' + ${itemEditForm.thumbnails[0].storeFileName}}"
                          alt="썸네일 1" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 2 -->
                 <div class="thumbnail-preview" id="thumb2Preview" onclick="document.getElementById('thumbnailInput').click();">
-                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 1}"
-                         th:src="@{'/' + ${itemUpdateForm.thumbnails[1].storeFileName}}"
+                    <img th:if="${itemEditForm.thumbnails != null and itemEditForm.thumbnails.size() > 1}"
+                         th:src="@{'/' + ${itemEditForm.thumbnails[1].storeFileName}}"
                          alt="썸네일 2" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 3 -->
                 <div class="thumbnail-preview" id="thumb3Preview" onclick="document.getElementById('thumbnailInput').click();">
-                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 2}"
-                         th:src="@{'/' + ${itemUpdateForm.thumbnails[2].storeFileName}}"
+                    <img th:if="${itemEditForm.thumbnails != null and itemEditForm.thumbnails.size() > 2}"
+                         th:src="@{'/' + ${itemEditForm.thumbnails[2].storeFileName}}"
                          alt="썸네일 3" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <!-- 썸네일 4 -->
                 <div class="thumbnail-preview" id="thumb4Preview" onclick="document.getElementById('thumbnailInput').click();">
-                    <img th:if="${itemUpdateForm.thumbnails != null and itemUpdateForm.thumbnails.size() > 3}"
-                         th:src="@{'/' + ${itemUpdateForm.thumbnails[3].storeFileName}}"
+                    <img th:if="${itemEditForm.thumbnails != null and itemEditForm.thumbnails.size() > 3}"
+                         th:src="@{'/' + ${itemEditForm.thumbnails[3].storeFileName}}"
                          alt="썸네일 4" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
             </div>
@@ -207,6 +207,15 @@
     const mainImagePreview = document.getElementById('mainImagePreview');
     const thumbnailInput = document.getElementById('thumbnailInput');
 
+    document.getElementById('thumbnailInput').addEventListener('change', function (event) {
+        const files = event.target.files;
+        if (files.length > 4) {
+            alert('썸네일 이미지는 최대 4개까지만 업로드할 수 있습니다.');
+            event.target.value = ''; // 입력 초기화
+        }
+    });
+
+    // 메인 이미지 처리
     mainImageInput.addEventListener('change', function () {
         const file = this.files[0];
         if (file) {
@@ -218,20 +227,40 @@
         }
     });
 
+    // 썸네일 이미지 처리
     thumbnailInput.addEventListener('change', function () {
         const gallery = document.getElementById('thumbnailGallery');
-        gallery.innerHTML = '';
-        Array.from(this.files).slice(0, 4).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'thumbnail-preview';
-                thumbnail.innerHTML = `<img src="${e.target.result}" alt="썸네일 ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                gallery.appendChild(thumbnail);
-            };
-            reader.readAsDataURL(file);
+        const files = Array.from(this.files); // 새로 선택된 파일
+        const thumbnails = Array.from(gallery.children); // 기존 썸네일들
+
+        files.forEach((file, index) => {
+            if (index < 4) { // 최대 4개의 썸네일만 처리
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // 이미 썸네일이 존재하면 해당 인덱스 업데이트
+                    if (thumbnails[index]) {
+                        thumbnails[index].innerHTML = `<img src="${e.target.result}" alt="썸네일 ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    } else {
+                        // 썸네일이 없으면 새로 추가
+                        const thumbnail = document.createElement('div');
+                        thumbnail.className = 'thumbnail-preview';
+                        thumbnail.innerHTML = `<img src="${e.target.result}" alt="썸네일 ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        gallery.appendChild(thumbnail);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
         });
+
+        // 갤러리에 4개 미만의 썸네일이 있을 경우, 빈 썸네일을 추가
+        for (let i = thumbnails.length; i < 4; i++) {
+            const emptyThumbnail = document.createElement('div');
+            emptyThumbnail.className = 'thumbnail-preview';
+            emptyThumbnail.innerHTML = '<p style="text-align: center; margin: 0; color: #ccc;">빈 썸네일</p>';
+            gallery.appendChild(emptyThumbnail);
+        }
     });
 </script>
+
 </body>
 </html>

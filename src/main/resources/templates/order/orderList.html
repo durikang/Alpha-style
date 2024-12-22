@@ -5,8 +5,9 @@
       layout:decorate="~{common/layouts/defaultLayout}"
       layout:fragment="Content">
 <head>
-    <link th:inline="css" rel="stylesheet" th:href = "@{/index/css/table-list.css}"href="./index/css/responsive.css" />
-    <title>주문 목록</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Order List</title>
     <style>
         table {
             width: 100%;
@@ -33,14 +34,118 @@
         table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+
+        .filter-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .filter-form select, .filter-form input, .filter-form button {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .filter-form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .pagination a {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            pointer-events: none;
+        }
+
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
 <main>
-    <h1>주문 목록</h1>
-    <!-- detailsUrl을 매개변수로 명확히 전달 -->
-    <div th:replace="~{common/fragments/order/orderTable :: orderTable(${orders}, ${detailsUrl}, false, false, true)}"></div>
-</main>
+    <h1>Order List</h1>
 
+    <!-- 필터 영역 -->
+    <form class="filter-form" th:action="@{/orders/list}" method="get">
+        <input type="text" name="searchKeyword" placeholder="검색어 입력" th:value="${searchKeyword}">
+        <select name="sortBy">
+            <option value="orderDate" th:selected="${sortBy == 'orderDate'}">주문 날짜</option>
+            <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">총 금액</option>
+            <option value="deliveryStatus" th:selected="${sortBy == 'deliveryStatus'}">배송 상태</option>
+        </select>
+        <select name="sortDir">
+            <option value="asc" th:selected="${sortDir == 'asc'}">오름차순</option>
+            <option value="desc" th:selected="${sortDir == 'desc'}">내림차순</option>
+        </select>
+        <button type="submit">적용</button>
+    </form>
+
+    <!-- 주문 리스트 테이블 -->
+    <table>
+        <thead>
+        <tr>
+            <th>주문 번호</th>
+            <th>회원 이름</th>
+            <th>주문 날짜</th>
+            <th>총 금액</th>
+            <th>배송 상태</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}"
+            th:data-id="${order.orderNo}"
+            th:data-details-url="@{/orders/details/}"
+            class="clickable-row">
+            <td th:text="${order.orderNo}">Order No</td>
+            <td th:text="${order.user.username}">User Name</td>
+            <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">Order Date</td>
+            <td th:text="${order.totalAmount}">Total Amount</td>
+            <td th:text="${order.deliveryStatus}">Delivery Status</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 영역 -->
+    <div class="pagination">
+        <a th:href="@{/orders/list(page=0, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, searchKeyword=${searchKeyword})}"
+           th:classappend="${currentPage == 0 ? 'disabled' : ''}">처음</a>
+        <a th:href="@{/orders/list(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, searchKeyword=${searchKeyword})}"
+           th:classappend="${currentPage == 0 ? 'disabled' : ''}">이전</a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/orders/list(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, searchKeyword=${searchKeyword})}"
+               th:classappend="${currentPage == i ? 'active' : ''}">[[${i + 1}]]</a>
+        </span>
+
+        <a th:href="@{/orders/list(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, searchKeyword=${searchKeyword})}"
+           th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">다음</a>
+        <a th:href="@{/orders/list(page=${totalPages - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, searchKeyword=${searchKeyword})}"
+           th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">끝</a>
+    </div>
+</main>
 </body>
 </html>

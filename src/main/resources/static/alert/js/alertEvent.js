@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
             alertBar.style.transform = "translateY(0)";
         }, 50); // 약간의 지연을 주어 애니메이션 적용
 
-        // 5초 후 알림 바 사라지는 애니메이션 (기존 2초에서 연장)
-        const autoHideDelay = 5000; // 자동 사라짐 지연 시간 (5초)
+        // 2초 후 알림 바 사라지는 애니메이션
+        const autoHideDelay = 2000; // 자동 사라짐 지연 시간 (2초)
         setTimeout(() => {
             hideAlertBar(alertBar);
         }, autoHideDelay);

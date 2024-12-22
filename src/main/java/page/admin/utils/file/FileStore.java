@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import page.admin.utils.exception.FileProcessingException;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,56 +27,94 @@ public class FileStore {
         return fileDir + filename;
     }
 
-    // 다중 파일 저장
-    public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
-        List<UploadFile> storeFileResult = new ArrayList<>();
-        for (int i = 0; i < Math.min(multipartFiles.size(), MAX_THUMBNAILS); i++) {
-            MultipartFile multipartFile = multipartFiles.get(i);
-            if (!multipartFile.isEmpty()) {
-                storeFileResult.add(storeFile(multipartFile)); // 각 파일을 저장
-            }
-        }
-        return storeFileResult;
-    }
-
     // 단일 파일 저장
-    public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) {
+    public UploadFile storeFile(MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
             return null;
         }
 
-        // 원본 파일명과 저장용 파일명 생성
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
 
-        // 저장 디렉토리 확인 및 생성
-        ensureDirectoryExists();
+        try {
+            ensureDirectoryExists();
+            multipartFile.transferTo(new File(getFullPath(storeFileName)));
+            return new UploadFile(originalFilename, storeFileName);
+        } catch (IOException e) {
+            log.error("파일 저장 중 오류 발생: {}", originalFilename, e);
+            throw new FileProcessingException("파일 저장 중 오류가 발생했습니다.", e);
+        }
+    }
 
-        // 실제 파일 저장
-        File targetFile = new File(getFullPath(storeFileName));
-        multipartFile.transferTo(targetFile);
+    // 다중 파일 저장
+    public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) {
+        List<UploadFile> storedFiles = new ArrayList<>();
+        if (multipartFiles != null) {
+            for (MultipartFile file : multipartFiles) {
+                if (!file.isEmpty()) {
+                    storedFiles.add(storeFile(file));
+                }
+            }
+        }
+        return storedFiles;
+    }
 
-        // 저장된 파일 정보 반환
-        return new UploadFile(originalFilename, storeFileName);
+    // 파일 교체
+    public UploadFile replaceFile(UploadFile existingFile, MultipartFile newFile) {
+        try {
+            if (newFile != null && !newFile.isEmpty()) {
+                // 기존 파일 삭제
+                if (existingFile != null) {
+                    deleteFile(existingFile.getStoreFileName());
+                }
+                return storeFile(newFile);
+            }
+        } catch (FileProcessingException e) {
+            log.error("파일 교체 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
+        return existingFile;
+    }
+
+    // 다중 파일 교체
+    public List<UploadFile> replaceFiles(List<UploadFile> existingFiles, List<MultipartFile> newFiles) {
+        try {
+            // 새로운 파일 저장
+            List<UploadFile> updatedFiles = storeFiles(newFiles);
+
+            // 기존 파일 삭제
+            if (existingFiles != null) {
+                for (UploadFile existingFile : existingFiles) {
+                    deleteFile(existingFile.getStoreFileName());
+                }
+            }
+
+            return updatedFiles;
+        } catch (FileProcessingException e) {
+            log.error("다중 파일 교체 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     // 파일 삭제
-    public void deleteFile(String storeFileName) {
+    public boolean deleteFile(String storeFileName) {
         if (storeFileName == null || storeFileName.isEmpty()) {
-            return;
+            log.warn("파일명이 비어 있습니다.");
+            return true; // 파일 이름이 없으면 삭제 성공으로 간주
         }
         File file = new File(getFullPath(storeFileName));
-        if (file.exists()) {
-            if (file.delete()) {
-                log.info("파일 삭제 성공: {}", file.getAbsolutePath());
-            } else {
-                log.warn("파일 삭제 실패: {}", file.getAbsolutePath());
-            }
+        if (!file.exists()) {
+            log.warn("파일이 존재하지 않습니다: {}", file.getAbsolutePath());
+            return true; // 파일이 없어도 삭제 성공으로 간주
+        }
+        if (file.delete()) {
+            log.info("파일 삭제 성공: {}", file.getAbsolutePath());
+            return true;
         } else {
-            log.warn("파일이 존재하지 않아 삭제할 수 없음: {}", file.getAbsolutePath());
+            log.error("파일 삭제 실패: {}", file.getAbsolutePath());
+            return false;
         }
     }
-
     // 파일명 생성
     private String createStoreFileName(String originalFilename) {
         String ext = extractExt(originalFilename);
@@ -93,10 +132,10 @@ public class FileStore {
     private void ensureDirectoryExists() {
         File directory = new File(fileDir);
         if (!directory.exists()) {
-            boolean isCreated = directory.mkdirs();
-            log.info("디렉토리 생성: {}", directory.getPath());
-            if (!isCreated) {
-                throw new RuntimeException("파일 저장 디렉토리를 생성할 수 없습니다: " + fileDir);
+            if (directory.mkdirs()) {
+                log.info("디렉토리 생성: {}", directory.getPath());
+            } else {
+                throw new FileProcessingException("파일 저장 디렉토리를 생성할 수 없습니다: " + fileDir);
             }
         }
     }

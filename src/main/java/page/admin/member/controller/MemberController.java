@@ -33,25 +33,32 @@ public class MemberController {
     @GetMapping
     public String listUsers(
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "sort", required = false, defaultValue = "userNo") String sortField,
             @RequestParam(value = "direction", required = false, defaultValue = "ASC") String sortDirection,
-            Model model
-    ) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Member> members = memberService.searchMembers(keyword, pageable);
+            @PageableDefault(size = 10) Pageable pageable,
+            Model model) {
 
+        // 정렬 설정
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+
+        // 페이지 요청 생성 (정렬 적용)
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        // 검색 및 페이징 처리
+        Page<Member> members = memberService.searchMembers(keyword, sortedPageable);
+
+        // 모델에 데이터 추가
         model.addAttribute("members", members.getContent());
         model.addAttribute("totalPages", members.getTotalPages());
-        model.addAttribute("currentPage", page + 1);
+        model.addAttribute("currentPage", members.getNumber() + 1);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
 
-        return "user/userList";
+        return "user/userList"; // 뷰 반환
     }
+
+
 
 
     @GetMapping("/{userNo}")
@@ -153,7 +160,7 @@ public class MemberController {
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("alert", new Alert("현재 회원에 등록된 제품이 있어 회원 탈퇴를 할 수 없습니다. 회원이 등록한 제품을 먼저 삭제한 후 탈퇴를 진행해주세요.", Alert.AlertType.ERROR));
         }
-        return "redirect:/user/users/"; // 리스트로 리다이렉트
+        return "redirect:/user/users"; // 리스트로 리다이렉트
     }
 
     @PostMapping("/batch-delete")

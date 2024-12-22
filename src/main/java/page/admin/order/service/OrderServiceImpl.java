@@ -1,9 +1,14 @@
 package page.admin.order.service;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import page.admin.order.domain.Order;
 import page.admin.order.domain.OrderDetail;
 import page.admin.order.domain.OrderDetailDTO;
+import page.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.order.repository.OrderRepository;
 import page.admin.item.repository.DeliveryCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderDetailDTO convertToDTO(Order order, OrderDetail detail) {
         OrderDetailDTO dto = new OrderDetailDTO();
         dto.setOrderNo(order.getOrderNo());
-        dto.setProductId(detail.getItem() != null ? detail.getItem().getItemId() : null);
+        dto.setItemId(detail.getItem() != null ? detail.getItem().getItemId() : null);
         dto.setItemName(detail.getItem() != null ? detail.getItem().getItemName() : "상품 없음");
         dto.setItemPrice(detail.getItem() != null ? detail.getItem().getPrice() : 0L);
         dto.setQuantity(detail.getQuantity());
@@ -67,7 +72,39 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateMultipleOrderStatus(List<Long> orderNos, String status) {
-        orderRepository.updateDeliveryStatusBatch(orderNos, status);
+    public Page<Order> getOrdersWithSearchAndPaging(String keyword, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (keyword.isBlank()) {
+            return orderRepository.findAll(pageable);
+        } else {
+            return orderRepository.findByUserUsernameContainingOrDeliveryStatusContaining(keyword, keyword, pageable);
+        }
     }
+
+    @Override
+    public Page<OrderSummaryDTO> getOrderSummariesWithPaging(int page, int size, String sortBy, String sortDir) {
+        Sort sort;
+
+        // sortBy 필드를 실제 HQL 별칭에 맞게 매핑
+        if (sortBy.equals("itemId")) {
+            sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                    ? Sort.by("d.item.itemId").ascending()
+                    : Sort.by("d.item.itemId").descending();
+        } else if (sortBy.equals("totalQuantity")) {
+            sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                    ? Sort.by("SUM(d.quantity)").ascending()
+                    : Sort.by("SUM(d.quantity)").descending();
+        } else {
+            sort = Sort.unsorted(); // 기본 정렬
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.findOrderSummariesWithPaging(pageable);
+    }
+
+
+
+
 }

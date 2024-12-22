@@ -28,6 +28,54 @@
         .btn-register:hover {
             background-color: #218838;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #007bff;
+            border-radius: 4px;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-bar button {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -35,34 +83,58 @@
     <h2>상품 목록</h2>
     <div class="container">
 
+        <!-- 검색 및 정렬 -->
+        <div class="search-bar">
+            <form th:action="@{/product/items}" method="get">
+                <input type="text" name="keyword" placeholder="상품 검색" th:value="${keyword}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
+
         <!-- 상단 등록 버튼 -->
         <div class="actions">
             <a th:href="@{/product/items/add}" class="btn-register">상품 등록</a>
+            <button id="deleteSelected" class="btn btn-delete">상품 삭제</button>
         </div>
 
         <!-- 테이블 -->
         <table>
             <thead>
             <tr>
-                <th>ID</th>
-                <th>상품명</th>
-                <th>가격</th>
-                <th>수량</th>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th><a th:href="@{/product/items(sort='itemId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">ID</a></th>
+                <th><a th:href="@{/product/items(sort='itemName', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">상품명</a></th>
+                <th><a th:href="@{/product/items(sort='price', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">가격</a></th>
+                <th><a th:href="@{/product/items(sort='quantity', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">수량</a></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${items}" th:data-id="${item.itemId}"
+            <!-- 데이터가 없을 경우 메시지 표시 -->
+            <tr th:if="${#lists.isEmpty(items)}">
+                <td colspan="5" style="text-align: center;">상품이 등록되어 있지 않습니다.</td>
+            </tr>
+
+            <!-- 데이터가 있을 경우 테이블 행 렌더링 -->
+            <tr th:each="item : ${items}"
+                th:data-id="${item.itemId}"
                 th:data-details-url="@{/product/items/}"
                 class="clickable-row">
-
-                <td th:text="${item.itemId}">1</td>
-                <td th:text="${item.itemName}">상품명</td>
-                <td th:text="${item.price}">10000</td>
-                <td th:text="${item.quantity}">10</td>
-
+                <td><input type="checkbox" class="select-checkbox" th:value="${item.itemId}"></td>
+                <td th:text="${item.itemId}"></td>
+                <td th:text="${item.itemName}"></td>
+                <td th:text="${item.price}"></td>
+                <td th:text="${item.quantity}"></td>
             </tr>
             </tbody>
         </table>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+            <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+               th:href="@{/product/items(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
+               th:classappend="${currentPage == i} ? 'active' : ''"
+               th:text="${i}"></a>
+        </div>
     </div>
 </main>
 </body>

@@ -11,7 +11,7 @@ import page.admin.member.domain.dto.MemberList;
 
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> , MemberRepositoryCustom{
+public interface MemberRepository extends JpaRepository<Member, Long>{
     Optional<Member> findByUserId(String userId); // 사용자 ID로 조회 (중복 검사를 위한 용도)
     Optional<Member> findByUserIdAndPassword(String userId, String password);
     // 검색 및 페이징 처리 메서드

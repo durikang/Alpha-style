@@ -22,7 +22,7 @@ public class OrderDetail {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "product_no", nullable = false)
+    @JoinColumn(name = "item_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)) // 외래 키 제약 조건 제거
     private Item item;
 
     private Integer quantity;

@@ -58,6 +58,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String role;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true) // 연관된 Item 삭제
+    @OneToMany(mappedBy = "seller")
     private List<Item> items;
 }

@@ -22,23 +22,25 @@ public class CustomErrorController implements ErrorController {
 
         logger.error("에러 발생! 상태 코드: {}, 요청 URI: {}", statusCode, requestUri);
 
-        // 에러 메시지 기본 설정
-        String errorMessage = "알 수 없는 에러가 발생했습니다.";
+        // 상태 코드 null 처리
+        if (statusCode == null) {
+            model.addAttribute("errorMessage", "예기치 못한 에러가 발생했습니다.");
+            return "error/general";
+        }
+        // 상태 코드에 따른 뷰 반환
         if (statusCode != null) {
             switch (statusCode) {
                 case 404:
-                    errorMessage = "페이지를 찾을 수 없습니다.";
-                    break;
+                    return "error/404";
                 case 500:
-                    errorMessage = "서버 내부 오류가 발생했습니다.";
-                    break;
+                    return "error/500";
                 default:
-                    errorMessage = "예기치 못한 오류가 발생했습니다.";
+                    model.addAttribute("statusCode", statusCode);
+                    return "error/general";
             }
         }
 
-        model.addAttribute("statusCode", statusCode);
-        model.addAttribute("errorMessage", errorMessage);
-        return "error/errorPage";
+        return "error/general";
     }
+
 }

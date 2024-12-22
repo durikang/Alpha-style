@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import page.admin.member.domain.Member;
-import page.admin.member.domain.dto.MemberList;
 import page.admin.member.domain.dto.UpdateForm;
 import page.admin.member.exception.DuplicateMemberException;
 import page.admin.member.exception.MemberNotFoundException;
-import page.admin.member.mapper.MemberMapper;
+import page.mapper.MemberMapper;
 import page.admin.member.repository.MemberRepository;
 
 import java.util.List;
@@ -40,22 +38,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<Member> searchMembers(String keyword, Pageable pageable) {
-        String formattedKeyword = (keyword == null || keyword.isEmpty()) ? "%" : "%" + keyword + "%";
-        int startRow = (int) pageable.getOffset();
-        int endRow = startRow + pageable.getPageSize();
-        String sortField = pageable.getSort().isSorted() ?
-                pageable.getSort().iterator().next().getProperty() : "userNo";
-        String sortDirection = pageable.getSort().isSorted() && pageable.getSort().iterator().next().isAscending() ?
-                "ASC" : "DESC";
-
-        // 데이터와 총 개수 조회
-        List<Member> members = memberMapper.searchMembersWithPagination(
-                formattedKeyword, startRow, endRow, sortField, sortDirection
+        return memberRepository.findByUserIdContainingIgnoreCaseOrUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                keyword, keyword, keyword, pageable
         );
-        int total = memberMapper.countMembers(formattedKeyword);
-
-        // Page 객체 반환
-        return new PageImpl<>(members, pageable, total);
     }
 
     @Override
@@ -86,18 +71,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void deleteMember(Long userNo) {
         Member member = memberRepository.findById(userNo)
-                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원 ID " + userNo + "에 해당하는 회원이 존재하지 않습니다."));
 
-        // 자식 데이터 확인
         if (!member.getItems().isEmpty()) {
             throw new IllegalStateException("회원이 등록한 제품이 존재합니다.");
         }
 
-        // 삭제 진행
         memberRepository.delete(member);
     }
+
 
 
     @Override

@@ -16,27 +16,26 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="order : ${orders}" th:data-id="${order.orderNo}"
-            th:data-details-url="${enableRowClick ? detailsUrl : ''}"
-            th:classappend="${enableRowClick ? 'clickable-row' : ''}">
+        <tr th:each="order : ${orders}" th:data-id="${order.orderNo}">
             <td th:if="${showCheckbox}">
                 <input type="checkbox" name="selectedOrders" th:value="${order.orderNo}">
             </td>
             <td th:text="${order.orderNo}">주문 번호</td>
-            <td th:text="${order.userNo}">사용자 번호</td>
+            <td th:text="${order.user.userNo}">회원 번호</td>
             <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">주문 날짜</td>
             <td th:text="${order.totalAmount}">총 금액</td>
-            <td th:text="${order.displayName}">배송 상태</td>
+            <td th:text="${order.deliveryStatus}">배송 상태</td> <!-- 변경 -->
             <td th:if="${showStatusSelect}">
                 <select name="status_${order.orderNo}">
                     <option th:each="status : ${statuses}"
                             th:value="${status.code}"
-                            th:selected="${status.code == order.delivaryStatus}"
-                            th:text="${status.displayName}">
+                            th:selected="${status.code == order.deliveryStatus}" <!-- 변경 -->
+                    th:text="${status.displayName}">
                     </option>
                 </select>
             </td>
         </tr>
+
         </tbody>
     </table>
 </div>

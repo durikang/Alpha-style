@@ -29,4 +29,5 @@ public interface MemberService {
     void editMemberInfo(Long userNo, UpdateForm updateForm);
 
     Page<Member> searchMembers(String keyword, Pageable pageable);
+
 }
