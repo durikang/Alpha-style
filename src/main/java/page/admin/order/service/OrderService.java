@@ -3,7 +3,7 @@ package page.admin.order.service;
 
 import org.springframework.data.domain.Page;
 import page.admin.order.domain.Order;
-import page.admin.order.domain.OrderDetailDTO;
+import page.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.order.domain.dto.OrderSummaryDTO;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package page.admin.order.domain;
+package page.admin.order.domain.dto;
 
 import lombok.Data;
 

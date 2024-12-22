@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import page.admin.order.domain.Order;
 import page.admin.order.domain.OrderDetail;
-import page.admin.order.domain.OrderDetailDTO;
+import page.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.order.repository.OrderRepository;
 import page.admin.item.repository.DeliveryCodeRepository;
