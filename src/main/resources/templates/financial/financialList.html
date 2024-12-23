@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <title>재무 데이터 관리</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .actions {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1>재무 데이터 관리</h1>
+
+
+
+        <!-- 검색 바 -->
+        <div th:replace="~{common/fragments/searchBar :: searchBar(
+        ${actionUrl}, '검색어를 입력하세요', ${keyword}, ${filters})}"></div>
+
+        <!-- 상단 등록 버튼 -->
+        <div class="actions">
+            <a href="/user/users/add" class="btn btn-register">엑셀 다운로드</a>
+            <!--<button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>-->
+        </div>
+
+        <!-- 데이터 테이블 -->
+        <table>
+            <thead>
+            <tr>
+                <th>거래일</th>
+                <th>거래 유형</th>
+                <th>제품명</th>
+                <th>수량</th>
+                <th>단가</th>
+                <th>공급 금액</th>
+                <th>VAT</th>
+                <th>총 금액</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${financialRecords}">
+                <td th:text="${record.year + '-' + record.month + '-' + record.day}"></td>
+                <td th:text="${record.transactionType == 1 ? '구매' : '판매'}"></td>
+                <td th:text="${record.productName}"></td>
+                <td th:text="${record.quantity}"></td>
+                <td th:text="${record.unitPrice}"></td>
+                <td th:text="${record.supplyAmount}"></td>
+                <td th:text="${record.vat}"></td>
+                <td th:text="${record.supplyAmount + record.vat}"></td>
+                <td class="actions">
+                    <a th:href="@{/admin/financial-data/edit/{id}(id=${record.recordNo})}">수정</a> |
+                    <a th:href="@{/admin/financial-data/delete/{id}(id=${record.recordNo})}">삭제</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이징 -->
+        <div th:replace="~{common/fragments/pagination :: pagination(
+        ${startPage},
+        ${endPage},
+        ${totalPages},
+        ${currentPage},
+        ${actionUrl},
+        ${keyword},
+        ${sortField},
+        ${sortDirection})}"></div>
+    </div>
+</main>
+</body>
+</html>

@@ -36,8 +36,16 @@ public class MemberController {
             @RequestParam(value = "direction", required = false, defaultValue = "ASC") String sortDirection,
             Model model) {
 
+        // 정렬 방향 검증 및 기본값 설정
+        Sort.Direction direction;
+        try {
+            direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.ASC; // 기본값 설정
+        }
+
         // 정렬 설정
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Sort sort = Sort.by(direction, sortField);
 
         // 페이지 요청 생성 (0-based index)
         Pageable sortedPageable = PageRequest.of(page, 10, sort);
@@ -59,10 +67,11 @@ public class MemberController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("sortDirection", direction.name().toLowerCase()); // 정렬 방향을 소문자로 반환
 
         return "user/userList"; // 뷰 반환
     }
+
 
     @GetMapping("/{userNo}")
     public String viewUser(

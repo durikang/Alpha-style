@@ -17,61 +17,6 @@
       justify-content: center;
       gap: 10px;
     }
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      gap: 5px;
-    }
-
-    .pagination a {
-      display: inline-block;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #007bff;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .pagination a.active {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-
-    .pagination a:hover {
-      background-color: #0056b3;
-      color: white;
-    }
-
-    .search-bar {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .search-bar input[type="text"] {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 300px;
-    }
-
-    .search-bar button {
-      padding: 8px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .search-bar button:hover {
-      background-color: #0056b3;
-    }
-
   </style>
 </head>
 <body>
@@ -80,12 +25,9 @@
   <div class="container">
 
     <!-- 검색 및 정렬 -->
-    <div class="search-bar">
-      <form th:action="@{/user/users}" method="get">
-        <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}">
-        <button type="submit">검색</button>
-      </form>
-    </div>
+    <div th:replace="~{common/fragments/searchBar :: searchBar(
+    '/user/users','검색어 입력',${keyword},null)}"></div>
+
     <!-- 상단 등록 버튼 -->
   <div class="actions">
       <a href="/user/users/add" class="btn btn-register">회원 등록</a>
@@ -120,20 +62,8 @@
     </tbody>
   </table>
 
-    <div class="pagination">
-      <a th:if="${startPage > 1}"
-         th:href="@{/user/users(page=${startPage - 2}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}">
-        &laquo;
-      </a>
-      <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
-         th:href="@{/user/users(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
-         th:classappend="${currentPage == i} ? 'active' : ''"
-         th:text="${i}"></a>
-      <a th:if="${endPage < totalPages}"
-         th:href="@{/user/users(page=${endPage}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}">
-        &raquo;
-      </a>
-    </div>
+    <div th:replace="~{common/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
+        ${currentPage},'/user/users',${keyword},${sortField},${sortDirection})}"></div>
 
   </div>
 </main>

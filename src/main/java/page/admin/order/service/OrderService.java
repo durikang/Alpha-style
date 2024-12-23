@@ -2,6 +2,7 @@ package page.admin.order.service;
 
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import page.admin.order.domain.Order;
 import page.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.order.domain.dto.OrderSummaryDTO;
@@ -13,7 +14,7 @@ public interface OrderService {
     Order getOrderById(Long orderNo);
     List<OrderDetailDTO> getOrderDetails(Long orderNo);
     void updateOrderStatus(Long orderNo, String status);
-    Page<Order> getOrdersWithSearchAndPaging(String keyword, int page, int size, String sortBy, String sortDir);
+    Page<Order> getOrdersWithSearchAndPaging(String keyword, Pageable pageable);
     Page<OrderSummaryDTO> getOrderSummariesWithPaging(int page, int size, String sortBy, String sortDir);
 
 }

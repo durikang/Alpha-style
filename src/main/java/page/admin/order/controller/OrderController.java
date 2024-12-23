@@ -1,6 +1,17 @@
 package page.admin.order.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import page.admin.item.service.DeliveryCodeService;
 import page.admin.item.service.RegionService;
 import page.admin.member.domain.Member;
@@ -8,10 +19,6 @@ import page.admin.order.domain.Order;
 import page.admin.order.domain.OrderDetail;
 import page.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.order.service.OrderService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,26 +33,48 @@ public class OrderController {
 
     @GetMapping("/list")
     public String getOrderList(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortBy", defaultValue = "orderDate") String sortBy,
-            @RequestParam(name = "sortDir", defaultValue = "desc") String sortDir,
-            @RequestParam(name = "searchKeyword", defaultValue = "") String searchKeyword,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "sortBy", defaultValue = "orderDate") String sortField,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDirection,
+            @RequestParam(value = "searchKeyword", defaultValue = "") String keyword,
+            @PageableDefault(size = 10) Pageable pageable,
             Model model) {
 
-        // 페이징, 정렬, 검색 처리
-        Page<Order> orders = orderService.getOrdersWithSearchAndPaging(searchKeyword, page, size, sortBy, sortDir);
+        // 정렬 설정
+        Sort sort;
+        try {
+            sort = Sort.by(Sort.Direction.fromString(sortDirection.toUpperCase()), sortField);
+        } catch (IllegalArgumentException e) {
+            sort = Sort.by(Sort.Direction.ASC, sortField); // 기본값
+        }
+
+        // 페이지 요청 생성
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        // 검색 및 페이징 처리
+        Page<Order> orders = orderService.getOrdersWithSearchAndPaging(keyword, sortedPageable);
+
+        // 페이지네이션 범위 계산
+        int currentPage = orders.getNumber() + 1; // 0-based → 1-based
+        int totalPages = orders.getTotalPages();
+        int startPage = Math.max(1, (currentPage - 1) / 10 * 10 + 1);
+        int endPage = Math.min(startPage + 9, totalPages);
 
         // 모델에 데이터 추가
         model.addAttribute("orders", orders.getContent());
-        model.addAttribute("currentPage", orders.getNumber());
-        model.addAttribute("totalPages", orders.getTotalPages());
-        model.addAttribute("sortBy", sortBy);
-        model.addAttribute("sortDir", sortDir);
-        model.addAttribute("searchKeyword", searchKeyword);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
 
         return "order/orderList"; // 주문 리스트 HTML
     }
+
+
+
 
 
 

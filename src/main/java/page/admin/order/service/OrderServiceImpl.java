@@ -72,16 +72,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<Order> getOrdersWithSearchAndPaging(String keyword, int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+    public Page<Order> getOrdersWithSearchAndPaging(String keyword, Pageable pageable) {
         if (keyword.isBlank()) {
             return orderRepository.findAll(pageable);
         } else {
             return orderRepository.findByUserUsernameContainingOrDeliveryStatusContaining(keyword, keyword, pageable);
         }
     }
+
 
     @Override
     public Page<OrderSummaryDTO> getOrderSummariesWithPaging(int page, int size, String sortBy, String sortDir) {

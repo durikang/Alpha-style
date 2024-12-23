@@ -1,6 +1,8 @@
 package page.admin.item.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -8,28 +10,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import page.admin.item.domain.Item;
-import page.admin.item.domain.UploadFile;
-import page.admin.item.domain.dto.ItemEditForm;
-import page.admin.item.domain.dto.ItemUpdateForm;
-import page.admin.item.domain.dto.ItemViewForm;
-import page.admin.item.domain.dto.ItemSaveForm;
-import page.admin.item.service.DeliveryCodeService;
-import page.admin.item.service.ItemTypeService;
-import page.admin.item.service.RegionService;
-import page.admin.member.domain.dto.LoginSessionInfo;
-import page.admin.utils.Alert;
-import page.admin.item.service.ItemService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import page.admin.item.domain.Item;
+import page.admin.item.domain.dto.ItemEditForm;
+import page.admin.item.domain.dto.ItemSaveForm;
+import page.admin.item.domain.dto.ItemUpdateForm;
+import page.admin.item.domain.dto.ItemViewForm;
+import page.admin.item.service.DeliveryCodeService;
+import page.admin.item.service.ItemService;
+import page.admin.item.service.ItemTypeService;
+import page.admin.item.service.RegionService;
+import page.admin.member.domain.dto.LoginSessionInfo;
+import page.admin.utils.Alert;
 import page.admin.utils.exception.FileProcessingException;
-import page.admin.utils.file.FileStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +54,12 @@ public class ItemController {
             Model model) {
 
         // 정렬 설정
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Sort sort;
+        try {
+            sort = Sort.by(Sort.Direction.fromString(sortDirection.toUpperCase()), sortField);
+        } catch (IllegalArgumentException e) {
+            sort = Sort.by(Sort.Direction.ASC, sortField); // 기본값
+        }
 
         // 페이지 요청 생성 (정렬 적용)
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
@@ -64,16 +67,25 @@ public class ItemController {
         // 검색 및 페이징 처리
         Page<Item> items = itemService.searchItems(keyword, sortedPageable);
 
+        // 페이지네이션 범위 계산
+        int currentPage = items.getNumber() + 1; // 0-based → 1-based
+        int totalPages = items.getTotalPages();
+        int startPage = Math.max(1, (currentPage - 1) / 10 * 10 + 1);
+        int endPage = Math.min(startPage + 9, totalPages);
+
         // 모델에 데이터 추가
         model.addAttribute("items", items.getContent());
-        model.addAttribute("totalPages", items.getTotalPages());
-        model.addAttribute("currentPage", items.getNumber() + 1);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
 
         return "product/items"; // HTML 템플릿 경로
     }
+
 
 
     @GetMapping("/{itemId}")

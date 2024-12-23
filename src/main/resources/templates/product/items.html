@@ -15,7 +15,6 @@
             justify-content: center;
             gap: 10px;
         }
-
         .btn-register {
             background: #28a745;
             color: white;
@@ -24,57 +23,8 @@
             border-radius: 4px;
             transition: background-color 0.3s;
         }
-
         .btn-register:hover {
             background-color: #218838;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            gap: 5px;
-        }
-
-        .pagination a {
-            display: inline-block;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #007bff;
-            border-radius: 4px;
-        }
-
-        .pagination a.active {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .search-bar {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .search-bar input {
-            padding: 8px;
-            width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .search-bar button {
-            padding: 8px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .search-bar button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
@@ -83,13 +33,7 @@
     <h2>상품 목록</h2>
     <div class="container">
 
-        <!-- 검색 및 정렬 -->
-        <div class="search-bar">
-            <form th:action="@{/product/items}" method="get">
-                <input type="text" name="keyword" placeholder="상품 검색" th:value="${keyword}">
-                <button type="submit">검색</button>
-            </form>
-        </div>
+        <div th:replace="~{common/fragments/searchBar :: searchBar('/product/items','상품 검색',${keyword},null)}"></div>
 
         <!-- 상단 등록 버튼 -->
         <div class="actions">
@@ -128,13 +72,9 @@
             </tbody>
         </table>
 
-        <!-- 페이지네이션 -->
-        <div class="pagination">
-            <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-               th:href="@{/product/items(page=${i - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
-               th:classappend="${currentPage == i} ? 'active' : ''"
-               th:text="${i}"></a>
-        </div>
+        <div th:replace="~{common/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
+                         ${currentPage},'/product/items',${keyword},${sortField},${sortDirection})}"></div>
+
     </div>
 </main>
 </body>
