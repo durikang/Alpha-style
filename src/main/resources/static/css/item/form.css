@@ -1,0 +1,202 @@
+/* 전체 컨테이너 */
+.container {
+    width: 80%;
+    max-width: 700px;
+    min-width: 700px;
+    margin: 20px auto;
+    background-color: #f7f9fc; /* 밝은 배경 */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    padding: 20px 30px;
+    font-family: Arial, sans-serif;
+}
+
+/* 제목 스타일 */
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.6em;
+    color: #333; /* 어두운 텍스트 */
+    font-weight: 600;
+}
+
+/* 폼 기본 스타일 */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 각 항목 간격 */
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.95em;
+    color: #555; /* 중간 톤 텍스트 */
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95em;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    border-color: #007bff; /* 블루 하이라이트 */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* 포커스 효과 */
+}
+
+/* 버튼 스타일 */
+button, a.btn-cancel {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 10px;
+}
+
+button {
+    background-color: #007bff;
+}
+
+button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+a.btn-cancel {
+    background-color: #dc3545;
+    text-decoration: none;
+    text-align: center;
+}
+
+a.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+/* 이미지 미리보기 */
+.image-preview {
+    width: 400px;
+    height: 500px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #999;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.image-preview-area{
+    align-self: center;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.image-preview:hover {
+    background-color: #f1f1f1;
+    border-color: #aaa;
+}
+
+/* 썸네일 갤러리 */
+.thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.thumbnail-preview {
+    width: 80px;
+    height: 100px;
+    border: 1px dashed #ddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    color: #999;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.thumbnail-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.thumbnail-preview:hover {
+    background-color: #f1f1f1;
+    border-color: #aaa;
+}
+
+/* 체크박스 및 라디오 버튼 */
+.checkbox-group,
+.radio-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3열 배치 */
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.checkbox-item,
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: #007bff; /* 체크박스 및 라디오 색상 */
+}
+
+/* 에러 메시지 */
+.error {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: -10px;
+}
+
+/* 파일 업로드 숨기기 */
+input[type="file"] {
+    display: none;
+}
+
+/* 유틸리티 */
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+.col {
+    flex: 1;
+}
+
+.btn-lg {
+    font-size: 1.2em;
+    padding: 10px;
+}

@@ -17,22 +17,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.item.domain.Item;
-import page.admin.item.domain.dto.ItemEditForm;
-import page.admin.item.domain.dto.ItemSaveForm;
-import page.admin.item.domain.dto.ItemUpdateForm;
-import page.admin.item.domain.dto.ItemViewForm;
-import page.admin.item.service.DeliveryCodeService;
-import page.admin.item.service.ItemService;
-import page.admin.item.service.ItemTypeService;
-import page.admin.item.service.RegionService;
+import page.admin.item.domain.SubCategory;
+import page.admin.item.domain.dto.*;
+import page.admin.item.service.*;
 import page.admin.member.domain.dto.LoginSessionInfo;
 import page.admin.utils.Alert;
-import page.admin.utils.exception.FileProcessingException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -44,6 +37,8 @@ public class ItemController {
     private final RegionService regionService;
     private final ItemTypeService itemTypeService;
     private final DeliveryCodeService deliveryCodeService;
+    private final MainCategoryService mainCategoryService;
+    private final SubCategoryService subCategoryService;
 
     @GetMapping
     public String items(
@@ -53,27 +48,17 @@ public class ItemController {
             @PageableDefault(size = 10) Pageable pageable,
             Model model) {
 
-        // 정렬 설정
-        Sort sort;
-        try {
-            sort = Sort.by(Sort.Direction.fromString(sortDirection.toUpperCase()), sortField);
-        } catch (IllegalArgumentException e) {
-            sort = Sort.by(Sort.Direction.ASC, sortField); // 기본값
-        }
-
-        // 페이지 요청 생성 (정렬 적용)
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection.toUpperCase()), sortField);
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        // 검색 및 페이징 처리
+        // 연관 엔티티를 로드하도록 서비스 확인 필요
         Page<Item> items = itemService.searchItems(keyword, sortedPageable);
 
-        // 페이지네이션 범위 계산
-        int currentPage = items.getNumber() + 1; // 0-based → 1-based
+        int currentPage = items.getNumber() + 1;
         int totalPages = items.getTotalPages();
         int startPage = Math.max(1, (currentPage - 1) / 10 * 10 + 1);
         int endPage = Math.min(startPage + 9, totalPages);
 
-        // 모델에 데이터 추가
         model.addAttribute("items", items.getContent());
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", currentPage);
@@ -83,9 +68,8 @@ public class ItemController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
 
-        return "product/items"; // HTML 템플릿 경로
+        return "product/items";
     }
-
 
 
     @GetMapping("/{itemId}")
@@ -97,8 +81,11 @@ public class ItemController {
 
     @GetMapping("/add")
     public String addForm(Model model) {
-        populateModelAttributes(model); // 공통 데이터 설정
+        populateModelAttributes(model, null);
         model.addAttribute("item", new ItemSaveForm());
+        model.addAttribute("formAction", "/product/items/add");
+
+        log.debug("Form attributes: {}", model.asMap());
         return "product/addForm";
     }
 
@@ -108,55 +95,50 @@ public class ItemController {
                           RedirectAttributes redirectAttributes,
                           @SessionAttribute(name = "loginMember", required = false) LoginSessionInfo loginSessionInfo,
                           Model model) {
-
         if (bindingResult.hasErrors()) {
-            populateModelAttributes(model); // 공통 데이터 설정
+            populateModelAttributes(model, null);
             return "product/addForm";
-        }
-
-        if (loginSessionInfo == null) {
-            bindingResult.reject("loginRequired", "로그인이 필요합니다.");
-            return "redirect:/login";
         }
 
         try {
+            // 파일 저장 로직 호출
             itemService.saveItem(form, loginSessionInfo);
-            redirectAttributes.addFlashAttribute("message", "상품이 등록되었습니다.");
+
+            redirectAttributes.addFlashAttribute("alert", new Alert("상품이 등록되었습니다.", Alert.AlertType.SUCCESS));
             return "redirect:/product/items";
         } catch (Exception e) {
-            log.error("파일 저장 실패", e);
-            bindingResult.reject("fileSaveError", "파일 저장 중 오류가 발생했습니다.");
-            populateModelAttributes(model); // 공통 데이터 설정
+            log.error("Error during item save", e);
+            bindingResult.reject("saveFailed", "상품 저장 중 오류가 발생했습니다.");
+            populateModelAttributes(model, null);
             return "product/addForm";
         }
     }
+
 
     @GetMapping("/{itemId}/edit")
     public String editItemForm(@PathVariable("itemId") Long itemId, Model model) {
         try {
-            // ItemEditForm 데이터 가져오기
             ItemEditForm itemEditForm = itemService.getItemEditForm(itemId);
 
-            // thumbnails 초기화 (null 방지)
-            if (itemEditForm.getThumbnails() == null) {
-                itemEditForm.setThumbnails(new ArrayList<>()); // 빈 리스트로 설정
+            if (itemEditForm == null) {
+                throw new IllegalArgumentException("해당 ID에 해당하는 상품이 없습니다.");
             }
 
-            // 공통 데이터 설정
-            populateModelAttributes(model);
-
-            // 모델에 itemEditForm 추가
-            model.addAttribute("itemEditForm", itemEditForm);
-
-            return "product/editForm"; // 템플릿 반환
+            populateModelAttributes(model, itemEditForm.getMainCategory());
+            model.addAttribute("item", itemEditForm);
+            model.addAttribute("formAction", "/product/items/" + itemId + "/edit");
+            return "product/editForm";
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid itemId {}: {}", itemId, e.getMessage());
+            model.addAttribute("alert", new Alert(e.getMessage(), Alert.AlertType.WARNING));
+            return "redirect:/product/items";
         } catch (Exception e) {
-            // 로그 기록
-            log.error("Error fetching itemEditForm for itemId {}: {}", itemId, e.getMessage());
-
-            // 오류 페이지로 이동 (404 혹은 에러 페이지)
+            log.error("Error fetching itemEditForm for itemId {}: {}", itemId, e.getMessage(), e);
             return "error/errorPage";
         }
     }
+
+
 
 
     @PostMapping("/{itemId}/edit")
@@ -166,34 +148,18 @@ public class ItemController {
             BindingResult bindingResult,
             Model model) {
 
-        log.info("Received mainImage : {}", form.getMainImage());
-        log.info("Received thumbnails: {}", form.getThumbnails());
-
-        // 유효성 검사 실패 처리
         if (bindingResult.hasErrors()) {
-            log.error("Validation errors: {}", bindingResult.getAllErrors());
-            populateModelAttributes(model); // 공통 데이터 설정
-            return "product/editForm";
+            return handleValidationErrors(bindingResult, model);
         }
 
         try {
-            // 아이템 업데이트
             itemService.updateItem(itemId, form);
-
-        } catch (FileProcessingException e) {
-            log.error("파일 처리 중 오류 발생", e);
-            bindingResult.reject("fileProcessingError", "파일 처리 중 오류가 발생했습니다.");
-            populateModelAttributes(model); // 공통 데이터 설정
-            return "product/editForm";
-
         } catch (Exception e) {
-            log.error("상품 수정 중 오류 발생", e);
+            log.error("Unexpected error during update", e);
             bindingResult.reject("updateFailed", "상품 수정 중 오류가 발생했습니다.");
-            populateModelAttributes(model); // 공통 데이터 설정
-            return "product/editForm";
+            return handleValidationErrors(bindingResult, model);
         }
 
-        // 수정 성공 시 리다이렉트
         return "redirect:/product/items/" + itemId;
     }
 
@@ -208,14 +174,44 @@ public class ItemController {
                     .body(Map.of("message", "상품 삭제 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
+    // 컨트롤러
+    @GetMapping("/subcategories/{mainCategoryId}")
+    @ResponseBody
+    public List<SubCategoryDTO> getSubCategories(@PathVariable("mainCategoryId") Long mainCategoryId) {
+        log.info("Fetching subcategories for mainCategoryId={}", mainCategoryId);
+
+        List<SubCategory> subCategories = subCategoryService.getSubCategoriesByMainCategory(mainCategoryId);
+        log.info("Found subcategories: {}", subCategories);
+
+        // DTO 변환
+        return subCategories.stream()
+                .map(subCategory -> new SubCategoryDTO(subCategory.getId(), subCategory.getSubCategoryName()))
+                .collect(Collectors.toList());
+    }
 
 
 
 
-    // 공통 데이터 설정 메서드
-    private void populateModelAttributes(Model model) {
+
+    private String handleValidationErrors(BindingResult bindingResult, Model model) {
+        populateModelAttributes(model,null);
+        return "product/editForm";
+    }
+
+    private void populateModelAttributes(Model model, Long mainCategoryId) {
         model.addAttribute("regions", regionService.getAllRegions());
         model.addAttribute("itemTypes", itemTypeService.getAllItemTypes());
         model.addAttribute("deliveryCodes", deliveryCodeService.getAllDeliveryCodes());
+        model.addAttribute("mainCategories", mainCategoryService.getAllMainCategories());
+
+        log.debug("Main Category ID: {}", mainCategoryId);
+        if (mainCategoryId != null) {
+            List<SubCategory> subCategories = subCategoryService.getSubCategoriesByMainCategory(mainCategoryId);
+            log.debug("Subcategories for Main Category ID {}: {}", mainCategoryId, subCategories);
+            model.addAttribute("subCategories", subCategories);
+        } else {
+            log.debug("Main Category ID is null, skipping subCategories.");
+        }
     }
+
 }

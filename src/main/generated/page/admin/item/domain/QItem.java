@@ -24,8 +24,7 @@ public class QItem extends EntityPathBase<Item> {
 
     public final page.admin.common.QBaseEntity _super = new page.admin.common.QBaseEntity(this);
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
+    public final DateTimePath<java.time.LocalDateTime> createdDate = createDateTime("createdDate", java.time.LocalDateTime.class);
 
     public final QDeliveryCode deliveryCode;
 
@@ -35,22 +34,27 @@ public class QItem extends EntityPathBase<Item> {
 
     public final QItemType itemType;
 
+    public final QMainCategory mainCategory;
+
     public final QUploadFile mainImage;
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
+    public final DateTimePath<java.time.LocalDateTime> modifiedDate = createDateTime("modifiedDate", java.time.LocalDateTime.class);
 
     public final BooleanPath open = createBoolean("open");
 
-    public final NumberPath<Long> price = createNumber("price", Long.class);
+    public final NumberPath<Integer> purchasePrice = createNumber("purchasePrice", Integer.class);
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
-    public final ListPath<Region, QRegion> regions = this.<Region, QRegion>createList("regions", Region.class, QRegion.class, PathInits.DIRECT2);
+    public final SetPath<Region, QRegion> regions = this.<Region, QRegion>createSet("regions", Region.class, QRegion.class, PathInits.DIRECT2);
+
+    public final NumberPath<Integer> salePrice = createNumber("salePrice", Integer.class);
 
     public final page.admin.member.domain.QMember seller;
 
-    public final ListPath<UploadFile, QUploadFile> thumbnails = this.<UploadFile, QUploadFile>createList("thumbnails", UploadFile.class, QUploadFile.class, PathInits.DIRECT2);
+    public final QSubCategory subCategory;
+
+    public final SetPath<UploadFile, QUploadFile> thumbnails = this.<UploadFile, QUploadFile>createSet("thumbnails", UploadFile.class, QUploadFile.class, PathInits.DIRECT2);
 
     public QItem(String variable) {
         this(Item.class, forVariable(variable), INITS);
@@ -72,8 +76,10 @@ public class QItem extends EntityPathBase<Item> {
         super(type, metadata, inits);
         this.deliveryCode = inits.isInitialized("deliveryCode") ? new QDeliveryCode(forProperty("deliveryCode")) : null;
         this.itemType = inits.isInitialized("itemType") ? new QItemType(forProperty("itemType")) : null;
+        this.mainCategory = inits.isInitialized("mainCategory") ? new QMainCategory(forProperty("mainCategory")) : null;
         this.mainImage = inits.isInitialized("mainImage") ? new QUploadFile(forProperty("mainImage")) : null;
         this.seller = inits.isInitialized("seller") ? new page.admin.member.domain.QMember(forProperty("seller")) : null;
+        this.subCategory = inits.isInitialized("subCategory") ? new QSubCategory(forProperty("subCategory"), inits.get("subCategory")) : null;
     }
 
 }

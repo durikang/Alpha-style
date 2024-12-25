@@ -1,19 +1,20 @@
 package page.admin.order.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import page.admin.item.domain.Item;
+import page.admin.item.repository.DeliveryCodeRepository;
 import page.admin.order.domain.Order;
 import page.admin.order.domain.OrderDetail;
 import page.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.order.repository.OrderRepository;
-import page.admin.item.repository.DeliveryCodeRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -51,18 +52,36 @@ public class OrderServiceImpl implements OrderService {
     private OrderDetailDTO convertToDTO(Order order, OrderDetail detail) {
         OrderDetailDTO dto = new OrderDetailDTO();
         dto.setOrderNo(order.getOrderNo());
-        dto.setItemId(detail.getItem() != null ? detail.getItem().getItemId() : null);
-        dto.setItemName(detail.getItem() != null ? detail.getItem().getItemName() : "상품 없음");
-        dto.setItemPrice(detail.getItem() != null ? detail.getItem().getPrice() : 0L);
-        dto.setQuantity(detail.getQuantity());
-        dto.setSubtotal(detail.getSubtotal() != null ? detail.getSubtotal() : 0.0);
 
+        // Item과 관련된 정보 설정
+        if (detail.getItem() != null) {
+            Item item = detail.getItem();
+            dto.setItemId(item.getItemId());
+            dto.setItemName(item.getItemName());
+            dto.setPurchasePrice(item.getPurchasePrice() != null ? item.getPurchasePrice() : 0); // 매입가
+            dto.setSalePrice(item.getSalePrice() != null ? item.getSalePrice() : 0); // 판매가
+        } else {
+            dto.setItemId(null);
+            dto.setItemName("상품 없음");
+            dto.setPurchasePrice(0);
+            dto.setSalePrice(0);
+        }
+
+        dto.setQuantity(detail.getQuantity() != null ? detail.getQuantity() : 0);
+        dto.setSubtotal(detail.getSubtotal() != null ? detail.getSubtotal() : 0L);
+
+        // 주문 날짜 포맷팅
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        dto.setOrderDate(order.getOrderDate().toInstant().atZone(ZoneId.systemDefault()).format(formatter));
-        dto.setDelivaryStatus(order.getDeliveryStatus());
+        dto.setOrderDate(
+                order.getOrderDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .format(formatter)
+        );
 
+        dto.setDeliveryStatus(order.getDeliveryStatus());
         return dto;
     }
+
 
     @Override
     public void updateOrderStatus(Long orderNo, String status) {

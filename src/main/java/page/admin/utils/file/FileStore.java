@@ -1,16 +1,17 @@
 package page.admin.utils.file;
 
-import page.admin.item.domain.UploadFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import page.admin.item.domain.UploadFile;
 import page.admin.utils.exception.FileProcessingException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -25,6 +26,14 @@ public class FileStore {
     // 파일 저장 경로 반환
     public String getFullPath(String filename) {
         return fileDir + filename;
+    }
+
+    // 업로드 파일 URL 반환
+    public String getFileUrl(UploadFile uploadFile) {
+        if (uploadFile == null || uploadFile.getStoreFileName() == null) {
+            return null; // 파일 정보가 없을 경우 null 반환
+        }
+        return fileDir + uploadFile.getStoreFileName();
     }
 
     // 단일 파일 저장
@@ -47,17 +56,32 @@ public class FileStore {
     }
 
     // 다중 파일 저장
-    public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) {
-        List<UploadFile> storedFiles = new ArrayList<>();
-        if (multipartFiles != null) {
-            for (MultipartFile file : multipartFiles) {
-                if (!file.isEmpty()) {
-                    storedFiles.add(storeFile(file));
-                }
+    public Set<UploadFile> storeFiles(Set<MultipartFile> files) {
+        if (files == null || files.isEmpty()) {
+            log.warn("No files to store.");
+            return Collections.emptySet();
+        }
+
+        Set<UploadFile> storedFiles = new HashSet<>();
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                log.warn("Empty file skipped: {}", file.getOriginalFilename());
+                continue;
+            }
+
+            log.info("Storing file: {}", file.getOriginalFilename());
+            UploadFile storedFile = storeFile(file);
+            if (storedFile != null) {
+                storedFiles.add(storedFile);
+                log.info("File stored successfully: {}", storedFile.getStoreFileName());
+            } else {
+                log.error("Stored file is null for: {}", file.getOriginalFilename());
             }
         }
         return storedFiles;
     }
+
+
 
     // 파일 교체
     public UploadFile replaceFile(UploadFile existingFile, MultipartFile newFile) {
@@ -77,10 +101,10 @@ public class FileStore {
     }
 
     // 다중 파일 교체
-    public List<UploadFile> replaceFiles(List<UploadFile> existingFiles, List<MultipartFile> newFiles) {
+    public Set<UploadFile> replaceFiles(Set<UploadFile> existingFiles, Set<MultipartFile> newFiles) {
         try {
             // 새로운 파일 저장
-            List<UploadFile> updatedFiles = storeFiles(newFiles);
+            Set<UploadFile> updatedFiles = storeFiles(newFiles);
 
             // 기존 파일 삭제
             if (existingFiles != null) {
@@ -95,6 +119,7 @@ public class FileStore {
             throw e;
         }
     }
+
 
     // 파일 삭제
     public boolean deleteFile(String storeFileName) {

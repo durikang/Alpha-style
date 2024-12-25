@@ -48,14 +48,18 @@
                 <th><input type="checkbox" id="selectAll"></th>
                 <th><a th:href="@{/product/items(sort='itemId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">ID</a></th>
                 <th><a th:href="@{/product/items(sort='itemName', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">상품명</a></th>
-                <th><a th:href="@{/product/items(sort='price', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">가격</a></th>
+                <th><a th:href="@{/product/items(sort='purchasePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">매입가</a></th>
+                <th><a th:href="@{/product/items(sort='salePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">매출가</a></th>
                 <th><a th:href="@{/product/items(sort='quantity', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">수량</a></th>
+                <th>메인 카테고리</th>
+                <th>서브 카테고리</th>
+                <th>판매자</th>
             </tr>
             </thead>
             <tbody>
             <!-- 데이터가 없을 경우 메시지 표시 -->
             <tr th:if="${#lists.isEmpty(items)}">
-                <td colspan="5" style="text-align: center;">상품이 등록되어 있지 않습니다.</td>
+                <td colspan="9" style="text-align: center;">상품이 등록되어 있지 않습니다.</td>
             </tr>
 
             <!-- 데이터가 있을 경우 테이블 행 렌더링 -->
@@ -66,8 +70,12 @@
                 <td><input type="checkbox" class="select-checkbox" th:value="${item.itemId}"></td>
                 <td th:text="${item.itemId}"></td>
                 <td th:text="${item.itemName}"></td>
-                <td th:text="${item.price}"></td>
+                <td th:text="${item.purchasePrice}"></td>
+                <td th:text="${item.salePrice}"></td>
                 <td th:text="${item.quantity}"></td>
+                <td th:text="${item.mainCategory != null ? item.mainCategory.mainCategoryName : '없음'}"></td>
+                <td th:text="${item.subCategory != null ? item.subCategory.subCategoryName : '없음'}"></td>
+                <td th:text="${item.seller.username}"></td>
             </tr>
             </tbody>
         </table>

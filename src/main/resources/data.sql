@@ -1,73 +1,43 @@
--- 데이터 초기화 순서: 자식 -> 부모
-DELETE FROM item_region_mapping;
-DELETE FROM item_thumbnails;
-DELETE FROM order_detail;
-DELETE FROM orders;
-DELETE FROM item;
-DELETE FROM delivery_code;
-DELETE FROM item_type;
-DELETE FROM region;
-DELETE FROM system_log;
+DROP TABLE IF EXISTS ORDER_DETAIL CASCADE CONSTRAINTS;  -- OrderDetail 테이블 삭제
+DROP TABLE IF EXISTS ORDERS CASCADE CONSTRAINTS;        -- Orders 테이블 삭제
+DROP TABLE IF EXISTS ITEM CASCADE CONSTRAINTS;          -- Item 테이블 삭제
+DROP TABLE IF EXISTS SUB_CATEGORY CASCADE CONSTRAINTS;  -- SubCategory 테이블 삭제
+DROP TABLE IF EXISTS MAIN_CATEGORY CASCADE CONSTRAINTS; -- MainCategory 테이블 삭제
+DROP TABLE IF EXISTS ITEM_TYPE CASCADE CONSTRAINTS;     -- ItemType 테이블 삭제
+DROP TABLE IF EXISTS DELIVERY_CODE CASCADE CONSTRAINTS; -- DeliveryCode 테이블 삭제
+DROP TABLE IF EXISTS REGION CASCADE CONSTRAINTS;        -- Region 테이블 삭제
+DROP TABLE IF EXISTS MEMBERS CASCADE CONSTRAINTS;       -- Members 테이블 삭제
+DROP TABLE IF EXISTS TAX_TYPE CASCADE CONSTRAINTS;      -- TaxType 테이블 삭제
+
+DROP SEQUENCE IF EXISTS ORDER_SEQ;          -- Order 시퀀스 삭제
+DROP SEQUENCE IF EXISTS ORDER_DETAIL_SEQ;   -- OrderDetail 시퀀스 삭제
+DROP SEQUENCE IF EXISTS ITEM_SEQ;           -- Item 시퀀스 삭제
+DROP SEQUENCE IF EXISTS REGION_SEQ;         -- Region 시퀀스 삭제
+DROP SEQUENCE IF EXISTS MAIN_CATEGORY_SEQ;  -- MainCategory 시퀀스 삭제
+DROP SEQUENCE IF EXISTS SUB_CATEGORY_SEQ;   -- SubCategory 시퀀스 삭제
+DROP SEQUENCE IF EXISTS ITEM_TYPE_SEQ;      -- ItemType 시퀀스 삭제
+DROP SEQUENCE IF EXISTS DELIVERY_CODE_SEQ;  -- DeliveryCode 시퀀스 삭제
+DROP SEQUENCE IF EXISTS MEMBERS_SEQ;        -- Members 시퀀스 삭제
+DROP SEQUENCE IF EXISTS TAX_TYPE_SEQ;       -- TaxType 시퀀스 삭제
+
 
 -- DeliveryCode 초기 데이터
-INSERT INTO delivery_code (id, code, display_name) VALUES (DELIVERY_CODE_SEQ.NEXTVAL, 'DROPOFF', '집하');
-INSERT INTO delivery_code (id, code, display_name) VALUES (DELIVERY_CODE_SEQ.NEXTVAL, 'COMPLETE', '배송완료');
-INSERT INTO delivery_code (id, code, display_name) VALUES (DELIVERY_CODE_SEQ.NEXTVAL, 'CANCELED', '취소됨');
+-- 자동 생성된 DeliveryCode 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- ItemType 초기 데이터
-INSERT INTO item_type (id, code, description) VALUES (ITEM_TYPE_SEQ.NEXTVAL, 'BOOK', '도서');
-INSERT INTO item_type (id, code, description) VALUES (ITEM_TYPE_SEQ.NEXTVAL, 'FOOD', '음식');
-INSERT INTO item_type (id, code, description) VALUES (ITEM_TYPE_SEQ.NEXTVAL, 'ELECTRONIC', '전자제품');
+-- 자동 생성된 ItemType 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- Region 초기 데이터
-INSERT INTO region (id, code, display_name, active) VALUES (REGION_SEQ.NEXTVAL, 'SEOUL', '서울', 1);
-INSERT INTO region (id, code, display_name, active) VALUES (REGION_SEQ.NEXTVAL, 'BUSAN', '부산', 1);
-INSERT INTO region (id, code, display_name, active) VALUES (REGION_SEQ.NEXTVAL, 'DAEGU', '대구', 1);
+-- 자동 생성된 Region 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- Members 초기 데이터 (관리자 및 userA 포함)
 -- 자동 생성된 회원 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- Item 초기 데이터
-INSERT INTO item (item_id, item_name, price, quantity, open, item_type_id, delivery_code_id, user_no)
-VALUES (ITEM_SEQ.NEXTVAL, 'Book1', 15000, 10, 1,
-        (SELECT id FROM item_type WHERE code = 'BOOK'),
-        (SELECT id FROM delivery_code WHERE code = 'DROPOFF'),
-        (SELECT user_no FROM members WHERE user_id = 'userA'));
-
-INSERT INTO item (item_id, item_name, price, quantity, open, item_type_id, delivery_code_id, user_no)
-VALUES (ITEM_SEQ.NEXTVAL, 'Food1', 30000, 5, 1,
-        (SELECT id FROM item_type WHERE code = 'FOOD'),
-        (SELECT id FROM delivery_code WHERE code = 'COMPLETE'),
-        (SELECT user_no FROM members WHERE user_id = 'system'));
+-- 자동 생성된 Item 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- Orders 초기 데이터
-INSERT INTO orders (order_no, user_no, order_date, total_amount, delivery_status)
-VALUES (ORDER_SEQ.NEXTVAL,
-        (SELECT user_no FROM members WHERE user_id = 'userA'),
-        TO_DATE('2024-12-01', 'YYYY-MM-DD'),
-        60000, '배송완료');
-
-INSERT INTO orders (order_no, user_no, order_date, total_amount, delivery_status)
-VALUES (ORDER_SEQ.NEXTVAL,
-        (SELECT user_no FROM members WHERE user_id = 'system'),
-        TO_DATE('2024-12-02', 'YYYY-MM-DD'),
-        30000, '집하');
+-- 자동 생성된 Orders 데이터는 별도 PL/SQL 구문에서 생성됨
 
 -- OrderDetail 초기 데이터
-INSERT INTO order_detail (order_detail_no, order_no, item_id, quantity, subtotal)
-VALUES (ORDER_DETAIL_SEQ.NEXTVAL,
-        (SELECT order_no FROM orders WHERE ROWNUM = 1 AND delivery_status = '배송완료'),
-        (SELECT item_id FROM item WHERE item_name = 'Book1'),
-        2, 30000);
-
-INSERT INTO order_detail (order_detail_no, order_no, item_id, quantity, subtotal)
-VALUES (ORDER_DETAIL_SEQ.NEXTVAL,
-        (SELECT order_no FROM orders WHERE ROWNUM = 1 AND delivery_status = '배송완료'),
-        (SELECT item_id FROM item WHERE item_name = 'Food1'),
-        1, 30000);
-
-INSERT INTO order_detail (order_detail_no, order_no, item_id, quantity, subtotal)
-VALUES (ORDER_DETAIL_SEQ.NEXTVAL,
-        (SELECT order_no FROM orders WHERE ROWNUM = 1 AND delivery_status = '집하'),
-        (SELECT item_id FROM item WHERE item_name = 'Food1'),
-        1, 30000);
+-- 자동 생성된 OrderDetail 데이터는 별도 PL/SQL 구문에서 생성됨

@@ -1,46 +1,69 @@
 package page.admin.item.domain.dto;
 
 import lombok.Getter;
-import lombok.Setter;
-import page.admin.item.domain.DeliveryCode;
-import page.admin.item.domain.ItemType;
-import page.admin.item.domain.Region;
-import page.admin.item.domain.UploadFile;
+import page.admin.item.domain.*;
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Getter
-@Setter
 public class ItemViewForm {
-    private Long itemId;             // 상품 ID
-    private String itemName;         // 상품명
-    private Long price;              // 가격
-    private String formattedPrice;   // 포맷된 가격 (₩ 표시 포함)
-    private Integer quantity;        // 수량
-    private Boolean open;            // 판매 여부
-    private List<Region> regions;    // 등록 지역
-    private ItemType itemType;       // 상품 종류
-    private DeliveryCode deliveryCode; // 배송 방식
-    private UploadFile mainImage;    // 메인 이미지
-    private List<UploadFile> thumbnails; // 썸네일 이미지
 
-    public String getFormattedPrice() {
-        if (price == null) return "가격 정보 없음";
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
-        return currencyFormat.format(price);
+    private final Long itemId;
+    private final String itemName;
+    private final Integer purchasePrice;
+    private final Integer salePrice;
+    private final Integer quantity;
+    private final Boolean open;
+    private final Set<Region> regions;
+    private final ItemType itemType;
+    private final DeliveryCode deliveryCode;
+    private final MainCategory mainCategory;
+    private final SubCategory subCategory;
+    private final UploadFile mainImage;
+    private final Set<UploadFile> thumbnails;
+
+    public ItemViewForm(Long itemId, String itemName, Integer purchasePrice, Integer salePrice, Integer quantity,
+                        Boolean open, Set<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
+                        MainCategory mainCategory, SubCategory subCategory, UploadFile mainImage,
+                        Set<UploadFile> thumbnails) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
+        this.quantity = quantity;
+        this.open = open;
+        this.regions = regions;
+        this.itemType = itemType;
+        this.deliveryCode = deliveryCode;
+        this.mainCategory = mainCategory;
+        this.subCategory = subCategory;
+        this.mainImage = mainImage;
+        this.thumbnails = thumbnails;
     }
 
-    public String getDeliveryDisplayName() {
-        return deliveryCode != null ? deliveryCode.getDisplayName() : "배송 정보 없음";
-    }
-
-    public String getItemTypeDescription() {
-        return itemType != null ? itemType.getDescription() : "상품 종류 없음";
-    }
-
+    // 판매 여부
     public String getOpenStatus() {
-        return open != null && open ? "판매 중" : "판매 중지";
+        return open != null && open ? "판매 중" : "판매 종료";
+    }
+
+    // 가격 포맷팅 메서드 추가
+    public String getFormattedPurchasePrice() {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
+        return purchasePrice != null ? currencyFormat.format(purchasePrice) : "가격 정보 없음";
+    }
+
+    public String getFormattedSalePrice() {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
+        return salePrice != null ? currencyFormat.format(salePrice) : "가격 정보 없음";
+    }
+    // 상품 종류 설명 추가
+    public String getItemTypeDescription() {
+        return itemType != null ? itemType.getDescription() : "정보 없음";
+    }
+    // 배송 방식 설명 추가
+    public String getDeliveryDisplayName() {
+        return deliveryCode != null ? deliveryCode.getDisplayName() : "정보 없음";
     }
 }

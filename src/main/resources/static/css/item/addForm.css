@@ -113,3 +113,48 @@ hr {
     margin-left: 5px;
     font-size: 1em;
 }
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    margin-right: 10px;
+    width: 120px;
+}
+
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+.image-preview {
+    width: 400px;
+    height: 500px;
+    margin-bottom: 10px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+}
+
+.thumbnail-preview {
+    width: 80px;
+    height: 100px;
+    border: 1px dashed #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+input[type="file"] {
+    display: none;
+}

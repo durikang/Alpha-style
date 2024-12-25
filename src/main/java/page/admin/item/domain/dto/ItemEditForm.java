@@ -3,12 +3,10 @@ package page.admin.item.domain.dto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
-import page.admin.item.domain.DeliveryCode;
-import page.admin.item.domain.ItemType;
-import page.admin.item.domain.Region;
 import page.admin.item.domain.UploadFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class ItemEditForm {
@@ -19,9 +17,13 @@ public class ItemEditForm {
     @NotBlank(message = "상품명은 필수 입력값입니다.")
     private String itemName;
 
-    @NotNull(message = "가격은 필수 입력값입니다.")
-    @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
-    private Long price;
+    @NotNull(message = "매입가는 필수 입력값입니다.")
+    @Min(value = 0, message = "매입가는 0 이상이어야 합니다.")
+    private Integer purchasePrice;
+
+    @NotNull(message = "판매가는 필수 입력값입니다.")
+    @Min(value = 0, message = "판매가는 0 이상이어야 합니다.")
+    private Integer salePrice;
 
     @NotNull(message = "수량은 필수 입력값입니다.")
     @Min(value = 0, message = "수량은 0 이상이어야 합니다.")
@@ -30,19 +32,36 @@ public class ItemEditForm {
     private Boolean open;
 
     @NotEmpty(message = "지역 코드는 최소 1개 이상 입력해야 합니다.")
-    private List<String> regionCodes; // 등록 지역 (지역 코드 리스트)
+    private Set<String> regionCodes;
 
-    @NotBlank(message = "상품 종류 코드는 필수 입력값입니다.")
-    private String itemType; // 상품 종류 (코드)
+    @NotNull(message = "상품 종류는 필수 입력값입니다.")
+    private Long itemType;
 
-    @NotBlank(message = "배송 방식 코드는 필수 입력값입니다.")
-    private String deliveryCode; // 변경: String으로 정의
+    @NotBlank(message = "배송 방식은 필수 입력값입니다.")
+    private String deliveryCode;
+
+    @NotNull(message = "메인 카테고리는 필수 입력값입니다.")
+    private Long mainCategory;
+
+    @NotNull(message = "세부 카테고리는 필수 입력값입니다.")
+    private Long subCategory;
 
     private UploadFile mainImage;
-    private List<UploadFile> thumbnails;
+    private Set<UploadFile> thumbnails;
+
+    private String mainImagePath;
+    private List<String> thumbnailPaths;
 
     private MultipartFile newMainImage;
+
     @Size(max = 4, message = "썸네일 이미지는 최대 4개까지 업로드할 수 있습니다.")
     private List<MultipartFile> newThumbnails;
 
+    @AssertTrue(message = "매입가는 매출가보다 낮아야 합니다.")
+    public boolean isValidPrice() {
+        if (purchasePrice == null || salePrice == null) {
+            return true; // 다른 유효성 검사에서 처리
+        }
+        return purchasePrice < salePrice;
+    }
 }

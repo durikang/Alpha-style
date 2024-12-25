@@ -1,13 +1,29 @@
 package page.admin.item.domain;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Data
 @NoArgsConstructor
-@Embeddable
+@SequenceGenerator(
+        name = "upload_file_seq_generator",
+        sequenceName = "upload_file_seq", // Oracle 시퀀스 이름
+        allocationSize = 1
+)
 public class UploadFile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq_generator")
+    @SequenceGenerator(name = "upload_file_seq_generator", sequenceName = "upload_file_seq", allocationSize = 1)
+    private Long id;
+
+
     private String uploadFileName;
     private String storeFileName;
 

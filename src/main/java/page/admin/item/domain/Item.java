@@ -2,71 +2,101 @@ package page.admin.item.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import page.admin.common.BaseEntity;
 import page.admin.member.domain.Member;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true) // BaseEntity의 equals, hashCode를 호출
 public class Item extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq_generator")
-    @SequenceGenerator(name = "item_seq_generator", sequenceName = "item_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq")
+    @SequenceGenerator(name = "item_seq", sequenceName = "item_seq", allocationSize = 1)
     private Long itemId;
 
-    private String itemName;
-    private Long price;
-    private Integer quantity;
 
-    @Embedded
+    @Column(nullable = false)
+    private String itemName; // 상품명
+
+    @Column(nullable = false)
+    private Integer purchasePrice; // 매입가
+
+    @Column(nullable = false)
+    private Integer salePrice; // 판매가
+
+    @Column(nullable = false)
+    private Integer quantity; // 수량
+
+    @Column(nullable = false)
+    private Boolean open; // 판매 여부
+
+    @CreationTimestamp
+    private LocalDateTime createdDate; // 생성 날짜
+
+    @UpdateTimestamp
+    private LocalDateTime modifiedDate; // 수정 날짜
+
+    // 메인 이미지
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "main_image_id", referencedColumnName = "id")
     private UploadFile mainImage;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "item_thumbnails",
-            joinColumns = @JoinColumn(name = "item_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    )
-    @Cascade(CascadeType.ALL)
-    private List<UploadFile> thumbnails;
+    // 썸네일 이미지들
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "item_id")
+    private Set<UploadFile> thumbnails;
 
-
-    private Boolean open;
-
-    // Regions 관계: Cascade를 제거하여 Item 삭제 시 영향 방지
+    // 지역 (N:N 관계)
     @ManyToMany
     @JoinTable(
             name = "item_region_mapping",
-            joinColumns = @JoinColumn(name = "item_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)),
-            inverseJoinColumns = @JoinColumn(name = "region_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "region_id")
     )
-    private List<Region> regions;
+    private Set<Region> regions;
 
-
-    // ItemType 관계: nullable 허용, Cascade 설정 제거
+    // 상품 종류 (1:N 관계)
     @ManyToOne
-    @JoinColumn(name = "item_type_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "item_type_id", nullable = false)
     private ItemType itemType;
 
+    // 배송 방식 (1:N 관계)
     @ManyToOne
-    @JoinColumn(name = "delivery_code_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "delivery_code_id", nullable = false)
     private DeliveryCode deliveryCode;
 
+    // 메인 카테고리
     @ManyToOne
-    @JoinColumn(name = "user_no", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "main_category_id", nullable = false)
+    private MainCategory mainCategory;
+
+    // 세부 카테고리
+    @ManyToOne
+    @JoinColumn(name = "sub_category_id", nullable = false)
+    private SubCategory subCategory;
+
+    // 판매자 정보 (N:1 관계)
+    @ManyToOne
+    @JoinColumn(name = "seller_user_no", referencedColumnName = "userNo", nullable = false)
     private Member seller;
 
     // 생성자
-    public Item(String itemName, Long price, Integer quantity, Boolean open,
-                List<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
-                UploadFile mainImage, List<UploadFile> thumbnails) {
+    public Item(String itemName, Integer purchasePrice, Integer salePrice, Integer quantity, Boolean open,
+                Set<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
+                UploadFile mainImage, Set<UploadFile> thumbnails, MainCategory mainCategory, SubCategory subCategory,
+                Member seller) {
         this.itemName = itemName;
-        this.price = price;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
         this.quantity = quantity;
         this.open = open;
         this.regions = regions;
@@ -74,12 +104,8 @@ public class Item extends BaseEntity {
         this.deliveryCode = deliveryCode;
         this.mainImage = mainImage;
         this.thumbnails = thumbnails;
-    }
-
-    public Item(String itemName, Long price, Integer quantity, Boolean open,
-                List<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
-                UploadFile mainImage, List<UploadFile> thumbnails, Member seller) {
-        this(itemName, price, quantity, open, regions, itemType, deliveryCode, mainImage, thumbnails);
+        this.mainCategory = mainCategory;
+        this.subCategory = subCategory;
         this.seller = seller;
     }
 }

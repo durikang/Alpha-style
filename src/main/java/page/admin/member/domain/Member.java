@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import page.admin.common.BaseEntity;
 import page.admin.item.domain.Item;
 
@@ -59,5 +60,6 @@ public class Member extends BaseEntity {
     private String role;
 
     @OneToMany(mappedBy = "seller")
+    @ToString.Exclude
     private List<Item> items;
 }

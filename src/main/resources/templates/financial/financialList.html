@@ -44,8 +44,104 @@
         <!-- 상단 등록 버튼 -->
         <div class="actions">
             <a href="/user/users/add" class="btn btn-register">엑셀 다운로드</a>
+
             <!--<button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>-->
         </div>
+        <div class="actions">
+            <!-- 다중 파일 업로드를 허용하려면 multiple 속성을 추가 -->
+            <input type="file" id="fileInput" accept=".xlsx,.csv" multiple>
+            <button id="uploadBtn" class="btn btn-register">파일 업로드</button>
+        </div>
+
+        <div id="fileListContainer">
+            <h3>선택된 파일:</h3>
+            <div id="fileList"></div>
+        </div>
+
+        <!-- 진행 표시줄 -->
+        <div id="progressContainer" style="display: none;">
+            <h3>업로드 진행:</h3>
+            <progress id="uploadProgress" value="0" max="100" style="width: 100%;"></progress>
+            <span id="progressText">0%</span>
+        </div>
+
+        <script>
+            const fileInput = document.getElementById('fileInput');
+            const fileList = document.getElementById('fileList');
+            const progressContainer = document.getElementById('progressContainer');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressText = document.getElementById('progressText');
+
+            fileInput.addEventListener('change', function () {
+                fileList.innerHTML = '';
+                const files = fileInput.files;
+
+                if (!files.length) {
+                    fileList.textContent = '선택된 파일이 없습니다.';
+                } else {
+                    Array.from(files).forEach(file => {
+                        const fileNameElement = document.createElement('div');
+                        fileNameElement.textContent = file.name;
+                        fileList.appendChild(fileNameElement);
+                    });
+                }
+            });
+
+            document.getElementById('uploadBtn').addEventListener('click', function () {
+                const files = fileInput.files;
+
+                if (!files.length) {
+                    alert('파일을 선택해주세요!');
+                    return;
+                }
+
+                const formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('files', files[i]);
+                }
+
+                // 진행 표시줄 표시
+                progressContainer.style.display = 'block';
+                uploadProgress.value = 0;
+                progressText.textContent = '0%';
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'http://localhost:5000/upload', true);
+
+                // 진행률 업데이트
+                xhr.upload.addEventListener('progress', function (event) {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        uploadProgress.value = percentComplete;
+                        progressText.textContent = `${percentComplete}%`;
+                    }
+                });
+
+                // 요청 완료 시 처리
+                xhr.addEventListener('load', function () {
+                    if (xhr.status === 200) {
+                        alert('파일 업로드 성공!');
+                    } else {
+                        alert('파일 업로드 실패!');
+                    }
+
+                    // 진행 표시 초기화
+                    progressContainer.style.display = 'none';
+                });
+
+                // 요청 에러 시 처리
+                xhr.addEventListener('error', function () {
+                    alert('업로드 중 오류가 발생했습니다.');
+                    progressContainer.style.display = 'none';
+                });
+
+                xhr.send(formData);
+            });
+        </script>
+
+
+
+
 
         <!-- 데이터 테이블 -->
         <table>

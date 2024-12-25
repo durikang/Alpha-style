@@ -35,18 +35,24 @@
                  alt="상품 메인 이미지" class="main-image">
         </div>
         <div class="thumbnail-gallery">
-            <!-- 썸네일 1 -->
-            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 0 ? '/' + item.thumbnails[0].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'}"
-                 alt="썸네일 1" class="thumbnail">
-            <!-- 썸네일 2 -->
-            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 1 ? '/' + item.thumbnails[1].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'}"
-                 alt="썸네일 2" class="thumbnail">
-            <!-- 썸네일 3 -->
-            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 2 ? '/' + item.thumbnails[2].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'}"
-                 alt="썸네일 3" class="thumbnail">
-            <!-- 썸네일 4 -->
-            <img th:src="${item.thumbnails != null and item.thumbnails.size() > 3 ? '/' + item.thumbnails[3].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'}"
-                 alt="썸네일 4" class="thumbnail">
+            <div class="thumbnail-gallery">
+                <!-- 썸네일 1 -->
+                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 0 ? '/' + item.thumbnails[0].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'}"
+                     alt="썸네일 1" class="thumbnail">
+
+                <!-- 썸네일 2 -->
+                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 1 ? '/' + item.thumbnails[1].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'}"
+                     alt="썸네일 2" class="thumbnail">
+
+                <!-- 썸네일 3 -->
+                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 2 ? '/' + item.thumbnails[2].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'}"
+                     alt="썸네일 3" class="thumbnail">
+
+                <!-- 썸네일 4 -->
+                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 3 ? '/' + item.thumbnails[3].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'}"
+                     alt="썸네일 4" class="thumbnail">
+            </div>
+
         </div>
     </div>
 
@@ -68,8 +74,14 @@
 
         <!-- 가격 -->
         <div class="detail-row">
-            <label>가격</label>
-            <p class="price" th:text="${item.getFormattedPrice}">₩26,000</p>
+            <label>구매가</label>
+            <p class="price" th:text="${item.getFormattedPurchasePrice}">₩20,000</p>
+        </div>
+
+        <!-- 판매가 -->
+        <div class="detail-row">
+            <label>판매가</label>
+            <p class="price" th:text="${item.getFormattedSalePrice}">₩26,000</p>
         </div>
 
         <!-- 수량 -->
@@ -92,6 +104,18 @@
                     <p th:text="${region.displayName}">등록 지역 없음</p>
                 </div>
             </div>
+        </div>
+
+        <!-- 메인 카테고리 -->
+        <div class="detail-row">
+            <label>메인 카테고리</label>
+            <p th:text="${item.mainCategory.mainCategoryName}">메인 카테고리 예시</p>
+        </div>
+
+        <!-- 서브 카테고리 -->
+        <div class="detail-row">
+            <label>서브 카테고리</label>
+            <p th:text="${item.subCategory.subCategoryName}">서브 카테고리 예시</p>
         </div>
 
         <!-- 상품 종류 -->

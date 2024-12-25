@@ -27,6 +27,6 @@ public class Alert {
 
     // Alert의 유형을 제한하는 Enum
     public enum AlertType {
-        SUCCESS, ERROR
+        SUCCESS, ERROR,WARNING
     }
 }

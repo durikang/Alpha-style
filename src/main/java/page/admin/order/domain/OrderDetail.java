@@ -26,11 +26,18 @@ public class OrderDetail {
     private Item item;
 
     private Integer quantity;
+
+    @Column(nullable = false)
     private Long subtotal;
 
+    /**
+     * Subtotal 계산: salePrice와 quantity를 기준으로 계산
+     */
     public void calculateSubtotal() {
-        if (item != null) {
-            this.subtotal = (item.getPrice() != null ? item.getPrice() : 0) * (quantity != null ? quantity : 0);
+        if (item != null && item.getSalePrice() != null && quantity != null) {
+            this.subtotal = (long) item.getSalePrice() * quantity;
+        } else {
+            this.subtotal = 0L;
         }
     }
 }
