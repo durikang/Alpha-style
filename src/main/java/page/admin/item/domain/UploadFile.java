@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class UploadFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq_generator")
-    @SequenceGenerator(name = "upload_file_seq_generator", sequenceName = "upload_file_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq")
+    @SequenceGenerator(name = "upload_file_seq", sequenceName = "UPLOAD_FILE_SEQ", allocationSize = 1)
     private Long id;
 
 

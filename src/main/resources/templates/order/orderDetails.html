@@ -128,8 +128,7 @@
                         <option th:each="status : ${deliveryStatuses}"
                                 th:value="${status}"
                                 th:selected="${status == order.deliveryStatus}"
-                                th:text="${status}">
-                        </option>
+                                th:text="${status}"></option>
                     </select>
                 </p>
             </div>
@@ -152,21 +151,22 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tbody>
                     <tr th:each="detail : ${details}">
-                        <td th:text="${detail.order.orderNo}">12345</td>
-                        <td th:text="${detail.item.itemId}">12345</td>
+                        <td th:text="${detail.orderNo}">12345</td>
+                        <td th:text="${detail.itemId}">12345</td>
                         <td>
-                            <img th:if="${detail.item.mainImage != null && detail.item.mainImage.url != null}"
-                                 th:src="${detail.item.mainImage.url}" alt="상품 이미지" style="max-width: 64px; max-height: 64px;">
-                            <img th:if="${detail.item.mainImage == null || detail.item.mainImage.url == null}"
-                                 src="https://via.placeholder.com/64x64.png?text=Main+Image" alt="기본 이미지" style="max-width: 64px; max-height: 64px;">
-                            <span th:text="${detail.item.itemName}">상품 이름</span>
+                            <img th:if="${detail.mainImageUrl != null}" th:src="${detail.mainImageUrl}" alt="상품 이미지" style="max-width: 64px; max-height: 64px;">
+                            <img th:if="${detail.mainImageUrl == null}" src="https://via.placeholder.com/64x64.png?text=No+Image" alt="기본 이미지" style="max-width: 64px; max-height: 64px;">
+                            <span th:text="${detail.itemName}">상품 이름</span>
                         </td>
                         <td th:text="${detail.quantity}">2</td>
-                        <td th:text="${detail.item.price}">20000</td>
+                        <td th:text="${detail.salePrice}">20000</td>
                         <td th:text="${detail.subtotal}">40000</td>
-                        <td th:text="${#dates.format(detail.order.orderDate, 'yyyy-MM-dd')}">2024-12-14</td>
+                        <td th:text="${detail.orderDate}">2024-12-14</td>
                     </tr>
+                    </tbody>
+
                     </tbody>
                 </table>
             </div>

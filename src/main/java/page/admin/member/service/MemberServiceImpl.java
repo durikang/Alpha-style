@@ -11,7 +11,7 @@ import page.admin.member.domain.Member;
 import page.admin.member.domain.dto.UpdateForm;
 import page.admin.member.exception.DuplicateMemberException;
 import page.admin.member.exception.MemberNotFoundException;
-import page.mapper.MemberMapper;
+
 import page.admin.member.repository.MemberRepository;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberMapper memberMapper;
+
 
     @Override
     public Optional<Member> findByUserIdAndPassword(String userId, String password) {

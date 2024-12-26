@@ -29,13 +29,20 @@
             </li>
             <li>판매 관리
                 <ul>
-                    <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 등록</a></li>
-                    <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 조회</a></li>
+                    <li><a th:href="@{/admin/sales}" href="/pages/variable">판매 기록 조회</a></li>
                     <li><a th:href="@{/pages/variable}" href="/pages/variable">판매 기록 분석</a></li>
                 </ul>
             </li>
             <li>재무 관리
                 <ul>
+                    <li><a th:href="@{/financial/option}" href="/pages/variable">임시</a></li>
+                    <li><a th:href="@{/financial/financials}" href="/pages/variable">재무 데이터 조회</a></li>
+                    <li><a th:href="@{/pages/variable}" href="/pages/variable">재무 데이터 분석</a></li>
+                </ul>
+            </li>
+            <li>재무 관리
+                <ul>
+                    <li><a th:href="@{/financial/option}" href="/pages/variable">임시</a></li>
                     <li><a th:href="@{/financial/financials}" href="/pages/variable">재무 데이터 조회</a></li>
                     <li><a th:href="@{/pages/variable}" href="/pages/variable">재무 데이터 분석</a></li>
                 </ul>

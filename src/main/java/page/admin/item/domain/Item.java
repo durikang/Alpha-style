@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import page.admin.common.BaseEntity;
 import page.admin.member.domain.Member;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,7 +24,6 @@ public class Item extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq")
     @SequenceGenerator(name = "item_seq", sequenceName = "item_seq", allocationSize = 1)
     private Long itemId;
-
 
     @Column(nullable = false)
     private String itemName; // 상품명
@@ -50,7 +51,6 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "main_image_id", referencedColumnName = "id")
     private UploadFile mainImage;
 
-    // 썸네일 이미지들
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "item_id")
     private Set<UploadFile> thumbnails;

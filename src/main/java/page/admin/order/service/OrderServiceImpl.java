@@ -35,10 +35,9 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAll();
     }
 
-    @Override
-    public Order getOrderById(Long orderNo) {
-        return orderRepository.findByIdWithDetails(orderNo)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 주문 번호: " + orderNo));
+    public Order getOrderById(Long id) {
+        return orderRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new IllegalArgumentException("주문 번호에 해당하는 정보를 찾을 수 없습니다."));
     }
 
     @Override

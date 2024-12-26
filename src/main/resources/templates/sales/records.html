@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <title>판매 기록 조회</title>
+</head>
+<body>
+<main>
+    <h2>판매 기록 조회</h2>
+    <!-- 검색 및 필터 -->
+    <div th:replace="~{common/fragments/searchBar(
+        actionUrl='/admin/sales',
+        keywordPlaceholder='상품명, 구매자 이름 등 검색',
+        keyword=${keyword},
+        filters=${filters})}">
+    </div>
+
+    <!-- 판매 기록 테이블 -->
+    <table>
+        <thead>
+        <tr>
+            <th>
+                <a th:href="@{/admin/sales(page=0, sort='orderNo', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'}, keyword=${keyword})}"
+                   th:text="'주문 번호' + (${sortField == 'orderNo' && sortDirection == 'ASC' ? ' ▲' : ' ▼'})"></a>
+            </th>
+            <th>
+                <a th:href="@{/admin/sales(page=0, sort='orderDate', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'}, keyword=${keyword})}"
+                   th:text="'주문 날짜' + (${sortField == 'orderDate' && sortDirection == 'ASC' ? ' ▲' : ' ▼'})"></a>
+            </th>
+            <th>구매자</th>
+            <th>상품명</th>
+            <th>수량</th>
+            <th>
+                <a th:href="@{/admin/sales(page=0, sort='salePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'}, keyword=${keyword})}"
+                   th:text="'판매가' + (${sortField == 'salePrice' && sortDirection == 'ASC' ? ' ▲' : ' ▼'})"></a>
+            </th>
+            <th>총 금액</th>
+            <th>배송 상태</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="record : ${records}">
+            <td th:text="${record.orderNo}">Order Number</td>
+            <td th:text="${record.orderDate}">Order Date</td>
+            <td th:text="${record.username}">Username</td>
+            <td th:text="${record.itemName}">Item Name</td>
+            <td th:text="${record.quantity}">Quantity</td>
+            <td th:text="${record.salePrice}">Sale Price</td>
+            <td th:text="${record.totalAmount}">Total Amount</td>
+            <td th:text="${record.deliveryStatus}">Delivery Status</td>
+        </tr>
+        <tr th:if="${records.empty}">
+            <td colspan="8" style="text-align: center;">조회된 판매 기록이 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 -->
+    <div th:replace="~{common/fragments/pagination(
+        startPage=${startPage},
+        endPage=${endPage},
+        totalPages=${totalPages},
+        currentPage=${currentPage},
+        url='/admin/sales',
+        keyword=${keyword},
+        sortField=${sortField},
+        sortDirection=${sortDirection})}">
+    </div>
+</main>
+</body>
+</html>
