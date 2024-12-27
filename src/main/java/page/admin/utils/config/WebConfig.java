@@ -1,5 +1,6 @@
 package page.admin.utils.config;
 
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import page.admin.utils.converter.StringToItemTypeConverter;
 import page.admin.utils.converter.StringToRegionConverter;
 import page.admin.item.domain.ItemType;
@@ -34,5 +35,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new AdminInterceptor())
                 .addPathPatterns("/**") // 모든 경로에 적용
                 .excludePathPatterns("/", "/login", "/logout", "/css/**", "/js/**", "/images/**"); // 예외 경로
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:///C:/fileRepository/file/");
     }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class ItemSaveForm {
@@ -27,7 +28,7 @@ public class ItemSaveForm {
     private Boolean open;
 
     @NotNull(message = "지역은 필수 입력값입니다.")
-    private List<Long> regions;
+    private Set<String> regionCodes;
 
     @NotNull(message = "상품 종류는 필수 입력값입니다.")
     private Long itemType;

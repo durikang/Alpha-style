@@ -49,7 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set placeholder image initially
         const img = preview.querySelector('img');
         if (img && placeholder) {
-            img.src = placeholder;
+            // 기존 src가 placeholder와 다르다면 그대로 둔다
+            // 또는 "비어있다면" placeholder로 설정
+            if (!img.src || img.src.includes('placeholder.com')) {
+                img.src = placeholder;
+            }
         }
     };
 

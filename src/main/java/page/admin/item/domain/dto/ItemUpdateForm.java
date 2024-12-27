@@ -49,7 +49,10 @@ public class ItemUpdateForm {
     private String mainImagePath;
 
     @Size(max = 4, message = "썸네일 이미지는 최대 4개까지만 업로드할 수 있습니다.")
-    private Set<MultipartFile> thumbnails;
+    private List<MultipartFile> thumbnails;
+
+    private List<String> thumbnailPaths;
+
 
     private String existingMainImage;
     private List<String> existingThumbnails;

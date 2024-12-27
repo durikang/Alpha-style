@@ -38,7 +38,8 @@
         <!-- 상단 등록 버튼 -->
         <div class="actions">
             <a th:href="@{/product/items/add}" class="btn-register">상품 등록</a>
-            <button id="deleteSelected" class="btn btn-delete">상품 삭제</button>
+            <!-- 삭제 버튼에 data-delete-url 속성 추가 -->
+            <button id="deleteSelected" class="btn btn-delete" data-delete-url="/product/items/batch-delete">상품 삭제</button>
         </div>
 
         <!-- 테이블 -->

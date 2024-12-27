@@ -6,5 +6,6 @@ import page.admin.item.domain.Region;
 import java.util.Set;
 
 public interface RegionRepository extends JpaRepository<Region, Long> {
-    Set<Region> findByCodeIn(Set<String> codes); // 코드 기반으로 조회
+    // code가 Set<String> 범위 내에 있는 Region들 조회
+    Set<Region> findByCodeIn(Set<String> codes);
 }
