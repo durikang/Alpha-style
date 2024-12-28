@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>상품별 주문 현황</title>
+    <style>
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            color: #555;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* 추가 버튼 스타일 */
+        .actions {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .actions button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .actions button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>상품별 주문 현황</h1>
+
+    <!-- 관리 기능 추가 -->
+    <div class="actions">
+        <button onclick="downloadCSV()">CSV 다운로드</button>
+    </div>
+
+    <div class="container">
+        <!-- 검색/필터 폼 -->
+        <form class="filter-form" th:action="@{/orders/filter}" method="get">
+            <input type="text" name="productName" placeholder="상품명 검색" th:value="${productName}">
+            <select name="status">
+                <option value="전체" th:selected="${status == '전체'}">전체 상태</option>
+                <option th:each="status : ${deliveryStatuses}" th:value="${status}" th:text="${status}"></option>
+            </select>
+            <select name="sortBy">
+                <option value="itemId" th:selected="${sortBy == 'itemId'}">상품 번호</option>
+                <option value="totalQuantity" th:selected="${sortBy == 'totalQuantity'}">주문 수량</option>
+                <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">총 주문 금액</option>
+            </select>
+            <select name="sortDir">
+                <option value="asc" th:selected="${sortDir == 'asc'}">오름차순</option>
+                <option value="desc" th:selected="${sortDir == 'desc'}">내림차순</option>
+            </select>
+            <button type="submit">검색</button>
+        </form>
+
+        <!-- 상품별 주문 현황 테이블 -->
+        <table>
+            <thead>
+            <tr>
+                <th>상품 번호</th>
+                <th>상품명</th>
+                <th>주문 수량</th>
+                <th>총 주문 금액</th>
+                <th>배송중 수량</th>
+                <th>배송완료 수량</th>
+                <th>상세 보기</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="summary : ${orderSummaries}">
+                <td th:text="${summary.itemId}">상품 번호</td>
+                <td th:text="${summary.itemName}">상품명</td>
+                <td th:text="${summary.totalQuantity}">주문 수량</td>
+                <td th:text="${summary.formattedTotalAmount}"></td>
+                <td th:text="${summary.shippingQuantity}">배송중 수량</td>
+                <td th:text="${summary.completedQuantity}">배송완료 수량</td>
+                <td>
+                    <a th:href="@{/orders/details/{itemId}(itemId=${summary.itemId})}" class="btn btn-info">보기</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이징 -->
+        <div class="pagination">
+            <a th:href="@{/orders/filter(page=0, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
+               th:classappend="${currentPage == 0 ? 'disabled' : ''}">처음</a>
+            <a th:href="@{/orders/filter(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
+               th:classappend="${currentPage == 0 ? 'disabled' : ''}">이전</a>
+
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/orders/filter(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
+                   th:classappend="${currentPage == i ? 'active' : ''}">[[${i + 1}]]</a>
+            </span>
+
+            <a th:href="@{/orders/filter(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
+               th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">다음</a>
+            <a th:href="@{/orders/filter(page=${totalPages - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
+               th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">끝</a>
+        </div>
+    </div>
+</main>
+<script>
+    function downloadCSV() {
+        window.location.href = '/orders/download';
+    }
+</script>
+</body>
+</html>

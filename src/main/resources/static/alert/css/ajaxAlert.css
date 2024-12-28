@@ -1,0 +1,48 @@
+/* src/main/resources/static/alert/css/ajaxAlert.css */
+.ajax-alert-bar {
+    position: fixed;
+    top: 10px; /* 화면 상단 약간 아래 */
+    right: 10px; /* 화면 오른쪽 */
+    width: auto;
+    max-width: 300px;
+    z-index: 1050; /* 기존 alert-bar보다 높은 z-index 설정 */
+    padding: 15px 20px;
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.ajax-alert-bar.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.ajax-alert-bar.hide {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.ajax-alert-success {
+    background-color: #28a745; /* 초록색 */
+    color: white;
+}
+
+.ajax-alert-error {
+    background-color: #dc3545; /* 빨간색 */
+    color: white;
+}
+
+.ajax-alert-bar .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <title>상품 수정</title>
+    <link rel="stylesheet" th:href="@{/admin/css/item/form.css}">
+    <script th:src="@{/admin/js/item/itemForm.js}" th:inline="none" defer></script>
+    <script th:src="@{/admin/js/item/categories.js}" defer></script>
+</head>
+<body>
+<main class="container">
+    <h1>상품 수정</h1>
+    <div>
+
+        <!-- 수정 폼, th:object -> ItemUpdateForm or ItemEditForm -->
+        <form th:action="${formAction}" th:object="${item}" method="post" enctype="multipart/form-data">
+
+            <!-- (1) itemId hidden field -->
+            <input type="hidden" th:field="*{itemId}"/>
+
+            <!-- 상품명 -->
+            <div class="form-group">
+                <label for="itemName">상품명</label>
+                <input type="text" id="itemName" th:field="*{itemName}" placeholder="상품명을 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('itemName')}"
+                      th:text="${#fields.errors('itemName')}"></span>
+            </div>
+
+            <!-- 매입가 -->
+            <div class="form-group">
+                <label for="purchasePrice">매입가</label>
+                <input type="number" id="purchasePrice" th:field="*{purchasePrice}" placeholder="매입가를 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('purchasePrice')}" th:text="${#fields.errors('purchasePrice')}"></span>
+            </div>
+
+            <!-- 판매가 -->
+            <div class="form-group">
+                <label for="salePrice">판매가</label>
+                <input type="number" id="salePrice" th:field="*{salePrice}" placeholder="판매가를 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('salePrice')}" th:text="${#fields.errors('salePrice')}"></span>
+            </div>
+
+            <!-- 수량 -->
+            <div class="form-group">
+                <label for="quantity">수량</label>
+                <input type="number" id="quantity" th:field="*{quantity}" placeholder="수량을 입력하세요">
+                <span class="error" th:if="${#fields.hasErrors('quantity')}" th:text="${#fields.errors('quantity')}"></span>
+            </div>
+
+            <!-- 판매 여부 -->
+            <div class="form-group">
+                <label for="open">판매 여부</label>
+                <input type="checkbox" id="open" th:field="*{open}">
+                <span class="error" th:if="${#fields.hasErrors('open')}" th:text="${#fields.errors('open')}"></span>
+            </div>
+
+            <!-- 메인 카테고리 -->
+            <div class="form-group">
+                <label for="mainCategory">메인 카테고리</label>
+                <select id="mainCategory" th:field="*{mainCategory}">
+                    <option value="" th:if="${item.mainCategory == null}" selected>== 메인 카테고리 선택 ==</option>
+                    <option th:each="mainCategory : ${mainCategories}"
+                            th:value="${mainCategory.id}"
+                            th:text="${mainCategory.mainCategoryName}"
+                            th:selected="${item.mainCategory != null and item.mainCategory == mainCategory.id}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- 서브 카테고리 -->
+            <div class="form-group">
+                <label for="subCategory">서브 카테고리</label>
+                <select id="subCategory" th:field="*{subCategory}">
+                    <option value="">== 서브 카테고리 선택 ==</option>
+                    <option th:each="subCategory : ${subCategories}"
+                            th:value="${subCategory.id}"
+                            th:text="${subCategory.subCategoryName}">
+                    </option>
+                </select>
+            </div>
+
+
+            <!-- 등록 지역(checkbox) -->
+            <div class="form-group">
+                <label>등록 지역</label>
+                <div>
+                    <div th:each="region : ${regions}">
+                        <input type="checkbox"
+                               th:value="${region.code}"
+                               th:name="regionCodes"
+                               th:checked="${item.regionCodes != null and item.regionCodes.contains(region.code)}"
+                               th:id="'regions_' + ${region.code}">
+                        <label th:for="'regions_' + ${region.code}"
+                               th:text="${region.displayName}"></label>
+                    </div>
+                </div>
+                <span class="error" th:if="${#fields.hasErrors('regionCodes')}"
+                      th:text="${#fields.errors('regionCodes')}"></span>
+            </div>
+
+            <!-- 상품 종류 (라디오) -->
+            <div class="form-group">
+                <label>상품 종류</label>
+                <div th:each="type : ${itemTypes}">
+                    <input type="radio"
+                           th:id="'type_' + ${type.id}"
+                           th:field="*{itemType}"
+                           th:value="${type.id}">
+                    <label th:for="'type_' + ${type.id}"
+                           th:text="${type.description}"></label>
+                </div>
+                <span class="error" th:if="${#fields.hasErrors('itemType')}"
+                      th:text="${#fields.errors('itemType')}"></span>
+            </div>
+
+            <!-- 배송 방식 -->
+            <div class="form-group">
+                <label>배송 방식</label>
+                <select th:field="*{deliveryCode}">
+                    <option value="">== 배송 방식 선택 ==</option>
+                    <option th:each="deliveryCode : ${deliveryCodes}"
+                            th:value="${deliveryCode.code}"
+                            th:text="${deliveryCode.displayName}"
+                            th:selected="${item.deliveryCode == deliveryCode.code}">
+                    </option>
+                </select>
+                <span class="error" th:if="${#fields.hasErrors('deliveryCode')}"
+                      th:text="${#fields.errors('deliveryCode')}"></span>
+            </div>
+
+            <!-- 메인 이미지 -->
+            <div class="form-group">
+                <label>메인 이미지</label>
+                <div class="image-preview" id="mainImagePreview"
+                     onclick="document.getElementById('mainImageInput').click();">
+                    <img th:src="${
+                        (item.mainImagePath != null)
+                          ? (
+                              #strings.contains(item.mainImagePath, '://')
+                                ? item.mainImagePath
+                                : '/images/' + item.mainImagePath
+                            )
+                          : 'https://via.placeholder.com/400x500.png?text=Main+Image'
+                    }"
+                         alt="메인 이미지"/>
+                    <!-- 기존 메인 이미지 경로를 서버로 전달 -->
+                    <input type="hidden" th:name="existingMainImage" th:value="${item.mainImagePath}"/>
+                </div>
+                <input type="file" id="mainImageInput" name="mainImage" accept="image/*">
+            </div>
+
+            <!-- 썸네일 이미지 4개 -->
+            <div class="form-group">
+                <label>썸네일 이미지</label>
+                <div class="thumbnail-gallery">
+
+                    <!-- 썸네일 #1 -->
+                    <div class="thumbnail-preview" id="thumb1Preview"
+                         onclick="document.getElementById('thumbnailInput1').click();">
+                        <img th:src="${
+                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 0)
+                            ? (
+                                #strings.contains(item.thumbnailPaths[0], '://')
+                                  ? item.thumbnailPaths[0]
+                                  : '/images/' + item.thumbnailPaths[0]
+                              )
+                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'
+                        }"
+                             alt="썸네일 1"/>
+                        <!-- 기존 썸네일 #1 경로를 서버로 전달 -->
+                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 0 ? item.thumbnailPaths[0] : ''}"/>
+                    </div>
+                    <input type="file" id="thumbnailInput1" name="thumbnails[0]" accept="image/*">
+
+                    <!-- 썸네일 #2 -->
+                    <div class="thumbnail-preview" id="thumb2Preview"
+                         onclick="document.getElementById('thumbnailInput2').click();">
+                        <img th:src="${
+                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 1)
+                            ? (
+                                #strings.contains(item.thumbnailPaths[1], '://')
+                                  ? item.thumbnailPaths[1]
+                                  : '/images/' + item.thumbnailPaths[1]
+                              )
+                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'
+                        }"
+                             alt="썸네일 2"/>
+                        <!-- 기존 썸네일 #2 경로를 서버로 전달 -->
+                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 1 ? item.thumbnailPaths[1] : ''}"/>
+                    </div>
+                    <input type="file" id="thumbnailInput2" name="thumbnails[1]" accept="image/*">
+
+                    <!-- 썸네일 #3 -->
+                    <div class="thumbnail-preview" id="thumb3Preview"
+                         onclick="document.getElementById('thumbnailInput3').click();">
+                        <img th:src="${
+                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 2)
+                            ? (
+                                #strings.contains(item.thumbnailPaths[2], '://')
+                                  ? item.thumbnailPaths[2]
+                                  : '/images/' + item.thumbnailPaths[2]
+                              )
+                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'
+                        }"
+                             alt="썸네일 3"/>
+                        <!-- 기존 썸네일 #3 경로를 서버로 전달 -->
+                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 2 ? item.thumbnailPaths[2] : ''}"/>
+                    </div>
+                    <input type="file" id="thumbnailInput3" name="thumbnails[2]" accept="image/*">
+
+                    <!-- 썸네일 #4 -->
+                    <div class="thumbnail-preview" id="thumb4Preview"
+                         onclick="document.getElementById('thumbnailInput4').click();">
+                        <img th:src="${
+                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 3)
+                            ? (
+                                #strings.contains(item.thumbnailPaths[3], '://')
+                                  ? item.thumbnailPaths[3]
+                                  : '/images/' + item.thumbnailPaths[3]
+                              )
+                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'
+                        }"
+                             alt="썸네일 4"/>
+                        <!-- 기존 썸네일 #4 경로를 서버로 전달 -->
+                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 3 ? item.thumbnailPaths[3] : ''}"/>
+                    </div>
+                    <input type="file" id="thumbnailInput4" name="thumbnails[3]" accept="image/*">
+                </div>
+            </div>
+
+
+            <!-- 수정 버튼 -->
+            <button class="btn-lg" type="submit"
+                    th:text="'상품 수정'">
+            </button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

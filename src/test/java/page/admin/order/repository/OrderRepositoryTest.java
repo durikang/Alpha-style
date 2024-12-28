@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import page.admin.order.domain.dto.OrderSummaryDTO;
+import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import page.admin.admin.order.repository.OrderRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 

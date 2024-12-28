@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="ajaxAlertBar">
+<!-- AJAX 알림 바 -->
+<div class="ajax-alert-bar" style="display: none;">
+    <p>알림 메시지</p>
+    <button class="close-btn">×</button>
+</div>
+
+<!-- AJAX 알림 바 관련 JS 및 CSS -->
+<script th:src="@{/alert/js/ajaxAlertEvent.js}" defer></script>
+<link rel="stylesheet" th:href="@{/alert/css/ajaxAlert.css}" />
+</html>

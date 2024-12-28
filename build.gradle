@@ -54,12 +54,6 @@ dependencies {
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	// Spring Security 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-
-	// Thymeleaf Spring Security Dialect 추가
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-
 }
 
 tasks.named('test') {

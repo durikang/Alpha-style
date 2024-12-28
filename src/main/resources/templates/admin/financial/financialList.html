@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <title>재무 데이터 관리</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .actions {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1>재무 데이터 관리</h1>
+
+
+
+        <!-- 검색 바 -->
+        <div th:replace="~{common/admin/fragments/searchBar :: searchBar(
+        ${actionUrl}, '검색어를 입력하세요', ${keyword}, ${filters})}"></div>
+
+        <!-- 상단 등록 버튼 -->
+        <div class="actions">
+            <a href="/admin/user/users/add" class="btn btn-register">엑셀 다운로드</a>
+
+            <!--<button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>-->
+        </div>
+        <div class="actions">
+            <form id="uploadForm" action="http://localhost:5000/upload" method="POST" enctype="multipart/form-data">
+            <div class="actions">
+                <input type="file" id="fileInput" name="files" accept=".xlsx,.csv" multiple>
+                <button type="submit" class="btn btn-register">파일 업로드</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="fileListContainer">
+            <h3>선택된 파일:</h3>
+            <div id="fileList"></div>
+        </div>
+
+        <!-- 진행 표시줄 -->
+        <div id="progressContainer" style="display: none;">
+            <h3>업로드 진행:</h3>
+            <progress id="uploadProgress" value="0" max="100" style="width: 100%;"></progress>
+            <span id="progressText">0%</span>
+        </div>
+        <div id="result"></div>
+
+        <script>
+            // 통합된 진행바 로직
+            const fileInput = document.getElementById('fileInput');
+            const fileList = document.getElementById('fileList');
+            const progressContainer = document.getElementById('progressContainer');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressText = document.getElementById('progressText');
+            const form = document.getElementById('uploadForm');
+            const resultDisplay = document.getElementById('result');
+
+            fileInput.addEventListener('change', function () {
+                fileList.innerHTML = '';
+                const files = fileInput.files;
+
+                if (!files.length) {
+                    fileList.textContent = '선택된 파일이 없습니다.';
+                } else {
+                    Array.from(files).forEach(file => {
+                        const fileNameElement = document.createElement('div');
+                        fileNameElement.textContent = file.name;
+                        fileList.appendChild(fileNameElement);
+                    });
+                }
+            });
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(form);
+
+                // Reset UI elements
+                resetUI();
+
+                try {
+                    // Simulate upload progress
+                    await simulateProgress(100, '업로드 중', () => {
+                        progressText.textContent = '병합 준비 중...';
+                    });
+
+                    // Simulate server request for merging
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    // Check if the response is OK
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+
+                    progressText.textContent = '파일 병합 중...';
+                    await simulateProgress(100, '파일 병합 중', () => {
+                        uploadProgress.value = 100;
+                        progressText.textContent = '100%';
+                    });
+
+                    // Parse JSON response
+                    const result = await response.json();
+
+                    // Update UI with the result
+                    progressContainer.style.display = 'none';
+                    resultDisplay.textContent = JSON.stringify(result, null, 2);
+                } catch (error) {
+                    handleError(error);
+                }
+            });
+
+
+            function resetUI() {
+                progressContainer.style.display = 'block';
+                uploadProgress.value = 0;
+                progressText.textContent = '0%';
+                resultDisplay.textContent = '';
+            }
+
+            async function simulateProgress(target, phase, callback) {
+                let progress = 0;
+                return new Promise((resolve) => {
+                    const interval = setInterval(() => {
+                        if (progress >= target) {
+                            clearInterval(interval);
+                            callback();
+                            resolve();
+                        } else {
+                            progress += 10;
+                            uploadProgress.value = progress;
+                            progressText.textContent = `${phase} ${progress}%`;
+                        }
+                    }, 300);
+                });
+            }
+
+            function handleError(error) {
+                progressContainer.style.display = 'none';
+                resultDisplay.textContent = `Error: ${error.message}`;
+            }
+
+        </script>
+
+
+
+
+
+        <!-- 데이터 테이블 -->
+        <table>
+            <thead>
+            <tr>
+                <th>거래일</th>
+                <th>거래 유형</th>
+                <th>제품명</th>
+                <th>수량</th>
+                <th>단가</th>
+                <th>공급 금액</th>
+                <th>VAT</th>
+                <th>총 금액</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${financialRecords}">
+                <td th:text="${record.year + '-' + record.month + '-' + record.day}"></td>
+                <td th:text="${record.transactionType == 1 ? '구매' : '판매'}"></td>
+                <td th:text="${record.productName}"></td>
+                <td th:text="${record.quantity}"></td>
+                <td th:text="${record.unitPrice}"></td>
+                <td th:text="${record.supplyAmount}"></td>
+                <td th:text="${record.vat}"></td>
+                <td th:text="${record.supplyAmount + record.vat}"></td>
+                <td class="actions">
+                    <a th:href="@{/admin/financial-data/edit/{id}(id=${record.recordNo})}">수정</a> |
+                    <a th:href="@{/admin/financial-data/delete/{id}(id=${record.recordNo})}">삭제</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이징 -->
+        <div th:replace="~{common/admin/fragments/pagination :: pagination(
+        ${startPage},
+        ${endPage},
+        ${totalPages},
+        ${currentPage},
+        ${actionUrl},
+        ${keyword},
+        ${sortField},
+        ${sortDirection})}"></div>
+    </div>
+</main>
+</body>
+</html>

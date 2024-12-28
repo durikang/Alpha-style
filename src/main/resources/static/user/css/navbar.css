@@ -1,0 +1,43 @@
+.custom-navbar {
+    background-color: #f8f9fa; /* 원하는 배경색 */
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.custom-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.custom-nav-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+
+.custom-nav-links li {
+    margin-right: 20px;
+}
+
+.custom-nav-links a {
+    text-decoration: none;
+    color: #333;
+}
+
+.custom-auth-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.custom-dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-dropdown-menu.show {
+    display: block;
+}
