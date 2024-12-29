@@ -59,6 +59,6 @@ public class SalesController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        return "sales/records";
+        return "admin/sales/records";
     }
 }

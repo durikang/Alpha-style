@@ -2,14 +2,14 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
       layout:fragment="Content">
 <head>
     <meta charset="UTF-8">
     <title>옵션 관리</title>
 
-    <link rel="stylesheet" th:href="@{/css/options/options.css}"/>
-    <script th:src="@{/js/options/options.js}" th:inline="none"></script>
+    <link rel="stylesheet" th:href="@{/admin/css/options/options.css}"/>
+    <script th:src="@{/admin/js/options/options.js}" th:inline="none"></script>
 </head>
 <body>
 <main class="container">
@@ -30,7 +30,7 @@
         <div class="options-tab-pane" th:classappend="${activeTab == 'regions'} ? ' active' : ''" id="regions">
             <h3>등록 지역 관리</h3>
             <!-- 등록 지역 추가 폼 -->
-            <form th:action="@{/product/options/regions}" th:object="${newRegion}" method="post" class="options-form">
+            <form th:action="@{/admin/product/options/regions}" th:object="${newRegion}" method="post" class="options-form">
                 <!-- 숨겨진 필드 추가 -->
                 <input type="hidden" name="activeTab" value="regions"/>
 
@@ -70,8 +70,8 @@
                     <td th:text="${region.displayName}">서울</td>
                     <td th:text="${region.active ? '활성' : '비활성'}">활성</td>
                     <td>
-                        <a th:href="@{/product/options/regions/edit/{id}(id=${region.id})}" class="options-btn-warning">수정</a>
-                        <form th:action="@{/product/options/regions/delete/{id}(id=${region.id})}" method="post" style="display:inline;">
+                        <a th:href="@{/admin/product/options/regions/edit/{id}(id=${region.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/regions/delete/{id}(id=${region.id})}" method="post" style="display:inline;">
                             <!-- 숨겨진 필드 추가 -->
                             <input type="hidden" name="activeTab" th:value="'regions'"/>
                             <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
@@ -86,7 +86,7 @@
         <div class="options-tab-pane" th:classappend="${activeTab == 'main-category'} ? ' active' : ''" id="main-category">
             <h3>메인 카테고리 관리</h3>
             <!-- 메인 카테고리 추가 폼 -->
-            <form th:action="@{/product/options/main-categories}" th:object="${newMainCategory}" method="post" class="options-form">
+            <form th:action="@{/admin/product/options/main-categories}" th:object="${newMainCategory}" method="post" class="options-form">
                 <!-- 숨겨진 필드 추가 -->
                 <input type="hidden" name="activeTab" value="main-category"/>
 
@@ -110,8 +110,8 @@
                     <td th:text="${mainCategory.id}">1</td>
                     <td th:text="${mainCategory.mainCategoryName}">전자제품</td>
                     <td>
-                        <a th:href="@{/product/options/main-categories/edit/{id}(id=${mainCategory.id})}" class="options-btn-warning">수정</a>
-                        <form th:action="@{/product/options/main-categories/delete/{id}(id=${mainCategory.id})}" method="post" style="display:inline;">
+                        <a th:href="@{/admin/product/options/main-categories/edit/{id}(id=${mainCategory.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/main-categories/delete/{id}(id=${mainCategory.id})}" method="post" style="display:inline;">
                             <!-- 숨겨진 필드 추가 -->
                             <input type="hidden" name="activeTab" th:value="'main-category'"/>
                             <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
@@ -126,7 +126,7 @@
         <div class="options-tab-pane" th:classappend="${activeTab == 'sub-category'} ? ' active' : ''" id="sub-category">
             <h3>서브 카테고리 관리</h3>
             <!-- 서브 카테고리 추가 폼 -->
-            <form th:action="@{/product/options/sub-categories}" th:object="${newSubCategory}" method="post" class="options-form">
+            <form th:action="@{/admin/product/options/sub-categories}" th:object="${newSubCategory}" method="post" class="options-form">
                 <!-- 숨겨진 필드 추가 -->
                 <input type="hidden" name="activeTab" value="sub-category"/>
 
@@ -162,8 +162,8 @@
                     <td th:text="${subCategory.subCategoryName}">스마트폰</td>
                     <td th:text="${subCategory.mainCategory.mainCategoryName}">전자제품</td>
                     <td>
-                        <a th:href="@{/product/options/sub-categories/edit/{id}(id=${subCategory.id})}" class="options-btn-warning">수정</a>
-                        <form th:action="@{/product/options/sub-categories/delete/{id}(id=${subCategory.id})}" method="post" style="display:inline;">
+                        <a th:href="@{/admin/product/options/sub-categories/edit/{id}(id=${subCategory.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/sub-categories/delete/{id}(id=${subCategory.id})}" method="post" style="display:inline;">
                             <!-- 숨겨진 필드 추가 -->
                             <input type="hidden" name="activeTab" th:value="'sub-category'"/>
                             <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
@@ -178,7 +178,7 @@
         <div class="options-tab-pane" th:classappend="${activeTab == 'item-type'} ? ' active' : ''" id="item-type">
             <h3>상품 종류 관리</h3>
             <!-- 상품 종류 추가 폼 -->
-            <form th:action="@{/product/options/item-types}" th:object="${newItemType}" method="post" class="options-form">
+            <form th:action="@{/admin/product/options/item-types}" th:object="${newItemType}" method="post" class="options-form">
                 <!-- 숨겨진 필드 추가 -->
                 <input type="hidden" name="activeTab" value="item-type"/>
 
@@ -208,8 +208,8 @@
                     <td th:text="${itemType.code}">ELEC</td>
                     <td th:text="${itemType.description}">전자 제품</td>
                     <td>
-                        <a th:href="@{/product/options/item-types/edit/{id}(id=${itemType.id})}" class="options-btn-warning">수정</a>
-                        <form th:action="@{/product/options/item-types/delete/{id}(id=${itemType.id})}" method="post" style="display:inline;">
+                        <a th:href="@{/admin/product/options/item-types/edit/{id}(id=${itemType.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/item-types/delete/{id}(id=${itemType.id})}" method="post" style="display:inline;">
                             <!-- 숨겨진 필드 추가 -->
                             <input type="hidden" name="activeTab" th:value="'item-type'"/>
                             <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
@@ -224,7 +224,7 @@
         <div class="options-tab-pane" th:classappend="${activeTab == 'delivery-method'} ? ' active' : ''" id="delivery-method">
             <h3>배송 방식 관리</h3>
             <!-- 배송 방식 추가 폼 -->
-            <form th:action="@{/product/options/delivery-methods}" th:object="${newDeliveryMethod}" method="post" class="options-form">
+            <form th:action="@{/admin/product/options/delivery-methods}" th:object="${newDeliveryMethod}" method="post" class="options-form">
                 <!-- 숨겨진 필드 추가 -->
                 <input type="hidden" name="activeTab" value="delivery-method"/>
 
@@ -254,8 +254,8 @@
                     <td th:text="${deliveryMethod.code}">EXP</td>
                     <td th:text="${deliveryMethod.displayName}">익스프레스</td>
                     <td>
-                        <a th:href="@{/product/options/delivery-methods/edit/{id}(id=${deliveryMethod.id})}" class="options-btn-warning">수정</a>
-                        <form th:action="@{/product/options/delivery-methods/delete/{id}(id=${deliveryMethod.id})}" method="post" style="display:inline;">
+                        <a th:href="@{/admin/product/options/delivery-methods/edit/{id}(id=${deliveryMethod.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/delivery-methods/delete/{id}(id=${deliveryMethod.id})}" method="post" style="display:inline;">
                             <!-- 숨겨진 필드 추가 -->
                             <input type="hidden" name="activeTab" th:value="'delivery-method'"/>
                             <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
@@ -267,50 +267,6 @@
         </div>
     </div>
 </main>
-
-<!-- JavaScript for Tab Functionality -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabs = document.querySelectorAll('.options-tab');
-        const tabPanes = document.querySelectorAll('.options-tab-pane');
-
-        // Function to activate a tab based on the tab name
-        function activateTab(tabName) {
-            tabs.forEach(tab => {
-                if (tab.getAttribute('data-tab') === tabName) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-
-            tabPanes.forEach(pane => {
-                if (pane.id === tabName) {
-                    pane.classList.add('active');
-                } else {
-                    pane.classList.remove('active');
-                }
-            });
-        }
-
-        // Get activeTab from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeTab = urlParams.get('activeTab') || 'regions';
-        activateTab(activeTab);
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const target = this.getAttribute('data-tab');
-                activateTab(target);
-
-                // Update the URL parameter without reloading the page
-                const url = new URL(window.location);
-                url.searchParams.set('activeTab', target);
-                window.history.pushState({}, '', url);
-            });
-        });
-    });
-</script>
 
 <!-- 스타일링을 위한 CSS 추가 -->
 <style>

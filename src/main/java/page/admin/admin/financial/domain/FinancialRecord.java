@@ -20,8 +20,13 @@ public class FinancialRecord {
     @JoinColumn(name = "user_no", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Member user; // 구매자 또는 판매자
 
+    @Column(name = "fin_year") // 예약어 문제를 피하기 위해 "fin_year"로 변경
     private Integer year;
+
+    @Column(name = "fin_month") // 예약어 문제를 피하기 위해 "fin_month"로 변경
     private Integer month;
+
+    @Column(name = "fin_day") // 예약어 문제를 피하기 위해 "fin_day"로 변경
     private Integer day;
 
     private Integer transactionType; // 1: 구매, 2: 판매

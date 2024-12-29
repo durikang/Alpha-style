@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/product/options")
+@RequestMapping("/admin/product/options")
 @RequiredArgsConstructor
 public class OptionsController {
 
@@ -58,7 +58,7 @@ public class OptionsController {
         // 활성 탭 정보 추가
         model.addAttribute("activeTab", activeTab);
 
-        return "product/options"; // Thymeleaf 템플릿 이름 (options.html)
+        return "admin/product/options"; // Thymeleaf 템플릿 이름 (options.html)
     }
 
     // --------------------- 등록 지역 (Region) CRUD ---------------------
@@ -78,7 +78,7 @@ public class OptionsController {
         }
         regionService.save(newRegion);
         log.info("새로운 지역 추가: {}", newRegion);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -93,7 +93,7 @@ public class OptionsController {
         model.addAttribute("entity", region);
         model.addAttribute("entityType", "region");
         model.addAttribute("activeTab", activeTab); // activeTab 전달
-        return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+        return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
     }
 
     /**
@@ -110,7 +110,7 @@ public class OptionsController {
             model.addAttribute("entity", regionDetails);
             model.addAttribute("entityType", "region");
             model.addAttribute("activeTab", activeTab);
-            return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+            return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
         }
         Region region = regionService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid region Id:" + id));
@@ -119,7 +119,7 @@ public class OptionsController {
         region.setActive(regionDetails.getActive());
         regionService.save(region);
         log.info("지역 수정: {}", region);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -130,7 +130,7 @@ public class OptionsController {
                                @RequestParam("activeTab") String activeTab) {
         regionService.deleteById(id);
         log.info("지역 삭제: ID {}", id);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     // --------------------- 메인 카테고리 (MainCategory) CRUD ---------------------
@@ -150,7 +150,7 @@ public class OptionsController {
         }
         mainCategoryService.save(newMainCategory);
         log.info("새로운 메인 카테고리 추가: {}", newMainCategory);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -165,7 +165,7 @@ public class OptionsController {
         model.addAttribute("entity", mainCategory);
         model.addAttribute("entityType", "mainCategory");
         model.addAttribute("activeTab", activeTab); // activeTab 전달
-        return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+        return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
     }
 
     /**
@@ -182,14 +182,14 @@ public class OptionsController {
             model.addAttribute("entity", mainCategoryDetails);
             model.addAttribute("entityType", "mainCategory");
             model.addAttribute("activeTab", activeTab);
-            return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+            return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
         }
         MainCategory mainCategory = mainCategoryService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid main category Id:" + id));
         mainCategory.setMainCategoryName(mainCategoryDetails.getMainCategoryName());
         mainCategoryService.save(mainCategory);
         log.info("메인 카테고리 수정: {}", mainCategory);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -200,7 +200,7 @@ public class OptionsController {
                                      @RequestParam("activeTab") String activeTab) {
         mainCategoryService.deleteById(id);
         log.info("메인 카테고리 삭제: ID {}", id);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     // --------------------- 서브 카테고리 (SubCategory) CRUD ---------------------
@@ -217,11 +217,11 @@ public class OptionsController {
             log.warn("서브 카테고리 추가 시 유효성 검사 실패: {}", result.getAllErrors());
             model.addAttribute("mainCategories", mainCategoryService.findAll());
             showOptionsPage(activeTab, model);
-            return "product/options";
+            return "admin/product/options";
         }
         subCategoryService.save(newSubCategory);
         log.info("새로운 서브 카테고리 추가: {}", newSubCategory);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -237,7 +237,7 @@ public class OptionsController {
         model.addAttribute("entityType", "subCategory");
         model.addAttribute("mainCategories", mainCategoryService.findAll());
         model.addAttribute("activeTab", activeTab); // activeTab 전달
-        return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+        return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
     }
 
     /**
@@ -255,7 +255,7 @@ public class OptionsController {
             model.addAttribute("entityType", "subCategory");
             model.addAttribute("mainCategories", mainCategoryService.findAll());
             model.addAttribute("activeTab", activeTab);
-            return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+            return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
         }
         SubCategory subCategory = subCategoryService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid sub category Id:" + id));
@@ -263,7 +263,7 @@ public class OptionsController {
         subCategory.setMainCategory(subCategoryDetails.getMainCategory());
         subCategoryService.save(subCategory);
         log.info("서브 카테고리 수정: {}", subCategory);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -274,7 +274,7 @@ public class OptionsController {
                                     @RequestParam("activeTab") String activeTab) {
         subCategoryService.deleteById(id);
         log.info("서브 카테고리 삭제: ID {}", id);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     // --------------------- 상품 종류 (ItemType) CRUD ---------------------
@@ -290,11 +290,11 @@ public class OptionsController {
         if (result.hasErrors()) {
             log.warn("상품 종류 추가 시 유효성 검사 실패: {}", result.getAllErrors());
             showOptionsPage(activeTab, model);
-            return "product/options";
+            return "admin/product/options";
         }
         itemTypeService.save(newItemType);
         log.info("새로운 상품 종류 추가: {}", newItemType);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -309,7 +309,7 @@ public class OptionsController {
         model.addAttribute("entity", itemType);
         model.addAttribute("entityType", "itemType");
         model.addAttribute("activeTab", activeTab); // activeTab 전달
-        return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+        return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
     }
 
     /**
@@ -326,7 +326,7 @@ public class OptionsController {
             model.addAttribute("entity", itemTypeDetails);
             model.addAttribute("entityType", "itemType");
             model.addAttribute("activeTab", activeTab);
-            return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+            return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
         }
         ItemType itemType = itemTypeService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid item type Id:" + id));
@@ -334,7 +334,7 @@ public class OptionsController {
         itemType.setDescription(itemTypeDetails.getDescription());
         itemTypeService.save(itemType);
         log.info("상품 종류 수정: {}", itemType);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -345,7 +345,7 @@ public class OptionsController {
                                  @RequestParam("activeTab") String activeTab) {
         itemTypeService.deleteById(id);
         log.info("상품 종류 삭제: ID {}", id);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     // --------------------- 배송 방식 (DeliveryCode) CRUD ---------------------
@@ -361,11 +361,11 @@ public class OptionsController {
         if (result.hasErrors()) {
             log.warn("배송 방식 추가 시 유효성 검사 실패: {}", result.getAllErrors());
             showOptionsPage(activeTab, model);
-            return "product/options";
+            return "admin/product/options";
         }
         deliveryCodeService.save(newDeliveryMethod);
         log.info("새로운 배송 방식 추가: {}", newDeliveryMethod);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -380,7 +380,7 @@ public class OptionsController {
         model.addAttribute("entity", deliveryMethod);
         model.addAttribute("entityType", "deliveryCode");
         model.addAttribute("activeTab", activeTab); // activeTab 전달
-        return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+        return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
     }
 
     /**
@@ -397,7 +397,7 @@ public class OptionsController {
             model.addAttribute("entity", deliveryMethodDetails);
             model.addAttribute("entityType", "deliveryCode");
             model.addAttribute("activeTab", activeTab);
-            return "/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
+            return "admin/product/edit-option"; // 공통 수정 페이지 템플릿 (edit-option.html)
         }
         DeliveryCode deliveryMethod = deliveryCodeService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid delivery method Id:" + id));
@@ -405,7 +405,7 @@ public class OptionsController {
         deliveryMethod.setDisplayName(deliveryMethodDetails.getDisplayName());
         deliveryCodeService.save(deliveryMethod);
         log.info("배송 방식 수정: {}", deliveryMethod);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 
     /**
@@ -416,6 +416,6 @@ public class OptionsController {
                                        @RequestParam("activeTab") String activeTab) {
         deliveryCodeService.deleteById(id);
         log.info("배송 방식 삭제: ID {}", id);
-        return "redirect:/product/options?activeTab=" + activeTab;
+        return "redirect:/admin/product/options?activeTab=" + activeTab;
     }
 }

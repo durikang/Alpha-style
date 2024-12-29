@@ -9,134 +9,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>상품별 주문 현황</title>
     <style>
-        /* 테이블 스타일 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        table th, table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-        table th {
-            background-color: #f4f4f4;
-            color: #555;
-            font-weight: bold;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* 추가 버튼 스타일 */
-        .actions {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .actions button {
-            padding: 8px 15px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .actions button:hover {
-            background-color: #218838;
-        }
+        .main-container { padding: 20px; }
+        .search-bar-container { margin-bottom: 20px; }
+        .order-summary-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .order-summary-table th, .order-summary-table td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+        .order-summary-table th { background-color: #f4f4f4; color: #555; font-weight: bold; }
+        .order-summary-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        .actions button { padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .actions button:hover { background-color: #218838; }
+        .chart-container { margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .chart-container canvas { max-width: 100%; }
     </style>
 </head>
 <body>
-<main>
+<main class="main-container">
     <h1>상품별 주문 현황</h1>
 
-    <!-- 관리 기능 추가 -->
+    <!-- 검색/필터 -->
+    <div class="search-bar-container">
+        <div th:replace="~{common/admin/fragments/searchBar(actionUrl='/admin/orders/filter', keywordPlaceholder='상품명 검색', keyword=${keyword}, filters=${filters})}"></div>
+    </div>
+
+    <!-- 테이블 -->
+    <table class="order-summary-table">
+        <thead>
+        <tr>
+            <th>상품 번호</th>
+            <th>상품명</th>
+            <th>카테고리</th>
+            <th>주문 수량</th>
+            <th>총 주문 금액</th>
+            <th>배송중 수량</th>
+            <th>배송완료 수량</th>
+            <th>판매자</th>
+            <th>등록일</th>
+            <th>상세 보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="summary : ${orderSummaries}">
+            <td th:text="${summary.itemId}">상품 번호</td>
+            <td th:text="${summary.itemName}">상품명</td>
+            <td th:text="${summary.categoryName}">카테고리</td>
+            <td th:text="${summary.totalQuantity}">주문 수량</td>
+            <td th:text="${summary.formattedTotalAmount}">총 주문 금액</td>
+            <td th:text="${summary.shippingQuantity}">배송중 수량</td>
+            <td th:text="${summary.completedQuantity}">배송완료 수량</td>
+            <td th:text="${summary.sellerName}">판매자</td>
+            <td th:text="${#dates.format(summary.createdDate, 'yyyy-MM-dd')}">등록일</td>
+            <td>
+                <a th:href="@{/orders/details/{itemId}(itemId=${summary.itemId})}" class="btn btn-info">상세 보기</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(orderSummaries)}">
+            <td colspan="10">데이터가 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 -->
+    <div th:replace="~{common/admin/fragments/pagination(startPage=${startPage}, endPage=${endPage}, totalPages=${totalPages}, currentPage=${currentPage}, url='/admin/orders/summaryList', keyword=${keyword}, sortField=${sortBy}, sortDirection=${sortDir})}"></div>
+
+    <!-- 그래프 -->
+    <div class="chart-container">
+        <canvas id="orderSummaryChart"></canvas>
+    </div>
+
+    <!-- 관리 기능 -->
     <div class="actions">
         <button onclick="downloadCSV()">CSV 다운로드</button>
     </div>
-
-    <div class="container">
-        <!-- 검색/필터 폼 -->
-        <form class="filter-form" th:action="@{/orders/filter}" method="get">
-            <input type="text" name="productName" placeholder="상품명 검색" th:value="${productName}">
-            <select name="status">
-                <option value="전체" th:selected="${status == '전체'}">전체 상태</option>
-                <option th:each="status : ${deliveryStatuses}" th:value="${status}" th:text="${status}"></option>
-            </select>
-            <select name="sortBy">
-                <option value="itemId" th:selected="${sortBy == 'itemId'}">상품 번호</option>
-                <option value="totalQuantity" th:selected="${sortBy == 'totalQuantity'}">주문 수량</option>
-                <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">총 주문 금액</option>
-            </select>
-            <select name="sortDir">
-                <option value="asc" th:selected="${sortDir == 'asc'}">오름차순</option>
-                <option value="desc" th:selected="${sortDir == 'desc'}">내림차순</option>
-            </select>
-            <button type="submit">검색</button>
-        </form>
-
-        <!-- 상품별 주문 현황 테이블 -->
-        <table>
-            <thead>
-            <tr>
-                <th>상품 번호</th>
-                <th>상품명</th>
-                <th>주문 수량</th>
-                <th>총 주문 금액</th>
-                <th>배송중 수량</th>
-                <th>배송완료 수량</th>
-                <th>상세 보기</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="summary : ${orderSummaries}">
-                <td th:text="${summary.itemId}">상품 번호</td>
-                <td th:text="${summary.itemName}">상품명</td>
-                <td th:text="${summary.totalQuantity}">주문 수량</td>
-                <td th:text="${summary.formattedTotalAmount}"></td>
-                <td th:text="${summary.shippingQuantity}">배송중 수량</td>
-                <td th:text="${summary.completedQuantity}">배송완료 수량</td>
-                <td>
-                    <a th:href="@{/orders/details/{itemId}(itemId=${summary.itemId})}" class="btn btn-info">보기</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <!-- 페이징 -->
-        <div class="pagination">
-            <a th:href="@{/orders/filter(page=0, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
-               th:classappend="${currentPage == 0 ? 'disabled' : ''}">처음</a>
-            <a th:href="@{/orders/filter(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
-               th:classappend="${currentPage == 0 ? 'disabled' : ''}">이전</a>
-
-            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a th:href="@{/orders/filter(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
-                   th:classappend="${currentPage == i ? 'active' : ''}">[[${i + 1}]]</a>
-            </span>
-
-            <a th:href="@{/orders/filter(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
-               th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">다음</a>
-            <a th:href="@{/orders/filter(page=${totalPages - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, productName=${productName}, status=${status})}"
-               th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">끝</a>
-        </div>
-    </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // 데이터 디버깅
+    const orderSummaries = /*[[${orderSummaries}]]*/ [];
+    console.log("주문 요약 데이터:", orderSummaries);
+
+    if (orderSummaries.length === 0) {
+        console.error("주문 요약 데이터가 비어 있습니다. 그래프를 생성할 수 없습니다.");
+    } else {
+        const labels = orderSummaries.map(summary => summary.itemName || "미정");
+        const orderQuantities = orderSummaries.map(summary => summary.totalQuantity || 0);
+        const totalAmounts = orderSummaries.map(summary => summary.totalAmount || 0);
+
+        const ctx = document.getElementById('orderSummaryChart').getContext('2d');
+        const orderSummaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '주문 수량',
+                        data: orderQuantities,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '총 주문 금액',
+                        data: totalAmounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+
+    // CSV 다운로드 함수
     function downloadCSV() {
-        window.location.href = '/orders/download';
+        window.location.href = '/admin/orders/download';
     }
 </script>
 </body>

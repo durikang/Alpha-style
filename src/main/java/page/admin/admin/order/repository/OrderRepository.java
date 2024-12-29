@@ -2,10 +2,10 @@ package page.admin.admin.order.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import page.admin.admin.order.domain.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import page.admin.admin.order.domain.Order;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.admin.sales.domain.dto.SalesRecordDto;
 
@@ -14,48 +14,42 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT o FROM Order o JOIN FETCH o.orderDetails WHERE o.orderNo = :orderNo")
+    /**
+     * 주문 상세 조회
+     * @param orderNo 주문 번호
+     * @return 주문 정보 및 상세 정보
+     */
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.orderNo = :orderNo")
     Optional<Order> findByIdWithDetails(@Param("orderNo") Long orderNo);
 
-    @Query("SELECT new page.admin.admin.order.domain.dto.OrderSummaryDTO(" +
-            "d.item.itemId, " +
-            "d.item.itemName, " +
-            "SUM(d.quantity), " +
-            "SUM(d.subtotal), " +
-            "SUM(CASE WHEN o.deliveryStatus = '배송중' THEN d.quantity ELSE 0 END), " +
-            "SUM(CASE WHEN o.deliveryStatus = '배송완료' THEN d.quantity ELSE 0 END)) " +
-            "FROM Order o " +
-            "JOIN o.orderDetails d " +
-            "GROUP BY d.item.itemId, d.item.itemName")
-
+    /**
+     * 검색 및 페이징 처리된 주문 데이터 조회
+     * @param username 사용자 이름
+     * @param deliveryStatus 배송 상태
+     * @param pageable 페이징 정보
+     * @return 주문 페이지
+     */
     Page<Order> findByUserUsernameContainingOrDeliveryStatusContaining(String username, String deliveryStatus, Pageable pageable);
 
-    /**
-     * 제품별 주문 현황 리스트 쿼리
-     * @param pageable
-     * @return
-     */
     @Query("SELECT new page.admin.admin.order.domain.dto.OrderSummaryDTO(" +
             "d.item.itemId, " +
             "d.item.itemName, " +
+            "d.item.mainCategory.mainCategoryName, " +
             "SUM(d.quantity), " +
-            "SUM(d.subtotal), " +
+            "SUM(d.subtotal * 1.0), " +
             "SUM(CASE WHEN o.deliveryStatus = '배송중' THEN d.quantity ELSE 0 END), " +
-            "SUM(CASE WHEN o.deliveryStatus = '배송완료' THEN d.quantity ELSE 0 END)) " +
+            "SUM(CASE WHEN o.deliveryStatus = '배송완료' THEN d.quantity ELSE 0 END), " +
+            "d.item.seller.username, " +
+            "CAST(d.item.createdDate AS LocalDateTime)) " + // 명시적 타입 캐스팅
             "FROM Order o " +
-            "JOIN o.orderDetails d " + // OrderDetail과 JOIN
-            "JOIN d.item i " +         // Item과 JOIN
-            "GROUP BY d.item.itemId, d.item.itemName")
+            "JOIN o.orderDetails d " +
+            "GROUP BY d.item.itemId, d.item.itemName, d.item.mainCategory.mainCategoryName, " +
+            "d.item.seller.username, d.item.createdDate " +
+            "ORDER BY SUM(d.quantity) DESC")
     Page<OrderSummaryDTO> findOrderSummariesWithPaging(Pageable pageable);
 
-
     /**
-     * 판매 기록 조회 (페이징, 검색, 정렬 지원)
-     * @param pageable 페이징 및 정렬 정보
-     * @param keyword 검색어 (구매자 이름 또는 상품명)
-     * @param startDate 조회 시작 날짜
-     * @param endDate 조회 종료 날짜
-     * @return 판매 기록 페이지
+     * 판매 기록 페이징 및 검색 조회
      */
     @Query("SELECT new page.admin.admin.sales.domain.dto.SalesRecordDto(" +
             "o.orderNo, " +

@@ -1,0 +1,238 @@
+/* 탭 메뉴 스타일 */
+.options-tabs {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.options-tab {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background-color: #f1f1f1;
+    margin-right: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: background-color 0.3s, font-weight 0.3s;
+}
+
+.options-tab.active {
+    background-color: #fff;
+    border-color: #ccc #ccc #fff #ccc;
+    font-weight: bold;
+}
+
+/* 탭 내용 스타일 */
+.options-tab-content {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 0 5px 5px 5px;
+    background-color: #fff;
+}
+
+.options-tab-pane {
+    display: none;
+}
+
+.options-tab-pane.active {
+    display: block;
+}
+
+/* 폼 스타일 */
+.options-form {
+    margin-bottom: 20px;
+}
+
+.options-form-group {
+    margin-bottom: 10px;
+}
+
+.options-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.options-input,
+.options-select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.options-button-primary {
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+}
+
+.options-button-primary:hover {
+    background-color: #0056b3;
+}
+
+/* 테이블 스타일 */
+.options-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.options-table, .options-table th, .options-table td {
+    border: 1px solid #ccc;
+}
+
+.options-table th,
+.options-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.options-table th {
+    background-color: #f9f9f9;
+}
+
+/* 버튼 스타일 */
+.options-btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: #fff;
+    margin-right: 5px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.options-btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.options-btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.options-btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+    .options-tabs {
+        flex-direction: column;
+    }
+
+    .options-tab {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+}
+
+/* 탭 스타일링 예시 */
+.options-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.options-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background-color: #f1f1f1;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.options-tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    font-weight: bold;
+}
+
+.options-tab-pane {
+    border: 1px solid #ccc;
+    padding: 20px;
+    display: none;
+    border-radius: 0 5px 5px 5px;
+    background-color: #fff;
+}
+
+.options-tab-pane.active {
+    display: block;
+}
+
+.options-form-group {
+    margin-bottom: 15px;
+}
+
+.options-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.options-input, .options-select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.options-button-primary {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.options-button-primary:hover {
+    background-color: #0056b3;
+}
+
+.options-btn-warning {
+    padding: 5px 10px;
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+.options-btn-danger {
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.options-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.options-table th, .options-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.options-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}

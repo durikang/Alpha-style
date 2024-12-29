@@ -1,86 +1,75 @@
 package page.admin.admin.order.service;
 
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import page.admin.admin.item.domain.Item;
-import page.admin.admin.item.repository.DeliveryCodeRepository;
+import page.admin.admin.item.domain.QItem;
+import page.admin.admin.member.domain.QMember;
 import page.admin.admin.order.domain.Order;
 import page.admin.admin.order.domain.OrderDetail;
-import page.admin.admin.order.domain.dto.OrderDetailDTO;
-import page.admin.admin.order.domain.dto.OrderSummaryDTO;
+import page.admin.admin.order.domain.QOrder;
+import page.admin.admin.order.domain.QOrderDetail;
+import page.admin.admin.order.domain.dto.*;
 import page.admin.admin.order.repository.OrderRepository;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Primary
 @RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements OrderService {
 
+    private final JPAQueryFactory queryFactory;
     private final OrderRepository orderRepository;
-    private final DeliveryCodeRepository deliveryCodeRepository;
 
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
+    @Override
     public Order getOrderById(Long id) {
-        return orderRepository.findByIdWithDetails(id)
-                .orElseThrow(() -> new IllegalArgumentException("주문 번호에 해당하는 정보를 찾을 수 없습니다."));
+        QOrder order = QOrder.order;
+        QOrderDetail orderDetail = QOrderDetail.orderDetail;
+
+        Order result = queryFactory
+                .selectFrom(order)
+                .leftJoin(order.orderDetails, orderDetail).fetchJoin()
+                .where(order.orderNo.eq(id))
+                .fetchOne();
+
+        if (result == null) {
+            throw new IllegalArgumentException("주문 번호에 해당하는 정보를 찾을 수 없습니다.");
+        }
+        return result;
     }
+
 
     @Override
     public List<OrderDetailDTO> getOrderDetails(Long orderNo) {
         Order order = getOrderById(orderNo);
         return order.getOrderDetails().stream()
-                .map(detail -> convertToDTO(order, detail))
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    private OrderDetailDTO convertToDTO(Order order, OrderDetail detail) {
+    private OrderDetailDTO convertToDTO(OrderDetail detail) {
         OrderDetailDTO dto = new OrderDetailDTO();
-        dto.setOrderNo(order.getOrderNo());
-
-        // Item과 관련된 정보 설정
-        if (detail.getItem() != null) {
-            Item item = detail.getItem();
-            dto.setItemId(item.getItemId());
-            dto.setItemName(item.getItemName());
-            dto.setPurchasePrice(item.getPurchasePrice() != null ? item.getPurchasePrice() : 0); // 매입가
-            dto.setSalePrice(item.getSalePrice() != null ? item.getSalePrice() : 0); // 판매가
-        } else {
-            dto.setItemId(null);
-            dto.setItemName("상품 없음");
-            dto.setPurchasePrice(0);
-            dto.setSalePrice(0);
-        }
-
+        dto.setOrderNo(detail.getOrder().getOrderNo());
+        dto.setItemId(detail.getItem() != null ? detail.getItem().getItemId() : null);
+        dto.setItemName(detail.getItem() != null ? detail.getItem().getItemName() : "상품 없음");
         dto.setQuantity(detail.getQuantity() != null ? detail.getQuantity() : 0);
         dto.setSubtotal(detail.getSubtotal() != null ? detail.getSubtotal() : 0L);
-
-        // 주문 날짜 포맷팅
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        dto.setOrderDate(
-                order.getOrderDate().toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .format(formatter)
-        );
-
-        dto.setDeliveryStatus(order.getDeliveryStatus());
+        dto.setDeliveryStatus(detail.getOrder().getDeliveryStatus());
         return dto;
     }
-
 
     @Override
     public void updateOrderStatus(Long orderNo, String status) {
@@ -91,36 +80,126 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<Order> getOrdersWithSearchAndPaging(String keyword, Pageable pageable) {
-        if (keyword.isBlank()) {
-            return orderRepository.findAll(pageable);
-        } else {
-            return orderRepository.findByUserUsernameContainingOrDeliveryStatusContaining(keyword, keyword, pageable);
+        QOrder order = QOrder.order;
+        QMember user = QMember.member;
+
+        // QueryDSL 쿼리 작성
+        var query = queryFactory
+                .selectFrom(order)
+                .join(order.user, user)
+                .fetchJoin()
+                .where(
+                        user.username.containsIgnoreCase(keyword)
+                                .or(user.userId.containsIgnoreCase(keyword))
+                )
+                .orderBy(order.orderDate.desc());
+
+        // 페이징 처리
+        List<Order> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = query.fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public Page<OrderSummaryDTO> getOrderSummariesWithPaging(Pageable pageable, String keyword) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+        QItem item = QItem.item;
+
+        var query = queryFactory
+                .select(new QOrderSummaryDTO(
+                        item.itemId,
+                        item.itemName,
+                        item.mainCategory.mainCategoryName,
+                        detail.quantity.sum().castToNum(Long.class),
+                        detail.subtotal.sum().castToNum(Double.class),
+                        Expressions.asNumber(
+                                order.deliveryStatus
+                                        .when("배송중").then(detail.quantity)
+                                        .otherwise(0)
+                                        .sum()
+                        ).castToNum(Long.class),
+                        Expressions.asNumber(
+                                order.deliveryStatus
+                                        .when("배송완료").then(detail.quantity)
+                                        .otherwise(0)
+                                        .sum()
+                        ).castToNum(Long.class),
+                        item.seller.username,
+                        item.createdDate
+                ))
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item)
+                .where(item.itemName.containsIgnoreCase(keyword)) // 검색 조건
+                .groupBy(item.itemId, item.itemName, item.mainCategory.mainCategoryName,
+                        item.seller.username, item.createdDate)
+                .orderBy(detail.quantity.sum().desc());
+
+        // 쿼리 디버깅
+        System.out.println("Generated Query: " + query);
+
+        List<OrderSummaryDTO> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        if (results.isEmpty()) {
+            System.out.println("Query 결과가 비어 있습니다.");
         }
+
+        long total = query.fetchCount();
+        return new PageImpl<>(results, pageable, total);
+    }
+
+
+
+    @Override
+    public List<OrderSummaryChartDTO> getOrderSummaryChartData(List<OrderSummaryDTO> summaries) {
+        if (summaries == null || summaries.isEmpty()) {
+            System.out.println("Summary 데이터가 비어 있습니다.");
+            return new ArrayList<>();
+        }
+
+        return summaries.stream()
+                .map(summary -> new OrderSummaryChartDTO(
+                        summary.getItemName(),
+                        summary.getTotalQuantity(),
+                        summary.getTotalAmount()
+                ))
+                .toList();
     }
 
 
     @Override
-    public Page<OrderSummaryDTO> getOrderSummariesWithPaging(int page, int size, String sortBy, String sortDir) {
-        Sort sort;
+    public List<OrderSummaryChartDTO> getOrderSummaryChartDataWithQuery(String keyword) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+        QItem item = QItem.item;
 
-        // sortBy 필드를 실제 HQL 별칭에 맞게 매핑
-        if (sortBy.equals("itemId")) {
-            sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                    ? Sort.by("d.item.itemId").ascending()
-                    : Sort.by("d.item.itemId").descending();
-        } else if (sortBy.equals("totalQuantity")) {
-            sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                    ? Sort.by("SUM(d.quantity)").ascending()
-                    : Sort.by("SUM(d.quantity)").descending();
-        } else {
-            sort = Sort.unsorted(); // 기본 정렬
-        }
+        // QueryDSL 쿼리 작성
+        var query = queryFactory
+                .select(new QOrderSummaryChartDTO(
+                        item.itemName,
+                        detail.quantity.sum().castToNum(Long.class),  // 총 주문 수량
+                        detail.subtotal.sum().castToNum(Double.class) // 총 주문 금액
+                ))
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item)
+                .where(item.itemName.containsIgnoreCase(keyword)) // 검색 조건
+                .groupBy(item.itemName) // 그룹화
+                .orderBy(detail.quantity.sum().desc()); // 총 주문 수량 기준 정렬
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return orderRepository.findOrderSummariesWithPaging(pageable);
+        System.out.println("Generated Chart Query: " + query);
+
+        // 데이터베이스에서 결과 가져오기
+        return query.fetch();
     }
-
-
-
 
 }

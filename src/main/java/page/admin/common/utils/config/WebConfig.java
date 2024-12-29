@@ -74,10 +74,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/alert/js/")
                 .setCachePeriod(3600);
 
-        // 파일 저장소 매핑
-        registry.addResourceHandler("/files/**")
-                .addResourceLocations("file:///C:/fileRepository/file/")
-                .setCachePeriod(3600);
+        // 이미지 저장소 매핑
+        registry.addResourceHandler("/images/**") // URL 경로
+                .addResourceLocations("file:///C:/fileRepository/file/") // 로컬 디렉토리 경로
+                .setCachePeriod(3600); // 캐싱 기간 설정 (초 단위)
     }
 
 

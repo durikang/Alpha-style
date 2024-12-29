@@ -51,4 +51,10 @@ public class FinancialController {
 
         return "admin/financial/financialList";
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "admin/financial/financialTestPage";
+    }
+
 }

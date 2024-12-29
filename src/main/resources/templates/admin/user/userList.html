@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 리스트 조회</title>
   <script th:src="@{/admin/js/member/listDelete.js}" th:inline="none"></script>
-  <link rel="stylesheet" th:href="@{/admin/user/css/userList.css}"/>
+  <link rel="stylesheet" th:href="@{/admin/css/user/userList.css}"/>
   <style>
     .actions {
       margin-bottom: 20px;
@@ -31,7 +31,7 @@
     <!-- 상단 등록 버튼 -->
   <div class="actions">
       <a href="/admin/user/users/add" class="btn btn-register">회원 등록</a>
-    <button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>
+    <button id="deleteSelected" data-delete-url="/admin/user/users/batch-delete">회원 삭제</button>
   </div>
     <!-- 테이블 -->
   <table>

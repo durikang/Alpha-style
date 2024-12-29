@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
       layout:fragment="Content">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
 <main>
     <h2>판매 기록 조회</h2>
     <!-- 검색 및 필터 -->
-    <div th:replace="~{common/fragments/searchBar(
+    <div th:replace="~{common/admin/fragments/searchBar(
         actionUrl='/admin/sales',
         keywordPlaceholder='상품명, 구매자 이름 등 검색',
         keyword=${keyword},
@@ -60,7 +60,7 @@
     </table>
 
     <!-- 페이징 -->
-    <div th:replace="~{common/fragments/pagination(
+    <div th:replace="~{common/admin/fragments/pagination(
         startPage=${startPage},
         endPage=${endPage},
         totalPages=${totalPages},

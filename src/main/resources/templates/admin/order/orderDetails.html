@@ -153,17 +153,17 @@
                     <tbody>
                     <tbody>
                     <tr th:each="detail : ${details}">
-                        <td th:text="${detail.orderNo}">12345</td>
-                        <td th:text="${detail.itemId}">12345</td>
+                        <td th:text="${detail.order.orderNo}">주문 번호</td>
+                        <td th:text="${detail.item.itemId}">12345</td>
                         <td>
-                            <img th:if="${detail.mainImageUrl != null}" th:src="${detail.mainImageUrl}" alt="상품 이미지" style="max-width: 64px; max-height: 64px;">
-                            <img th:if="${detail.mainImageUrl == null}" src="https://via.placeholder.com/64x64.png?text=No+Image" alt="기본 이미지" style="max-width: 64px; max-height: 64px;">
-                            <span th:text="${detail.itemName}">상품 이름</span>
+                            <img th:if="${detail.item.mainImage != null}" th:src="${'/images/' + detail.item.mainImage.getStoreFileName()}" alt="상품 이미지" style="max-width: 64px; max-height: 64px;">
+                            <img th:if="${detail.item.mainImage == null}" src="https://via.placeholder.com/64x64.png?text=No+Image" alt="기본 이미지" style="max-width: 64px; max-height: 64px;">
+                            <a th:href="@{/admin/product/items/{id}(id=${detail.item.itemId})}"><span th:text="${detail.item.itemName}">상품 이름</span></a>
                         </td>
                         <td th:text="${detail.quantity}">2</td>
-                        <td th:text="${detail.salePrice}">20000</td>
+                        <td th:text="${detail.item.salePrice}">20000</td>
                         <td th:text="${detail.subtotal}">40000</td>
-                        <td th:text="${detail.orderDate}">2024-12-14</td>
+                        <td th:text="${detail.order.orderDate}">2024-12-14</td>
                     </tr>
                     </tbody>
 
