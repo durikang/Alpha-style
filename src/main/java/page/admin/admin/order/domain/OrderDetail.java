@@ -22,13 +22,27 @@ public class OrderDetail {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "item_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)) // 외래 키 제약 조건 제거
+    @JoinColumn(name = "item_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Item item;
 
     private Integer quantity;
 
     @Column(nullable = false)
     private Long subtotal;
+
+    // 부가세 컬럼 추가
+    @Column(nullable = false)
+    private Double vat;
+
+    /**
+     * Subtotal 및 VAT 계산
+     */
+    @PrePersist
+    @PreUpdate
+    public void calculateAmounts() {
+        calculateSubtotal();
+        calculateVAT();
+    }
 
     /**
      * Subtotal 계산: salePrice와 quantity를 기준으로 계산
@@ -38,6 +52,17 @@ public class OrderDetail {
             this.subtotal = (long) item.getSalePrice() * quantity;
         } else {
             this.subtotal = 0L;
+        }
+    }
+
+    /**
+     * VAT 계산: Subtotal의 10%
+     */
+    public void calculateVAT() {
+        if (this.subtotal != null) {
+            this.vat = this.subtotal * 0.10;
+        } else {
+            this.vat = 0.0;
         }
     }
 }

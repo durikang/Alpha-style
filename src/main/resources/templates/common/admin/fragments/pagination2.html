@@ -1,0 +1,58 @@
+<!-- src/main/resources/templates/common/admin/fragments/pagination2.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="pagination2(startPage, endPage, totalPages, currentPage, url, keyword, sortField, sortDirection,startDate,endDate)">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagination Fragment 2</title>
+</head>
+<body>
+<style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 5px;
+  }
+
+  .pagination a {
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .pagination a.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+
+  .pagination a:hover {
+    background-color: #0056b3;
+    color: white;
+  }
+</style>
+<div class="pagination">
+  <!-- 이전 페이지 링크 -->
+  <a th:if="${currentPage > startPage}"
+     th:href="@{${url}(page=${currentPage - 2}, keyword=${keyword}, sortField=${sortField}, sortDirection=${sortDirection}, startDate=${startDate}, endDate=${endDate})}">
+    &laquo;
+  </a>
+
+  <!-- 페이지 번호 링크 -->
+  <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
+     th:href="@{${url}(page=${i - 1}, keyword=${keyword}, sortField=${sortField}, sortDirection=${sortDirection}, startDate=${startDate}, endDate=${endDate})}"
+     th:classappend="${currentPage == i} ? 'active' : ''"
+     th:text="${i}"></a>
+
+  <!-- 다음 페이지 링크 -->
+  <a th:if="${endPage < totalPages}"
+     th:href="@{${url}(page=${endPage}, keyword=${keyword}, sortField=${sortField}, sortDirection=${sortDirection}, startDate=${startDate}, endDate=${endDate})}">
+    &raquo;
+  </a>
+</div>
+</body>
+</html>

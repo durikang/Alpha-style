@@ -81,57 +81,12 @@
         <button onclick="downloadCSV()">CSV 다운로드</button>
     </div>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // 데이터 디버깅
-    const orderSummaries = /*[[${orderSummaries}]]*/ [];
-    console.log("주문 요약 데이터:", orderSummaries);
-
-    if (orderSummaries.length === 0) {
-        console.error("주문 요약 데이터가 비어 있습니다. 그래프를 생성할 수 없습니다.");
-    } else {
-        const labels = orderSummaries.map(summary => summary.itemName || "미정");
-        const orderQuantities = orderSummaries.map(summary => summary.totalQuantity || 0);
-        const totalAmounts = orderSummaries.map(summary => summary.totalAmount || 0);
-
-        const ctx = document.getElementById('orderSummaryChart').getContext('2d');
-        const orderSummaryChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: '주문 수량',
-                        data: orderQuantities,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: '총 주문 금액',
-                        data: totalAmounts,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: { beginAtZero: true },
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    }
-
-
+<script th:inline="javascript">
     // CSV 다운로드 함수
     function downloadCSV() {
         window.location.href = '/admin/orders/download';
     }
 </script>
+
 </body>
 </html>
