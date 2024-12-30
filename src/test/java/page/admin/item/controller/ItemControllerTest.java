@@ -10,7 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.WebApplicationContext;
-import page.admin.item.service.ItemService;
+import page.admin.admin.item.controller.ItemController;
+import page.admin.admin.item.service.ItemService;
 
 import java.util.List;
 

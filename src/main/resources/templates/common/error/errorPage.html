@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오류 발생</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .error-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            display: inline-block;
+        }
+
+        .error-title {
+            font-size: 24px;
+            color: #dc3545;
+        }
+
+        .error-message {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <h1>오류가 발생했습니다</h1>
+    <p>상태 코드: <span th:text="${statusCode}"></span></p>
+    <p>에러 메시지: <span th:text="${errorMessage}"></span></p>
+    <p th:if="${exception}">
+        예외 메시지: <span th:text="${exception}"></span>
+    </p>
+    <a href="/static" class="btn btn-primary">홈으로 이동</a>
+</div>
+</body>
+</html>

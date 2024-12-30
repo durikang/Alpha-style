@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <title>옵션 관리</title>
+
+    <link rel="stylesheet" th:href="@{/admin/css/options/options.css}"/>
+    <script th:src="@{/admin/js/options/options.js}" th:inline="none"></script>
+</head>
+<body>
+<main class="container">
+    <h1>옵션 관리</h1>
+
+    <!-- 탭 메뉴 -->
+    <div class="options-tabs">
+        <div class="options-tab" data-tab="regions" th:classappend="${activeTab == 'regions'} ? ' active' : ''">등록 지역</div>
+        <div class="options-tab" data-tab="main-category" th:classappend="${activeTab == 'main-category'} ? ' active' : ''">메인 카테고리</div>
+        <div class="options-tab" data-tab="sub-category" th:classappend="${activeTab == 'sub-category'} ? ' active' : ''">서브 카테고리</div>
+        <div class="options-tab" data-tab="item-type" th:classappend="${activeTab == 'item-type'} ? ' active' : ''">상품 종류</div>
+        <div class="options-tab" data-tab="delivery-method" th:classappend="${activeTab == 'delivery-method'} ? ' active' : ''">배송 방식</div>
+    </div>
+
+    <!-- 탭 내용 -->
+    <div class="options-tab-content">
+        <!-- 등록 지역 탭 -->
+        <div class="options-tab-pane" th:classappend="${activeTab == 'regions'} ? ' active' : ''" id="regions">
+            <h3>등록 지역 관리</h3>
+            <!-- 등록 지역 추가 폼 -->
+            <form th:action="@{/admin/product/options/regions}" th:object="${newRegion}" method="post" class="options-form">
+                <!-- 숨겨진 필드 추가 -->
+                <input type="hidden" name="activeTab" value="regions"/>
+
+                <div class="options-form-group">
+                    <label for="code" class="options-label">코드</label>
+                    <input type="text" id="code" th:field="*{code}" class="options-input" required>
+                </div>
+                <div class="options-form-group">
+                    <label for="displayName" class="options-label">지역 이름</label>
+                    <input type="text" id="displayName" th:field="*{displayName}" class="options-input" required>
+                </div>
+                <div class="options-form-group">
+                    <label for="active" class="options-label">활성 상태</label>
+                    <select id="active" th:field="*{active}" class="options-select" required>
+                        <option value="" disabled selected>상태를 선택하세요</option>
+                        <option value="true">활성</option>
+                        <option value="false">비활성</option>
+                    </select>
+                </div>
+                <button type="submit" class="options-button-primary">추가</button>
+            </form>
+            <!-- 등록 지역 목록 테이블 -->
+            <table class="options-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>코드</th>
+                    <th>지역 이름</th>
+                    <th>활성 상태</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="region : ${regions}">
+                    <td th:text="${region.id}">1</td>
+                    <td th:text="${region.code}">REG1</td>
+                    <td th:text="${region.displayName}">서울</td>
+                    <td th:text="${region.active ? '활성' : '비활성'}">활성</td>
+                    <td>
+                        <a th:href="@{/admin/product/options/regions/edit/{id}(id=${region.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/regions/delete/{id}(id=${region.id})}" method="post" style="display:inline;">
+                            <!-- 숨겨진 필드 추가 -->
+                            <input type="hidden" name="activeTab" th:value="'regions'"/>
+                            <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 메인 카테고리 탭 -->
+        <div class="options-tab-pane" th:classappend="${activeTab == 'main-category'} ? ' active' : ''" id="main-category">
+            <h3>메인 카테고리 관리</h3>
+            <!-- 메인 카테고리 추가 폼 -->
+            <form th:action="@{/admin/product/options/main-categories}" th:object="${newMainCategory}" method="post" class="options-form">
+                <!-- 숨겨진 필드 추가 -->
+                <input type="hidden" name="activeTab" value="main-category"/>
+
+                <div class="options-form-group">
+                    <label for="mainCategoryName" class="options-label">메인 카테고리 이름</label>
+                    <input type="text" id="mainCategoryName" th:field="*{mainCategoryName}" class="options-input" required>
+                </div>
+                <button type="submit" class="options-button-primary">추가</button>
+            </form>
+            <!-- 메인 카테고리 목록 테이블 -->
+            <table class="options-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>메인 카테고리 이름</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="mainCategory : ${mainCategories}">
+                    <td th:text="${mainCategory.id}">1</td>
+                    <td th:text="${mainCategory.mainCategoryName}">전자제품</td>
+                    <td>
+                        <a th:href="@{/admin/product/options/main-categories/edit/{id}(id=${mainCategory.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/main-categories/delete/{id}(id=${mainCategory.id})}" method="post" style="display:inline;">
+                            <!-- 숨겨진 필드 추가 -->
+                            <input type="hidden" name="activeTab" th:value="'main-category'"/>
+                            <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 서브 카테고리 탭 -->
+        <div class="options-tab-pane" th:classappend="${activeTab == 'sub-category'} ? ' active' : ''" id="sub-category">
+            <h3>서브 카테고리 관리</h3>
+            <!-- 서브 카테고리 추가 폼 -->
+            <form th:action="@{/admin/product/options/sub-categories}" th:object="${newSubCategory}" method="post" class="options-form">
+                <!-- 숨겨진 필드 추가 -->
+                <input type="hidden" name="activeTab" value="sub-category"/>
+
+                <div class="options-form-group">
+                    <label for="subCategoryName" class="options-label">서브 카테고리 이름</label>
+                    <input type="text" id="subCategoryName" th:field="*{subCategoryName}" class="options-input" required>
+                </div>
+                <div class="options-form-group">
+                    <label for="mainCategory" class="options-label">메인 카테고리</label>
+                    <select id="mainCategory" th:field="*{mainCategory.id}" class="options-select" required>
+                        <option value="" disabled selected>메인 카테고리를 선택하세요</option>
+                        <option th:each="mainCategory : ${mainCategories}"
+                                th:value="${mainCategory.id}"
+                                th:text="${mainCategory.mainCategoryName}">
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="options-button-primary">추가</button>
+            </form>
+            <!-- 서브 카테고리 목록 테이블 -->
+            <table class="options-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>서브 카테고리 이름</th>
+                    <th>메인 카테고리</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="subCategory : ${subCategories}">
+                    <td th:text="${subCategory.id}">1</td>
+                    <td th:text="${subCategory.subCategoryName}">스마트폰</td>
+                    <td th:text="${subCategory.mainCategory.mainCategoryName}">전자제품</td>
+                    <td>
+                        <a th:href="@{/admin/product/options/sub-categories/edit/{id}(id=${subCategory.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/sub-categories/delete/{id}(id=${subCategory.id})}" method="post" style="display:inline;">
+                            <!-- 숨겨진 필드 추가 -->
+                            <input type="hidden" name="activeTab" th:value="'sub-category'"/>
+                            <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 상품 종류 탭 -->
+        <div class="options-tab-pane" th:classappend="${activeTab == 'item-type'} ? ' active' : ''" id="item-type">
+            <h3>상품 종류 관리</h3>
+            <!-- 상품 종류 추가 폼 -->
+            <form th:action="@{/admin/product/options/item-types}" th:object="${newItemType}" method="post" class="options-form">
+                <!-- 숨겨진 필드 추가 -->
+                <input type="hidden" name="activeTab" value="item-type"/>
+
+                <div class="options-form-group">
+                    <label for="code" class="options-label">상품 종류 코드</label>
+                    <input type="text" id="code" th:field="*{code}" class="options-input" required>
+                </div>
+                <div class="options-form-group">
+                    <label for="description" class="options-label">설명</label>
+                    <input type="text" id="description" th:field="*{description}" class="options-input" required>
+                </div>
+                <button type="submit" class="options-button-primary">추가</button>
+            </form>
+            <!-- 상품 종류 목록 테이블 -->
+            <table class="options-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>코드</th>
+                    <th>설명</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="itemType : ${itemTypes}">
+                    <td th:text="${itemType.id}">1</td>
+                    <td th:text="${itemType.code}">ELEC</td>
+                    <td th:text="${itemType.description}">전자 제품</td>
+                    <td>
+                        <a th:href="@{/admin/product/options/item-types/edit/{id}(id=${itemType.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/item-types/delete/{id}(id=${itemType.id})}" method="post" style="display:inline;">
+                            <!-- 숨겨진 필드 추가 -->
+                            <input type="hidden" name="activeTab" th:value="'item-type'"/>
+                            <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 배송 방식 탭 -->
+        <div class="options-tab-pane" th:classappend="${activeTab == 'delivery-method'} ? ' active' : ''" id="delivery-method">
+            <h3>배송 방식 관리</h3>
+            <!-- 배송 방식 추가 폼 -->
+            <form th:action="@{/admin/product/options/delivery-methods}" th:object="${newDeliveryMethod}" method="post" class="options-form">
+                <!-- 숨겨진 필드 추가 -->
+                <input type="hidden" name="activeTab" value="delivery-method"/>
+
+                <div class="options-form-group">
+                    <label for="code" class="options-label">배송 코드</label>
+                    <input type="text" id="code" th:field="*{code}" class="options-input" required>
+                </div>
+                <div class="options-form-group">
+                    <label for="displayName" class="options-label">표시 이름</label>
+                    <input type="text" id="displayName" th:field="*{displayName}" class="options-input" required>
+                </div>
+                <button type="submit" class="options-button-primary">추가</button>
+            </form>
+            <!-- 배송 방식 목록 테이블 -->
+            <table class="options-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>코드</th>
+                    <th>표시 이름</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="deliveryMethod : ${deliveryMethods}">
+                    <td th:text="${deliveryMethod.id}">1</td>
+                    <td th:text="${deliveryMethod.code}">EXP</td>
+                    <td th:text="${deliveryMethod.displayName}">익스프레스</td>
+                    <td>
+                        <a th:href="@{/admin/product/options/delivery-methods/edit/{id}(id=${deliveryMethod.id})}" class="options-btn-warning">수정</a>
+                        <form th:action="@{/admin/product/options/delivery-methods/delete/{id}(id=${deliveryMethod.id})}" method="post" style="display:inline;">
+                            <!-- 숨겨진 필드 추가 -->
+                            <input type="hidden" name="activeTab" th:value="'delivery-method'"/>
+                            <button type="submit" class="options-btn-danger" onclick="return confirm('삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- 스타일링을 위한 CSS 추가 -->
+<style>
+    /* 에러 메시지 스타일 */
+    .error {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+</style>
+</body>
+</html>

@@ -3,12 +3,10 @@ package page.admin.common;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import page.admin.member.service.MemberServiceImpl;
 
 @Controller
 public class CustomErrorController implements ErrorController {
@@ -25,22 +23,22 @@ public class CustomErrorController implements ErrorController {
         // 상태 코드 null 처리
         if (statusCode == null) {
             model.addAttribute("errorMessage", "예기치 못한 에러가 발생했습니다.");
-            return "error/general";
+            return "common/error/general";
         }
         // 상태 코드에 따른 뷰 반환
         if (statusCode != null) {
             switch (statusCode) {
                 case 404:
-                    return "error/404";
+                    return "common/error/404";
                 case 500:
-                    return "error/500";
+                    return "common/error/500";
                 default:
                     model.addAttribute("statusCode", statusCode);
-                    return "error/general";
+                    return "common/error/general";
             }
         }
 
-        return "error/general";
+        return "common/error/general";
     }
 
 }

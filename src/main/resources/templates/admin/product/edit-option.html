@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <title>엔티티 수정</title>
+</head>
+<body>
+<div class="edit-container">
+    <h2 th:text="'엔티티 수정: ' + ${entityType}">엔티티 수정</h2>
+
+    <!-- Region 수정 폼 -->
+    <form th:if="${entityType == 'region'}"
+          th:action="@{/admin/product/options/regions/{id}(id=${entity.id})}"
+          th:object="${entity}"
+          method="post">
+        <!-- 숨겨진 activeTab 필드 추가 -->
+        <input type="hidden" name="activeTab" th:value="'regions'"/>
+
+        <div class="edit-form-group">
+            <label for="code" class="edit-label">코드</label>
+            <input type="text" id="code" th:field="*{code}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('code')}" class="error">
+                <p th:errors="*{code}">코드 오류</p>
+            </div>
+        </div>
+        <div class="edit-form-group">
+            <label for="displayName" class="edit-label">지역 이름</label>
+            <input type="text" id="displayName" th:field="*{displayName}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('displayName')}" class="error">
+                <p th:errors="*{displayName}">지역 이름 오류</p>
+            </div>
+        </div>
+        <div class="edit-form-group">
+            <label for="active" class="edit-label">활성 상태</label>
+            <select id="active" th:field="*{active}" class="edit-select" required>
+                <option value="" disabled>상태를 선택하세요</option>
+                <option th:value="true" th:selected="${entity.active}">활성</option>
+                <option th:value="false" th:selected="${!entity.active}">비활성</option>
+            </select>
+            <div th:if="${#fields.hasErrors('active')}" class="error">
+                <p th:errors="*{active}">활성 상태 오류</p>
+            </div>
+        </div>
+        <button type="submit" class="edit-button-primary">수정</button>
+        <!-- 취소 링크에 activeTab 파라미터 추가 -->
+        <a th:href="@{/admin/product/options(activeTab='regions')}" class="edit-cancel-link">취소</a>
+    </form>
+
+    <!-- MainCategory 수정 폼 -->
+    <form th:if="${entityType == 'mainCategory'}"
+          th:action="@{/admin/product/options/main-categories/{id}(id=${entity.id})}"
+          th:object="${entity}"
+          method="post">
+        <!-- 숨겨진 activeTab 필드 추가 -->
+        <input type="hidden" name="activeTab" th:value="'main-category'"/>
+
+        <div class="edit-form-group">
+            <label for="mainCategoryName" class="edit-label">메인 카테고리 이름</label>
+            <input type="text" id="mainCategoryName" th:field="*{mainCategoryName}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('mainCategoryName')}" class="error">
+                <p th:errors="*{mainCategoryName}">메인 카테고리 이름 오류</p>
+            </div>
+        </div>
+        <button type="submit" class="edit-button-primary">수정</button>
+        <!-- 취소 링크에 activeTab 파라미터 추가 -->
+        <a th:href="@{/admin/product/options(activeTab='main-category')}" class="edit-cancel-link">취소</a>
+    </form>
+
+    <!-- SubCategory 수정 폼 -->
+    <form th:if="${entityType == 'subCategory'}"
+          th:action="@{/admin/product/options/sub-categories/{id}(id=${entity.id})}"
+          th:object="${entity}"
+          method="post">
+        <!-- 숨겨진 activeTab 필드 추가 -->
+        <input type="hidden" name="activeTab" th:value="'sub-category'"/>
+
+        <div class="edit-form-group">
+            <label for="subCategoryName" class="edit-label">서브 카테고리 이름</label>
+            <input type="text" id="subCategoryName" th:field="*{subCategoryName}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('subCategoryName')}" class="error">
+                <p th:errors="*{subCategoryName}">서브 카테고리 이름 오류</p>
+            </div>
+        </div>
+        <div class="edit-form-group">
+            <label for="mainCategory" class="edit-label">메인 카테고리</label>
+            <select id="mainCategory" th:field="*{mainCategory.id}" class="edit-select" required>
+                <option value="" disabled>메인 카테고리를 선택하세요</option>
+                <option th:each="mainCategory : ${mainCategories}"
+                        th:value="${mainCategory.id}"
+                        th:text="${mainCategory.mainCategoryName}"
+                        th:selected="${mainCategory.id == entity.mainCategory.id}">
+                </option>
+            </select>
+            <div th:if="${#fields.hasErrors('mainCategory')}" class="error">
+                <p th:errors="*{mainCategory}">메인 카테고리 오류</p>
+            </div>
+        </div>
+        <button type="submit" class="edit-button-primary">수정</button>
+        <!-- 취소 링크에 activeTab 파라미터 추가 -->
+        <a th:href="@{/admin/product/options(activeTab='sub-category')}" class="edit-cancel-link">취소</a>
+    </form>
+
+    <!-- ItemType 수정 폼 -->
+    <form th:if="${entityType == 'itemType'}"
+          th:action="@{/admin/product/options/item-types/{id}(id=${entity.id})}"
+          th:object="${entity}"
+          method="post">
+        <!-- 숨겨진 activeTab 필드 추가 -->
+        <input type="hidden" name="activeTab" th:value="'item-type'"/>
+
+        <div class="edit-form-group">
+            <label for="code" class="edit-label">상품 종류 코드</label>
+            <input type="text" id="code" th:field="*{code}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('code')}" class="error">
+                <p th:errors="*{code}">상품 종류 코드 오류</p>
+            </div>
+        </div>
+        <div class="edit-form-group">
+            <label for="description" class="edit-label">설명</label>
+            <input type="text" id="description" th:field="*{description}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('description')}" class="error">
+                <p th:errors="*{description}">설명 오류</p>
+            </div>
+        </div>
+        <button type="submit" class="edit-button-primary">수정</button>
+        <!-- 취소 링크에 activeTab 파라미터 추가 -->
+        <a th:href="@{/admin/product/options(activeTab='item-type')}" class="edit-cancel-link">취소</a>
+    </form>
+
+    <!-- DeliveryCode 수정 폼 -->
+    <form th:if="${entityType == 'deliveryCode'}"
+          th:action="@{/admin/product/options/delivery-methods/{id}(id=${entity.id})}"
+          th:object="${entity}"
+          method="post">
+        <!-- 숨겨진 activeTab 필드 추가 -->
+        <input type="hidden" name="activeTab" th:value="'delivery-method'"/>
+
+        <div class="edit-form-group">
+            <label for="code" class="edit-label">배송 코드</label>
+            <input type="text" id="code" th:field="*{code}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('code')}" class="error">
+                <p th:errors="*{code}">배송 코드 오류</p>
+            </div>
+        </div>
+        <div class="edit-form-group">
+            <label for="displayName" class="edit-label">표시 이름</label>
+            <input type="text" id="displayName" th:field="*{displayName}" class="edit-input" required>
+            <div th:if="${#fields.hasErrors('displayName')}" class="error">
+                <p th:errors="*{displayName}">표시 이름 오류</p>
+            </div>
+        </div>
+        <button type="submit" class="edit-button-primary">수정</button>
+        <!-- 취소 링크에 activeTab 파라미터 추가 -->
+        <a th:href="@{/admin/product/options(activeTab='delivery-method')}" class="edit-cancel-link">취소</a>
+    </form>
+</div>
+</body>
+</html>
