@@ -7,16 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.admin.item.service.DeliveryCodeService;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.order.domain.Order;
 import page.admin.admin.order.domain.OrderDetail;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.admin.order.service.OrderService;
+import page.admin.common.utils.Alert;
 import page.admin.common.utils.PageableUtils;
 
 import java.io.IOException;
@@ -278,4 +277,27 @@ public class OrderController {
 
         return "admin/order/orderDetails";
     }
+
+    @PostMapping("/update")
+    public String updateOrderStatus(
+            @RequestParam("orderNo") Long orderNo,
+            @RequestParam("status") String status,
+            RedirectAttributes redirectAttributes) {
+        try {
+            orderService.updateOrderStatus(orderNo, status);
+            redirectAttributes.addFlashAttribute("alert", new Alert("배송 상태가 성공적으로 업데이트되었습니다.", Alert.AlertType.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 요청: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("alert", new Alert("잘못된 요청입니다. 주문 번호를 확인하세요.", Alert.AlertType.ERROR));
+        } catch (Exception e) {
+            log.error("배송 상태 업데이트 중 오류 발생", e);
+            redirectAttributes.addFlashAttribute("alert", new Alert("배송 상태를 업데이트하는 중 오류가 발생했습니다.", Alert.AlertType.ERROR));
+        }
+        return "redirect:/admin/orders/details/" + orderNo;
+    }
+
+
+
+
+
 }
