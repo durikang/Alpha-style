@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.signup-form {
+    width: 20%;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+
+}
+
+.signup-form h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.signup-form h2 {
+    font-size: 18px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.signup-form div {
+    margin-bottom: 15px;
+
+}
+
+.signup-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+
+}
+
+.signup-form input,
+.signup-form select,
+.signup-form button {
+    width: 95%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+}
+
+.signup-form input[type="radio"],
+.signup-form input[type="checkbox"] {
+    width: auto;
+
+}
+
+.signup-form button {
+    background-color: #000;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.signup-form button:hover {
+    background-color: #000;
+}
+
+.required {
+    color: red;
+}
+input[type="text"] {
+    text-align: center;
+    margin-top: 10px;
+}
+input[type="email"] {
+    text-align: center;
+}

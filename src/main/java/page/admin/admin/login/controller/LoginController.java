@@ -20,7 +20,7 @@ public class LoginController {
     private final MemberService memberService;
 
     // 로그인 페이지
-    @GetMapping({"/admin", "/admin/"})
+    @GetMapping("/login")
     public String loginPage(HttpSession session, Model model) {
         AdminSessionInfo sessionInfo = (AdminSessionInfo) session.getAttribute("loginMember");
 
@@ -29,11 +29,11 @@ public class LoginController {
         }
 
         model.addAttribute("loginMember", new LoginForm());
-        return "/admin/login";
+        return "login"; // 로그인 페이지 템플릿
     }
 
     // 로그인 처리
-    @PostMapping("/admin/login")
+    @PostMapping("/login")
     public String login(
             @Validated @ModelAttribute LoginForm loginForm,
             BindingResult bindingResult,
@@ -42,7 +42,7 @@ public class LoginController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("loginMember", loginForm);
-            return "/admin/login";
+            return "login"; // 로그인 페이지 템플릿
         }
 
         var member = memberService.findByUserIdAndPassword(loginForm.getUserId(), loginForm.getPassword());
@@ -60,14 +60,14 @@ public class LoginController {
 
         model.addAttribute("errorMessage", "아이디 또는 비밀번호가 잘못되었습니다.");
         model.addAttribute("loginMember", loginForm);
-        return "/admin/login";
+        return "login";
     }
 
     // 로그아웃 처리
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/admin";
+        return "redirect:/login";
     }
 
     // 역할에 따른 리다이렉트
@@ -77,6 +77,6 @@ public class LoginController {
         } else if ("member".equalsIgnoreCase(role)) {
             return "redirect:/user/home";
         }
-        return "redirect:/admin"; // 기본 로그인 페이지로 리다이렉트
+        return "redirect:/login";
     }
 }
