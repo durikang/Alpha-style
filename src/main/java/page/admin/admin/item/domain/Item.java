@@ -10,8 +10,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import page.admin.common.BaseEntity;
 import page.admin.admin.member.domain.Member;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Entity
@@ -108,4 +110,17 @@ public class Item extends BaseEntity {
         this.subCategory = subCategory;
         this.seller = seller;
     }
+
+
+    // 가격 포맷팅 메서드 추가
+    public String getFormattedPurchasePrice() {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
+        return purchasePrice != null ? currencyFormat.format(purchasePrice) : "가격 정보 없음";
+    }
+
+    public String getFormattedSalePrice() {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
+        return salePrice != null ? currencyFormat.format(salePrice) : "가격 정보 없음";
+    }
+
 }

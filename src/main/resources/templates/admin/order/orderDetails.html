@@ -120,6 +120,7 @@
             </div>
             <div class="box">
                 <h3>주문 정보</h3>
+                <input type="hidden" id="orderNo" th:value="${order.orderNo}">
                 <p><strong>주문 번호:</strong> <span th:text="${order.orderNo != null ? order.orderNo : '주문 번호 없음'}">12345</span></p>
                 <p><strong>주문 날짜:</strong> <span th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-12-14 14:30</span></p>
                 <p><strong>총 금액:</strong> <span th:text="${order.totalAmount}">50000</span>원</p>
@@ -146,31 +147,31 @@
                         <th>주문 상품</th>
                         <th>수량</th>
                         <th>상품 금액</th>
-                        <th>결제 금액</th>
-                        <th>주문날짜</th>
+                        <th>부가세 (10%)</th>
+                        <th>결제 금액 (세금 포함)</th>
+                        <th>주문 날짜</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tbody>
                     <tr th:each="detail : ${details}">
                         <td th:text="${detail.order.orderNo}">주문 번호</td>
-                        <td th:text="${detail.item.itemId}">12345</td>
+                        <td th:text="${detail.item.itemId}">상품 번호</td>
                         <td>
                             <img th:if="${detail.item.mainImage != null}" th:src="${'/images/' + detail.item.mainImage.getStoreFileName()}" alt="상품 이미지" style="max-width: 64px; max-height: 64px;">
                             <img th:if="${detail.item.mainImage == null}" src="https://via.placeholder.com/64x64.png?text=No+Image" alt="기본 이미지" style="max-width: 64px; max-height: 64px;">
                             <a th:href="@{/admin/product/items/{id}(id=${detail.item.itemId})}"><span th:text="${detail.item.itemName}">상품 이름</span></a>
                         </td>
-                        <td th:text="${detail.quantity}">2</td>
-                        <td th:text="${detail.item.salePrice}">20000</td>
-                        <td th:text="${detail.subtotal}">40000</td>
-                        <td th:text="${detail.order.orderDate}">2024-12-14</td>
+                        <td th:text="${detail.quantity}">수량</td>
+                        <td th:text="${detail.getFormattedSubtotal()}">상품 금액</td>
+                        <td th:text="${detail.getFormattedVAT()}">부가세</td>
+                        <td th:text="${detail.getFormattedTotalAmount()}">결제 금액 (세금 포함)</td>
+                        <td th:text="${#dates.format(detail.order.orderDate, 'yyyy-MM-dd')}">주문 날짜</td>
                     </tr>
-                    </tbody>
-
                     </tbody>
                 </table>
             </div>
         </div>
+
 
         <!-- 하단 작업 버튼 -->
         <div class="actions">
@@ -190,33 +191,33 @@
         }
     }
     function saveChanges() {
-        // 주문 번호와 상태 값 가져오기
-        const orderNo = document.getElementById('orderNo').value; // Hidden input에서 값 가져오기
-        const status = document.querySelector('#status-select').value; // 상태 선택 값 가져오기
+        const orderNoInput = document.querySelector('#orderNo');
+        const statusSelect = document.querySelector('#status-select');
 
-        // 요청 데이터 출력 (디버깅용)
-        console.log("Order No:", orderNo);
-        console.log("Selected Status:", status);
+        if (!orderNoInput || !statusSelect) {
+            alert('필수 데이터가 누락되었습니다.');
+            return;
+        }
 
-        // 폼 데이터 생성
+        const orderNo = orderNoInput.value;
+        const status = statusSelect.value;
+
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/orders/update';
+        form.action = '/admin/orders/update';
 
-        // hidden input으로 데이터 추가
-        const orderNoInput = document.createElement('input');
-        orderNoInput.type = 'hidden';
-        orderNoInput.name = 'orderNo';
-        orderNoInput.value = orderNo;
-        form.appendChild(orderNoInput);
+        const orderNoHidden = document.createElement('input');
+        orderNoHidden.type = 'hidden';
+        orderNoHidden.name = 'orderNo';
+        orderNoHidden.value = orderNo;
+        form.appendChild(orderNoHidden);
 
-        const statusInput = document.createElement('input');
-        statusInput.type = 'hidden';
-        statusInput.name = 'status';
-        statusInput.value = status;
-        form.appendChild(statusInput);
+        const statusHidden = document.createElement('input');
+        statusHidden.type = 'hidden';
+        statusHidden.name = 'status';
+        statusHidden.value = status;
+        form.appendChild(statusHidden);
 
-        // 폼을 body에 추가하고 제출
         document.body.appendChild(form);
         form.submit();
     }

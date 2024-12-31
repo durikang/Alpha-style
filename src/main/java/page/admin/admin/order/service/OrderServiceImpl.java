@@ -1,5 +1,7 @@
 package page.admin.admin.order.service;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,9 @@ import page.admin.admin.order.domain.QOrderDetail;
 import page.admin.admin.order.domain.dto.*;
 import page.admin.admin.order.repository.OrderRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,6 +107,119 @@ public class OrderServiceImpl implements OrderService {
         long total = query.fetchCount();
 
         return new PageImpl<>(results, pageable, total);
+    }
+
+    @Override
+    public List<Order> getAllOrdersWithFilters(String keyword, Date startDate, Date endDate) {
+        QOrder order = QOrder.order;
+        QMember user = QMember.member;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            builder.and(
+                    user.username.containsIgnoreCase(keyword)
+                            .or(user.userId.containsIgnoreCase(keyword))
+            );
+        }
+
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        // QueryDSL 쿼리 작성
+        var query = queryFactory
+                .selectFrom(order)
+                .join(order.user, user)
+                .fetchJoin()
+                .where(builder)
+                .orderBy(order.orderDate.desc());
+
+        // 페이징 없이 모든 데이터 조회
+        List<Order> results = query.fetch();
+
+        return results;
+    }
+
+
+    @Override
+    public Page<Order> getOrdersWithFilters(String keyword, Date startDate, Date endDate, Pageable pageable, String sortField, String sortDirection) {
+        QOrder order = QOrder.order;
+        QMember user = QMember.member;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            builder.and(
+                    user.username.containsIgnoreCase(keyword)
+                            .or(user.userId.containsIgnoreCase(keyword))
+            );
+        }
+
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        // 정렬 필드와 방향을 기반으로 OrderSpecifier 생성
+        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(sortField, sortDirection);
+
+        // QueryDSL 쿼리 작성
+        var query = queryFactory
+                .selectFrom(order)
+                .join(order.user, user)
+                .fetchJoin()
+                .where(builder)
+                .orderBy(orderSpecifier);
+
+        if (pageable.isPaged()) {
+            // 페이징이 활성화된 경우
+            List<Order> results = query
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+
+            long total = query.fetchCount();
+
+            return new PageImpl<>(results, pageable, total);
+        } else {
+            // 페이징이 비활성화된 경우 (모든 데이터 조회)
+            List<Order> results = query.fetch();
+
+            long total = results.size();
+
+            return new PageImpl<>(results, pageable, total);
+        }
+    }
+
+    /**
+     * 정렬 필드와 방향에 따라 OrderSpecifier를 반환합니다.
+     * @param sortField 정렬 필드
+     * @param sortDirection 정렬 방향 (asc 또는 desc)
+     * @return OrderSpecifier
+     */
+    private OrderSpecifier<?> getOrderSpecifier(String sortField, String sortDirection) {
+        switch (sortField) {
+            case "orderNo":
+                return sortDirection.equalsIgnoreCase("asc") ? QOrder.order.orderNo.asc() : QOrder.order.orderNo.desc();
+            case "user.username":
+                return sortDirection.equalsIgnoreCase("asc") ? QMember.member.username.asc() : QMember.member.username.desc();
+            case "orderDate":
+                return sortDirection.equalsIgnoreCase("asc") ? QOrder.order.orderDate.asc() : QOrder.order.orderDate.desc();
+            case "totalAmount":
+                return sortDirection.equalsIgnoreCase("asc") ? QOrder.order.totalAmount.asc() : QOrder.order.totalAmount.desc();
+            case "deliveryStatus":
+                return sortDirection.equalsIgnoreCase("asc") ? QOrder.order.deliveryStatus.asc() : QOrder.order.deliveryStatus.desc();
+            default:
+                return QOrder.order.orderDate.desc(); // 기본 정렬
+        }
     }
 
     @Override
