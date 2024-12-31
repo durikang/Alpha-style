@@ -1,4 +1,4 @@
-fetch('mainHover.html')
+fetch('../../templates/user/mainHover.html')
     .then((response) => response.text())
     .then((data) => {
         // HTML 내용을 body의 맨 위에 삽입
