@@ -55,11 +55,6 @@ public class ItemController {
 
         Page<Item> items = itemService.searchItems(keyword, sortedPageable);
 
-        // 로그 추가
-        for (Item item : items.getContent()) {
-            log.info("Item ID: {}", item.getItemId());
-        }
-
         int currentPage = items.getNumber() + 1;
         int totalPages = items.getTotalPages();
         int startPage = Math.max(1, (currentPage - 1) / 10 * 10 + 1);

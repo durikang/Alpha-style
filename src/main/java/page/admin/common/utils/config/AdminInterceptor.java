@@ -18,14 +18,15 @@ public class AdminInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 세션에서 LoginSessionInfo 객체 가져오기
         AdminSessionInfo sessionInfo = (AdminSessionInfo) session.getAttribute("loginMember");
 
         if (sessionInfo == null || !"admin".equalsIgnoreCase(sessionInfo.getRole())) {
-            response.sendRedirect("/"); // 관리자가 아니면 로그인 페이지로 리다이렉트
+            // 일반 사용자는 user 홈으로 리다이렉트
+            response.sendRedirect(sessionInfo == null ? "/" : "/user/home");
             return false;
         }
 
         return true; // admin이면 요청 진행
     }
+
 }

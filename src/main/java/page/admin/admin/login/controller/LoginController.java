@@ -15,28 +15,26 @@ import page.admin.admin.member.service.MemberService;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminHomeController {
+public class LoginController {
 
     private final MemberService memberService;
-    // 어드민 로그인 페이지
+
+    // 로그인 페이지
     @GetMapping({"/admin", "/admin/"})
-    public String adminLoginPage(HttpSession session, Model model) {
-        // 세션에서 로그인된 사용자 확인
+    public String loginPage(HttpSession session, Model model) {
         AdminSessionInfo sessionInfo = (AdminSessionInfo) session.getAttribute("loginMember");
 
-        // 이미 로그인된 경우 관리자 홈으로 리다이렉트
-        if (sessionInfo != null && "admin".equalsIgnoreCase(sessionInfo.getRole())) {
-            return "redirect:admin/adminHome";
+        if (sessionInfo != null) {
+            return redirectToHome(sessionInfo.getRole());
         }
 
-        // 로그인되지 않은 경우 로그인 폼 추가 후 로그인 페이지 반환
         model.addAttribute("loginMember", new LoginForm());
         return "/admin/login";
     }
 
-    // 어드민 로그인 처리
+    // 로그인 처리
     @PostMapping("/admin/login")
-    public String adminLogin(
+    public String login(
             @Validated @ModelAttribute LoginForm loginForm,
             BindingResult bindingResult,
             HttpSession session,
@@ -44,12 +42,11 @@ public class AdminHomeController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("loginMember", loginForm);
-            return "admin/login"; // 오류 시 로그인 페이지로 반환
+            return "/admin/login";
         }
 
         var member = memberService.findByUserIdAndPassword(loginForm.getUserId(), loginForm.getPassword());
-        if (member.isPresent() && "admin".equalsIgnoreCase(member.get().getRole())) {
-            // 세션에 로그인 정보 저장
+        if (member.isPresent()) {
             AdminSessionInfo sessionInfo = new AdminSessionInfo(
                     member.get().getUserNo(),
                     member.get().getUserId(),
@@ -58,32 +55,28 @@ public class AdminHomeController {
                     member.get().getEmail()
             );
             session.setAttribute("loginMember", sessionInfo);
-            return "redirect:/admin/adminHome";
+            return redirectToHome(member.get().getRole());
         }
 
-        // 인증 실패 시
         model.addAttribute("errorMessage", "아이디 또는 비밀번호가 잘못되었습니다.");
         model.addAttribute("loginMember", loginForm);
-        return "admin/login";
-    }
-
-    // 어드민 홈 페이지
-    @GetMapping("/admin/adminHome")
-    public String adminHome(HttpSession session, Model model) {
-        AdminSessionInfo sessionInfo = (AdminSessionInfo) session.getAttribute("loginMember");
-
-        if (sessionInfo == null || !"admin".equalsIgnoreCase(sessionInfo.getRole())) {
-            return "redirect:/admin"; // 로그인되지 않았거나 관리자가 아니면 로그인 페이지로 이동
-        }
-
-        model.addAttribute("username", sessionInfo.getUsername());
-        return "admin/adminHome";
+        return "/admin/login";
     }
 
     // 로그아웃 처리
-    @GetMapping("/admin/logout")
+    @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/admin"; // 로그아웃 후 로그인 페이지로 이동
+        return "redirect:/admin";
+    }
+
+    // 역할에 따른 리다이렉트
+    private String redirectToHome(String role) {
+        if ("admin".equalsIgnoreCase(role)) {
+            return "redirect:/admin/adminHome";
+        } else if ("member".equalsIgnoreCase(role)) {
+            return "redirect:/user/home";
+        }
+        return "redirect:/admin"; // 기본 로그인 페이지로 리다이렉트
     }
 }

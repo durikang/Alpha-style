@@ -47,6 +47,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/images/**",         // 공용 이미지
                         "/fonts/**"           // 공용 폰트
                 );
+        registry.addInterceptor(new UserInterceptor())
+                .addPathPatterns("/user/**");
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
