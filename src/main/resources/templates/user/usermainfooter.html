@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+
+    .footer {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #555;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    .footer-links a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 15px;
+      font-size: 14px;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .footer-contact {
+      font-size: 14px;
+      text-align: left;
+    }
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .footer-social img {
+      width: 20px;
+      height: 20px;
+    }
+    .footer-bottom {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-links">
+      <a th:href="">공지사항</a>
+      <a th:href="">이용약관</a>
+      <a th:href="">개인정보처리방침</a>
+      <a th:href="">협업/제휴</a>
+    </div>
+    <div class="footer-contact">
+      <p>협업/제휴/협찬: <a th:href="">12344523@gmaii.com</a></p>
+      <p>고객센터: <strong>8582-14429</strong> (월~금 10:00 - 17:00 / 점심 13:00 - 14:00)</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>
+      company. 주식회사 inteinger| ceo. 강승진 | business no. 1631-837-00028 | mail order license. 제 2014-경기도-0427호
+    </p>
+    <p>
+      tel. 1644-1429 | fax. 02-2245-1016 | address. 경기도 서울시 장안동 921-2 빌딩 3층
+    </p>
+    <p>해당 사이트에서 판매되는 모든 상품의 책임은 판매자에게 있습니다. 담당자: 강승진</p>
+    <p>© Inteinger Corp. All rights reserved.</p>
+  </div>
+</footer>
+</body>
+</html>
