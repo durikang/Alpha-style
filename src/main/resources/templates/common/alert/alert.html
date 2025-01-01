@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<!-- Thymeleaf 선언 / FooterFragment 임을 선언-->
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       th:fragment="alertBar">
 
 <!-- 알림 바 -->
 <script th:src="@{/alert/js/alertEvent.js}" defer></script>
-<link th:inline="css" rel="stylesheet" th:href="@{/alert/css/alert.css}" />
+<link th:href="@{/alert/css/alert.css}" rel="stylesheet"/>
 
 <div th:if="${alert != null and alert.active}"
-     th:classappend="${alert.type == T(page.admin.common.utils.Alert.AlertType).SUCCESS} ? 'alert-success' : 'alert-error'"
+     th:classappend="${alert.type.cssClass}"
      class="alert-bar">
     <p th:text="${alert.title}">알림 메시지</p>
-    <button class="close-btn">×</button>
+    <button class="close-btn" onclick="this.parentElement.style.display='none';">×</button>
 </div>
 
 </html>

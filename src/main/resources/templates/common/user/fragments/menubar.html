@@ -1,0 +1,30 @@
+<header class="header" th:fragment="menu">
+    <div class="logo">
+        <span><a th:href="@{/}"><img th:src="@{/user/img/alpha_Style.png}" alt="logo"></a></span>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/user/popular-products}" class="nav-item">인기상품</a>
+        <a th:href="@{/user/new-products}" class="nav-item">신상품</a>
+        <a th:href="@{/user/winter-products}" class="nav-item">겨울상품</a>
+        <a th:href="@{/user/summer-products}" class="nav-item">여름상품</a>
+    </nav>
+    <div class="user-options">
+        <!-- 로그인 여부에 따라 메뉴 표시 -->
+        <div th:if="${session.loginMember == null}">
+            <a th:href="@{/signup}" class="user-item">회원가입</a>
+            <a th:href="@{/login}" class="user-item">로그인</a>
+        </div>
+        <div th:if="${session.loginMember != null}">
+            <span th:text="'안녕하세요, ' + ${session.loginMember.username} + '님!'"></span>
+            <a th:href="@{/logout}" class="user-item">로그아웃</a>
+            <a th:href="@{/user/order-check}" class="user-item">주문조회</a>
+            <a th:href="@{/user/mypage}" class="user-item">마이페이지</a>
+        </div>
+
+    </div>
+    <div class="search-cart">
+        <input type="text" placeholder="검색어를 입력하세요">
+        <a th:href="@{/user/cart}" class="cart">🛒</a>
+        <a th:href="@{/user/profile}" class="user">👤</a>
+    </div>
+</header>

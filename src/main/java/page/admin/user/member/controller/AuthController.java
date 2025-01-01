@@ -1,6 +1,8 @@
 package page.admin.user.member.controller;
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import page.admin.user.member.service.AuthService;
@@ -18,7 +20,9 @@ public class AuthController {
             authService.sendVerificationEmail(email);
             return ResponseEntity.ok("인증 코드가 이메일로 발송되었습니다.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("인증 코드 발송에 실패했습니다. 다시 시도해주세요.");
+            // 일반적인 예외 처리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("알 수 없는 오류가 발생했습니다: " + e.getMessage());
         }
     }
 

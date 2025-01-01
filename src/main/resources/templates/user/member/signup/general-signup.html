@@ -1,202 +1,176 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}"
+      layout:fragment="Content">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
     <link rel="stylesheet" th:href="@{/user/css/general-signup.css}">
-    <style>
-        /* 모달창 스타일 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-        }
-        .modal-content h3 {
-            margin: 0;
-            margin-bottom: 20px;
-        }
-        .modal-content button {
-            margin: 5px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/user/css/general-modal.css}">
+
+    <script type="module" th:src="@{/user/js/signup-form-main.js}" th:inline="none" defer></script>
+    <script th:src="@{/user/js/email-auth.js}" th:inline="none" defer></script>
+    <script th:src="@{/user/js/kakao-auth.js}" th:inline="none" defer></script>
+    <script th:src="@{/user/js/modal-handler.js}" th:inline="none" defer></script>
+    <script th:src="@{/user/js/general-address.js}" th:inline="none" defer></script>
+    <script th:src="@{/user/js/general-autoCursor.js}" th:inline="none" defer></script>
+
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <!--Daum API 스크립트-->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+
 </head>
 <body>
-<div class="signup-form">
-    <h1>회원 가입</h1>
-
-    <form th:action="@{/signup/general}" method="post">
-        <h2>기본정보</h2>
-        <!-- 아이디 -->
-        <div>
-            <label for="userId">아이디 <span class="required">*</span></label>
-            <input type="text" id="userId" name="userId" placeholder="영문소문자/숫자, 4~16자" required>
+<main>
+    <div class="signup-form">
+        <!-- 로고 이미지 추가 -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
         </div>
-
-        <!-- 비밀번호 -->
-        <div>
-            <label for="password">비밀번호 <span class="required">*</span></label>
-            <input type="password" id="password" name="password" placeholder="영문 대소문자/숫자/특수문자 조합, 8~16자" required>
-        </div>
-
-        <!-- 비밀번호 확인 -->
-        <div>
-            <label for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
-            <input type="password" id="passwordConfirm" name="passwordConfirm" required>
-        </div>
-
-        <!-- 본인인증 -->
-        <div>
-            <button type="button" id="authButton">인증하기</button>
-        </div>
-
-        <!-- 모달창 -->
-        <div id="authModal" class="modal">
-            <div class="modal-content">
-                <h3>본인 인증 방법을 선택하세요</h3>
-                <button type="button" id="emailAuthBtn">이메일 인증</button>
-                <button type="button" id="kakaoAuthBtn">카카오 인증</button>
-                <button type="button" id="closeModalBtn">닫기</button>
+        <h1>회원 가입</h1>
+        <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate>
+            <!-- 아이디 -->
+            <div>
+                <label for="userId">아이디 <span class="required">*</span></label>
+                <input type="text" id="userId" th:field="*{userId}" placeholder="영문소문자/숫자, 4~16자" required>
+                <div id="userIdMessage" style="color: red; margin-top: 5px;"></div>
             </div>
-        </div>
 
-        <!-- 이메일 인증 -->
-        <div id="emailAuthDiv" style="display: none;">
-            <label for="email">이메일 <span class="required">*</span></label>
-            <input type="email" id="email" name="email" placeholder="example@domain.com">
-            <button type="button" id="sendCodeBtn">인증 코드 받기</button>
-            <div id="emailMessage" style="color: green; margin-top: 5px;"></div>
-            <div id="timerMessage" style="color: red; margin-top: 5px;"></div>
+            <!-- 비밀번호 -->
+            <div>
+                <label for="password">비밀번호 <span class="required">*</span></label>
+                <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 4~16자로 입력해주세요." required>
+                <div id="passwordMessage" style="color: red; margin-top: 5px;"></div> <!-- 유효성 메시지 div -->
+            </div>
 
-            <label for="verificationCode">인증코드 <span class="required">*</span></label>
-            <input type="text" id="verificationCode" name="verificationCode" placeholder="인증코드 입력">
-            <button type="button" id="verifyCodeBtn">인증코드 확인</button>
-            <div id="codeMessage" style="color: red; margin-top: 5px;"></div>
-        </div>
+            <!-- 비밀번호 확인 -->
+            <div>
+                <label for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
+                <input type="password" id="passwordConfirm" th:field="*{passwordConfirm}" required>
+                <div th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color: red;"></div>
+            </div>
 
-        <!-- 카카오 인증 -->
-        <div id="kakaoAuthDiv" style="display: none;">
-            <p>카카오 인증 진행 중입니다...</p>
-            <button type="button" id="startKakaoAuthBtn">카카오 인증 요청</button>
-            <div id="kakaoAuthMessage" style="color: green; margin-top: 5px;"></div>
-        </div>
+            <!-- 본인인증 -->
+            <div class="auth-div">
+                <button type="button" id="authButton">본인 인증</button>
+            </div>
 
-        <!-- 휴대전화 -->
-        <div>
-            <label for="mobile">휴대전화 <span class="required">*</span></label>
-            <input type="tel" id="mobile" name="mobile" placeholder="010-xxxx-xxxx" required>
-        </div>
+            <!-- 모달창 -->
+            <div id="authModal" class="modal">
+                <div class="modal-content">
+                    <h3>본인 인증 방법을 선택하세요</h3>
+                    <button type="button" id="emailAuthBtn">이메일 인증</button>
+                    <button type="button" id="kakaoAuthBtn">카카오 인증</button>
+                    <button type="button" id="closeModalBtn">닫기</button>
+                </div>
+            </div>
 
-        <!-- 이름 -->
-        <div>
-            <label for="username">이름 <span class="required">*</span></label>
-            <input type="text" id="username" name="username" required>
-        </div>
+            <!-- 이메일 인증 -->
+            <div id="emailAuthDiv" style="display: none;">
+                <label for="email">이메일 <span class="required">*</span></label>
+                <input type="email" id="email" name="email" th:value="*{email}" placeholder="example@domain.com">
+                <button type="button" id="sendCodeBtn">인증 코드 받기</button>
+                <span id="emailLoading" style="display: none; margin-left: 10px;">🔄 전송 중...</span>
+                <div id="emailMessage" style="color: green; margin-top: 5px;"></div>
+                <div id="timerMessage" style="color: red; margin-top: 5px;"></div>
 
-        <!-- 생년월일 -->
-        <div>
-            <label for="birthDate">생년월일 <span class="required">*</span></label>
-            <input type="date" id="birthDate" name="birthDate" required>
-        </div>
+                <label for="verificationCode">인증코드 <span class="required">*</span></label>
+                <input type="text" id="verificationCode" name="verificationCode" placeholder="인증코드 입력">
+                <button type="button" id="verifyCodeBtn">인증코드 확인</button>
+                <div id="codeMessage" style="color: red; margin-top: 5px;"></div>
+            </div>
 
-        <!-- 주소 -->
-        <div>
-            <label for="address">주소 <span class="required">*</span></label>
-            <input type="text" id="zipCode" name="zipCode" placeholder="우편번호" readonly required>
-            <input type="text" id="basicAddress" name="address" placeholder="기본주소" readonly required>
-            <input type="text" id="secondaryAddress" name="secondaryAddress" placeholder="나머지주소">
-            <button type="button" id="searchAddressBtn">주소 찾기</button>
-        </div>
+            <!-- 이메일 확인 모달 -->
+            <div id="emailConfirmModal" class="modal">
+                <div class="modal-content">
+                    <h3>입력한 이메일이 맞습니까?</h3>
+                    <p id="emailPreview" style="font-weight: bold;"></p>
+                    <button type="button" id="confirmEmailBtn">확인</button>
+                    <button type="button" id="cancelEmailBtn">취소</button>
+                </div>
+            </div>
 
-        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script>
-            document.getElementById('searchAddressBtn').addEventListener('click', function () {
-                new daum.Postcode({
-                    oncomplete: function (data) {
-                        // 우편번호와 주소 정보를 가져와서 폼에 입력
-                        document.getElementById('zipCode').value = data.zonecode; // 우편번호
-                        document.getElementById('basicAddress').value = data.address; // 기본주소
-                        document.getElementById('secondaryAddress').focus(); // 상세주소 입력창으로 포커스 이동
-                    }
-                }).open();
-            });
-        </script>
+            <!-- 인증 완료 메시지 -->
+            <div id="authCompleteMessage" style="display: none; color: green; font-weight: bold; margin-top: 20px;">
+                인증이 완료되었습니다! 🎉
+            </div>
 
-        <!-- 보안 질문 -->
-        <div>
-            <label for="securityQuestion">비밀번호 확인 질문</label>
-            <select id="securityQuestion" name="securityQuestion">
-                <option>기억에 남는 추억의 장소는?</option>
-                <option>가장 좋아하는 음식은?</option>
-                <option>다른 사람이 모르는 별명이 있다면?</option>
-            </select>
-        </div>
+            <!-- 카카오 인증 -->
+            <div id="kakaoAuthDiv" style="display: none;">
+                <button type="button" id="startKakaoAuthBtn">카카오 인증 코드 받기</button>
+                <input type="text" id="kakaoAuthCode" placeholder="카카오 인증 코드를 입력하세요">
+                <button type="button" id="verifyKakaoAuthCodeBtn">인증코드 확인</button>
+                <div id="kakaoAuthMessage" style="color: red; margin-top: 5px;"></div>
+            </div>
 
-        <!-- 보안 답변 -->
-        <div>
-            <label for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
-            <input type="text" id="securityAnswer" name="securityAnswer" required>
-        </div>
+            <!-- 휴대전화 -->
+            <div>
+                <label for="mobilePhone">휴대전화 <span class="required">*</span></label>
+                <input type="tel" id="mobilePhone" name="mobilePhone" th:value="*{mobilePhone}" placeholder="010-xxxx-xxxx" required>
+                <div id="mobilePhoneMessage" style="color: red; margin-top: 5px;"></div>
+            </div>
 
-        <button type="submit">회원가입</button>
-    </form>
-</div>
 
-<script>
-    const authButton = document.getElementById('authButton');
-    const authModal = document.getElementById('authModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const emailAuthBtn = document.getElementById('emailAuthBtn');
-    const kakaoAuthBtn = document.getElementById('kakaoAuthBtn');
-    const emailAuthDiv = document.getElementById('emailAuthDiv');
-    const kakaoAuthDiv = document.getElementById('kakaoAuthDiv');
+            <!-- 이름 -->
+            <div>
+                <label for="username">이름 <span class="required">*</span></label>
+                <input type="text" id="username" name="username" th:value="*{username}" required>
+            </div>
 
-    // 인증하기 버튼 클릭 시 모달 열기
-    authButton.addEventListener('click', () => {
-        authModal.style.display = 'block';
-    });
+            <!-- 생년월일 -->
+            <div>
+                <label for="birthDate">생년월일 <span class="required">*</span></label>
+                <input type="text" id="birthDate" name="birthDate" th:value="*{birthDate}" placeholder="YYYY-MM-DD">
 
-    // 모달 닫기
-    closeModalBtn.addEventListener('click', () => {
-        authModal.style.display = 'none';
-    });
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        flatpickr("#birthDate", {
+                            dateFormat: "Y-m-d",
+                            maxDate: "today", // 오늘 날짜 이전만 선택 가능
+                            defaultDate: "2000-01-01", // 기본값
+                            locale: "ko" // 한국어로 변경
+                        });
+                    });
+                </script>
+            </div>
 
-    // 이메일 인증 선택
-    emailAuthBtn.addEventListener('click', () => {
-        authModal.style.display = 'none';
-        emailAuthDiv.style.display = 'block';
-        kakaoAuthDiv.style.display = 'none';
-    });
+            <!-- 주소 -->
+            <div>
+                <label for="address">주소 <span class="required">*</span></label>
+                <input type="text" id="zipCode" name="zipCode" th:value="*{zipCode}" placeholder="우편번호" readonly required>
+                <input type="text" id="basicAddress" name="address" th:value="*{address}" placeholder="기본주소" readonly required>
+                <input type="text" id="secondaryAddress" name="secondaryAddress" th:value="*{secondaryAddress}" placeholder="나머지주소">
+                <button type="button" id="searchAddressBtn">주소 찾기</button>
+            </div>
 
-    // 카카오 인증 선택
-    kakaoAuthBtn.addEventListener('click', () => {
-        authModal.style.display = 'none';
-        emailAuthDiv.style.display = 'none';
-        kakaoAuthDiv.style.display = 'block';
-    });
+            <!-- 보안 질문 -->
+            <div>
+                <label for="securityQuestion">비밀번호 확인 질문</label>
+                <select id="securityQuestion" name="securityQuestion" th:field="*{securityQuestion}">
+                    <option value="" disabled selected>질문을 선택하세요</option>
+                    <option th:each="question : ${securityQuestions}" th:value="${question}" th:text="${question}"></option>
+                </select>
+                <div th:if="${#fields.hasErrors('securityQuestion')}" th:errors="*{securityQuestion}" class="error-message"></div>
+            </div>
 
-    // 카카오 인증 요청 버튼
-    document.getElementById('startKakaoAuthBtn').addEventListener('click', () => {
-        const kakaoAuthUrl = 'https://kauth.kakao.com/oauth/authorize';
-        const clientId = 'fe5c5e2597bb7e827575b24d04ea8a96'; // 카카오 앱 REST API 키
-        const redirectUri = 'https://yourdomain.com/kakao/callback';
+            <!-- 보안 답변 -->
+            <div>
+                <label for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
+                <input type="text" id="securityAnswer" name="securityAnswer" th:value="*{securityAnswer}" required>
+            </div>
 
-        // 카카오 인증 요청
-        window.location.href = `${kakaoAuthUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
-    });
-</script>
+            <button type="submit">회원가입</button>
+        </form>
+    </div>
+</main>
 </body>
 </html>

@@ -8,13 +8,14 @@ import lombok.*;
 @NoArgsConstructor
 public class Alert {
     private String title;
-    private AlertType type; // Enum을 사용하여 타입 제한
-    private boolean active; // 알림 활성화 여부
+    private AlertType type;
+    private boolean active;
 
+    // 기본 생성자
     public Alert(String title, AlertType type) {
         this.title = title;
         this.type = type;
-        this.active = true; // 기본값 활성화
+        this.active = true;
     }
 
     public boolean isActive() {
@@ -25,8 +26,25 @@ public class Alert {
         this.active = false;
     }
 
-    // Alert의 유형을 제한하는 Enum
+    // Enum
     public enum AlertType {
-        SUCCESS, ERROR,WARNING
+        SUCCESS("alert-success"),
+        ERROR("alert-error"),
+        WARNING("alert-warning");
+
+        private final String cssClass;
+
+        AlertType(String cssClass) {
+            this.cssClass = cssClass;
+        }
+
+        public String getCssClass() {
+            return cssClass;
+        }
+    }
+
+    // 유효성 검사 메서드 추가
+    public static boolean isValid(Alert alert) {
+        return alert != null && alert.getTitle() != null && !alert.getTitle().isBlank();
     }
 }
