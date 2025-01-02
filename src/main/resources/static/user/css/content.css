@@ -18,7 +18,7 @@ main {
     max-width: 1620px; /* 기존 max-width 유지 */
 /*    min-width: 1200px; !* 기존 min-width 유지 *!
     min-height: 100vh; !* main이 전체 뷰포트를 채우도록 설정 *!*/
-    margin: 300px auto; /* 화면 가운데 정렬 */
+    margin: 150px auto; /* 화면 가운데 정렬 */
     flex: 1; /* 남은 공간을 차지하여 footer를 하단에 위치 */
 }
 

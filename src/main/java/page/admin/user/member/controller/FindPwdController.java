@@ -10,6 +10,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.common.utils.Alert;
 import page.admin.user.member.service.AuthService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/user/member/find")
 @RequiredArgsConstructor
@@ -24,23 +27,27 @@ public class FindPwdController {
         return "user/member/find/find-pwd"; // 비밀번호 찾기 페이지
     }
 
-    // 이메일 인증 코드 발송
+    // 비밀번호 찾기용 이메일 인증 코드 발송
     @PostMapping("/send-email")
     @ResponseBody
-    public ResponseEntity<String> sendEmail(@RequestParam String email) {
+    public ResponseEntity<Map<String, String>> sendEmail(@RequestParam String email) {
+        Map<String, String> response = new HashMap<>();
         try {
-            authService.validateAndSendCode(email); // 이메일 검증 및 인증 코드 발송
-            return ResponseEntity.ok("이메일로 인증 코드를 전송했습니다.");
+            authService.validateAndSendCode(email); // 비밀번호 찾기용 이메일 인증 코드 발송
+            response.put("message", "이메일로 인증 코드를 전송했습니다.");
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.error("이메일 검증 실패: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             log.error("이메일 전송 중 오류 발생: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+            response.put("message", "이메일 전송 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    // 인증 코드 검증
+    // 비밀번호 찾기용 인증 코드 검증
     @PostMapping("/verify-code")
     @ResponseBody
     public ResponseEntity<String> verifyAuthCode(@RequestParam String email, @RequestParam String authCode) {
@@ -71,4 +78,3 @@ public class FindPwdController {
         }
     }
 }
-

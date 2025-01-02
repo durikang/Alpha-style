@@ -7,25 +7,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 인증 코드 전송 폼 제출
     findPwdForm.addEventListener('submit', function (e) {
-        e.preventDefault();
+        e.preventDefault(); // 기본 폼 제출 방지
+
         const email = document.getElementById('email').value;
 
-        // 이메일 전송 요청
         fetch('/user/member/find/send-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email: email }),
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('이메일로 인증 코드가 전송되었습니다.');
-                    authCodeSection.classList.remove('hidden');
-                } else {
-                    alert('이메일 전송 실패: ' + data.message);
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || '이메일 전송 실패');
+                    });
                 }
+                return response.json();
             })
-            .catch(error => console.error('Error:', error));
+            .then(data => {
+                alert(data.message);
+                document.getElementById('authCodeSection').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || '알 수 없는 오류가 발생했습니다.');
+            });
     });
 
     // 인증 코드 확인
