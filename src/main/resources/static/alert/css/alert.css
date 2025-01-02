@@ -3,7 +3,7 @@
     top: 0; /* 화면 최상단 */
     left: 0;
     width: 100%; /* 화면 전체 너비 */
-    z-index: 1000;
+    z-index: 1050; /* 네비게이션 바보다 높은 z-index 설정 */
     padding: 15px 20px;
     text-align: center; /* 텍스트 가운데 정렬 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -34,6 +34,11 @@
 .alert-error {
     background-color: #dc3545; /* 빨간색 */
     color: white;
+}
+
+/* 경고 메시지 */
+.alert-warning {
+    background-color: orange;
 }
 
 /* 닫기 버튼 */

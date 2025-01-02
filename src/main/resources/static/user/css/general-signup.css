@@ -1,0 +1,149 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.signup-form {
+    width: 50%;
+    max-width: 600px;
+    min-width: 400px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    margin-top: 70px;
+}
+
+.signup-form h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.signup-form h2 {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    color: #555;
+    padding-bottom: 5px;
+}
+
+.signup-form img {
+    display: block;
+    margin: 0 auto 30px auto;
+    width: 150px;
+    height: auto;
+}
+
+.signup-form div {
+    margin-bottom: 20px;
+}
+
+.signup-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.signup-form input,
+.signup-form select,
+.signup-form button {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.signup-form input:focus,
+.signup-form select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.signup-form button {
+    background-color: #4a90e2;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.signup-form button:hover {
+    background-color: #357abd;
+    transform: scale(1.02);
+}
+
+.signup-form button#authButton {
+    width: auto;
+    padding: 12px 25px;
+    background: linear-gradient(45deg, #ff6b6b, #f65f97);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.signup-form button#authButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.signup-form .required {
+    color: red;
+    font-size: 12px;
+}
+
+.signup-form .modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+}
+
+#authCompleteMessage {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .signup-form {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .signup-form h1 {
+        font-size: 24px;
+    }
+
+    .signup-form div {
+        margin-bottom: 15px;
+    }
+}

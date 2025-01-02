@@ -1,43 +1,86 @@
-.custom-navbar {
-    background-color: #f8f9fa; /* 원하는 배경색 */
-    border-bottom: 1px solid #e5e5e5;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
 }
 
-.custom-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.custom-nav-links {
-    list-style: none;
-    padding: 0;
+.header {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #ddd;
+    position: fixed; /* 헤더 고정 */
+    top: 0; /* 브라우저 상단에 고정 */
+    left: 0;
+    right: 0;
+    z-index: 1000; /* 다른 요소 위에 표시되도록 설정 */
 }
 
-.custom-nav-links li {
-    margin-right: 20px;
+.logo img {
+    width: 100px;
+    height: 30px;
 }
 
-.custom-nav-links a {
+.nav {
+    display: flex;
+    flex: 1;
+    justify-content: flex-start;
+    gap: 50px;
+    margin-left: 50px;
+}
+
+.nav .nav-item {
+    margin-right: 3px;
     text-decoration: none;
-    color: #333;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.custom-auth-links {
-    list-style: none;
-    padding: 0;
+.nav .nav-item:hover {
+    color: #007bff; /* 호버 시 색상 변경 */
+    text-decoration: underline;
+}
+
+.user-options {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.user-options .user-item {
+    margin-left: 10px;
+    margin-right: 10px;
+    text-decoration: none;
+    color: #000;
+    font-size: 14px;
+}
+
+.search-cart {
     display: flex;
     align-items: center;
+    gap: 10px;
+    font-size: 16px;
 }
 
-.custom-dropdown-menu {
-    display: none;
-    position: absolute;
-    background-color: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.search-cart input {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.custom-dropdown-menu.show {
-    display: block;
+.search-cart button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-cart a {
+    font-size: 20px;
+    text-decoration: none;
+    color: #000;
 }

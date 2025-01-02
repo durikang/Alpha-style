@@ -3,6 +3,7 @@ package page.admin.common.utils.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import page.admin.admin.item.domain.ItemType;
@@ -48,7 +49,11 @@ public class WebConfig implements WebMvcConfigurer {
                         "/fonts/**"           // 공용 폰트
                 );
         registry.addInterceptor(new UserInterceptor())
-                .addPathPatterns("/user/**");
+                .addPathPatterns("/user/**")
+                .excludePathPatterns(
+                        "/user/css/**", "/user/js/**", "/user/img/**",
+                        "/static/user/css/**", "/static/user/js/**", "/static/user/img/**"
+                );
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -61,6 +66,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .setCachePeriod(3600);
 
         // 사용자 정적 리소스 매핑
+        registry.addResourceHandler("/user/**")
+                .addResourceLocations("classpath:/static/user/")
+                .setCachePeriod(3600);
+
         registry.addResourceHandler("/user/css/**")
                 .addResourceLocations("classpath:/static/user/css/")
                 .setCachePeriod(3600);
@@ -80,6 +89,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**") // URL 경로
                 .addResourceLocations("file:///C:/fileRepository/file/") // 로컬 디렉토리 경로
                 .setCachePeriod(3600); // 캐싱 기간 설정 (초 단위)
+    }
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
     }
 
 
