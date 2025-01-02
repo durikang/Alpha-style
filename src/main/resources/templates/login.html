@@ -41,9 +41,14 @@
             background-color: #000;
             color: #fff;
             cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s ease;
         }
         .login-container button:hover {
             background-color: #444;
+        }
+        .login-container button:active {
+            transform: scale(0.95);
+            background-color: #333;
         }
         .login-container input {
             width: 95%;
@@ -77,27 +82,55 @@
         }
         .login-container .options a {
             color: #007BFF;
-            padding-left: 15%;
-            padding-right: 15%;
+        }
+        .btn-social {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-kakao { background-color: #FEE500; color: #3C1E1E; }
+        .btn-google { background-color: #DB4437; }
+        .btn-naver { background-color: #1EC800; }
+        @media (max-width: 600px) {
+            .login-container {
+                width: 90%;
+                padding: 15px;
+            }
+            .login-container input, .login-container button {
+                font-size: 14px;
+            }
+        }
+        #loadingSpinner {
+            display: none;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
 <main>
     <div class="login-container">
-        <h1>LOGIN</h1>
-        <form th:action="@{/login}" th:object="${loginMember}" method="post">
+        <h1>로그인</h1>
+        <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()">
             <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>
-            <span th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">사용자 ID 오류</span>
+            <span id="userIdError" style="color: red; font-size: 12px;"></span>
 
             <input type="password" id="password" name="password" th:field="*{password}" placeholder="비밀번호" required>
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">비밀번호 오류</span>
+            <button type="button" onclick="togglePassword()">👁</button>
 
             <div class="save-id-container">
                 <label for="save-id">아이디 저장</label>
                 <input type="checkbox" id="save-id" name="save-id">
             </div>
             <button type="submit" class="btn btn-login">로그인</button>
+            <div id="loadingSpinner">🔄 로그인 중...</div>
         </form>
 
         <form th:action="@{/signup}" method="get">
@@ -106,9 +139,60 @@
 
         <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
         <div class="options">
-            <a th:href="@{/user/signup/find-id}">아이디찾기</a> | <a th:href="@{/user/signup/find-password}">비밀번호찾기</a>
+            <a th:href="@{/user/member/find-id}">아이디찾기</a> | <a th:href="@{/user/member/find-password}">비밀번호찾기</a>
         </div>
+
+        <hr>
+        <button class="btn btn-social btn-kakao">카카오 로그인</button>
+        <button class="btn btn-social btn-google">구글 로그인</button>
+        <button class="btn btn-social btn-naver">네이버 로그인</button>
     </div>
 </main>
+
+<script>
+    // 실시간 아이디 유효성 검사
+    document.getElementById('userId').addEventListener('input', function () {
+        const userId = this.value;
+        const errorMessage = document.querySelector('#userIdError');
+        if (userId.length < 4 || userId.length > 16) {
+            errorMessage.textContent = '아이디는 4~16자 사이여야 합니다.';
+        } else {
+            errorMessage.textContent = '';
+        }
+    });
+
+    // 비밀번호 보기/숨기기 토글
+    function togglePassword() {
+        const passwordField = document.getElementById('password');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+        } else {
+            passwordField.type = 'password';
+        }
+    }
+
+    // 로딩 스피너 표시
+    function showLoadingSpinner() {
+        document.getElementById('loadingSpinner').style.display = 'block';
+    }
+
+    // 아이디 저장 로직
+    document.getElementById('save-id').addEventListener('change', function () {
+        const userId = document.getElementById('userId').value;
+        if (this.checked) {
+            localStorage.setItem('savedUserId', userId);
+        } else {
+            localStorage.removeItem('savedUserId');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const savedUserId = localStorage.getItem('savedUserId');
+        if (savedUserId) {
+            document.getElementById('userId').value = savedUserId;
+            document.getElementById('save-id').checked = true;
+        }
+    });
+</script>
 </body>
 </html>

@@ -75,7 +75,16 @@ public class AuthServiceImpl implements AuthService {
         sendVerificationEmail(email);
     }
 
+    @Override
+    public void resetPassword(String email, String newPassword) {
+        // 이메일로 사용자 검색
+        Member member = memberRepository.findSingleMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 이메일입니다."));
 
+        // 비밀번호 재설정
+        member.setPassword(newPassword); // TODO: 비밀번호 암호화 추가
+        memberRepository.save(member);
+    }
 
 
 }

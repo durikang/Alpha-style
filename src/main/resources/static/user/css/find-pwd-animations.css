@@ -1,0 +1,44 @@
+/* 초기 숨김 처리 */
+.hidden {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* 단계 표시 효과 */
+.show {
+    display: block;
+    opacity: 1;
+}
+
+/* 페이드 인 효과 */
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* 페이드 아웃 효과 */
+.fade-out {
+    animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

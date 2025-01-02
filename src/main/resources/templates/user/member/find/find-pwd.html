@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>비밀번호 찾기</title>
+    <link rel="stylesheet" th:href="@{/user/css/find-pwd.css}">
+    <link rel="stylesheet" th:href="@{/user/css/find-pwd-animations.css}">
+    <script th:src="@{/user/js/find-pwd.js}" defer></script>
+    <script th:src="@{/user/js/find-pwd-steps.js}" defer></script>
+</head>
+<body>
+<main class="find-pwd-container">
+    <h1>비밀번호 찾기</h1>
+    <p>가입 시 등록한 이메일 주소를 입력해주세요.</p>
+
+    <!-- 이메일 입력 -->
+    <form id="findPwdForm" th:action="@{/user/member/find/send-email}" method="post">
+        <div class="form-group">
+            <label for="email">이메일 주소</label>
+            <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+        </div>
+        <button type="submit" class="btn">인증 코드 보내기</button>
+    </form>
+
+    <!-- 인증 코드 입력 -->
+    <div id="authCodeSection" class="hidden">
+        <p>이메일로 전송된 인증 코드를 입력해주세요.</p>
+        <div class="form-group">
+            <label for="authCode">인증 코드</label>
+            <input type="text" id="authCode" placeholder="인증 코드를 입력하세요" required>
+        </div>
+        <button type="button" id="verifyAuthCodeBtn" class="btn">인증 코드 확인</button>
+        <div id="authMessage" class="message"></div>
+    </div>
+
+    <!-- 새 비밀번호 설정 -->
+    <div id="resetPwdSection" class="hidden">
+        <p>새로운 비밀번호를 설정해주세요.</p>
+        <form th:action="@{/user/member/find/reset-pwd}" method="post">
+            <div class="form-group">
+                <label for="newPassword">새 비밀번호</label>
+                <input type="password" id="newPassword" name="newPassword" placeholder="새 비밀번호 입력" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">비밀번호 확인</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="비밀번호 재입력" required>
+            </div>
+            <button type="submit" class="btn">비밀번호 재설정</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
