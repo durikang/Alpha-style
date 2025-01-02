@@ -8,11 +8,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 가입 방법 선택</title>
+    <link rel="stylesheet" th:href="@{/user/css/signup-options.css}">
     <style>
         .container {
-            margin-top: 55px;
+            padding-top: 55px;
             text-align: center;
-            display: flex;
+            /*display: flex;*/
             flex-direction: row;
             justify-content: center;
             gap: 30px;
@@ -38,12 +39,16 @@
 <body>
 <main>
     <div class="container">
-        <form th:action="@{/user/signup/general}" method="get">
-            <button type="submit" class="button">일반 회원가입</button>
-        </form>
-        <form th:action="@{/user/signup/naver}" method="get">
-            <button type="submit" class="button">네이버 회원가입</button>
-        </form>
+        <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
+        <h1>회원 가입 선택창</h1>
+        <div class="button-group">
+            <form th:action="@{/user/signup/general}" method="get">
+                <button type="submit" class="button">일반 회원가입</button>
+            </form>
+            <form th:action="@{/signup/naver}" method="get">
+                <button type="submit" class="button" id="naver">네이버 회원가입</button>
+            </form>
+        </div>
     </div>
 </main>
 </body>

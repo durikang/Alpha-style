@@ -57,4 +57,9 @@ public class FinancialController {
         return "admin/financial/financialTestPage";
     }
 
+    @GetMapping("/options")
+    public String options() {
+        return "admin/financial/financialOpton";
+    }
+
 }
