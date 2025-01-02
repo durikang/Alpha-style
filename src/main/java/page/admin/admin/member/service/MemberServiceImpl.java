@@ -43,6 +43,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public List<Member> findByEmail(String email) {
+        List<Member> members = memberRepository.findAllMembersByEmail(email);
+        if (members.isEmpty()) {
+            throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
+        }
+        return members;
+    }
+
+
+
+    @Override
     public Member getMemberById(Long userNo) {
         return memberRepository.findById(userNo)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. ID: " + userNo));

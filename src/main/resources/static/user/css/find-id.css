@@ -1,0 +1,110 @@
+.find-id-container {
+    width: 50%;
+    max-width: 500px;
+    margin: 300px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    text-align: center; /* 모든 내용을 중앙 정렬 */
+}
+
+.find-id-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: #333;
+}
+
+.find-id-container button:hover {
+    background-color: #357abd;
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+#resultMessage {
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out, bounce 1.2s ease-in-out;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#userId {
+    font-size: 24px;
+    font-weight: bold;
+    animation: bounce 1s infinite ease-in-out;
+    color: #fff;
+}
+
+.find-id-container form div {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* Flex 방향을 세로로 설정 */
+}
+
+.find-id-container label {
+    margin-bottom: 5px; /* 라벨과 입력 박스 사이 간격 */
+    font-weight: bold;
+    color: #555;
+}
+
+.find-id-container input {
+    width: 100%; /* 입력 필드가 가로 전체를 차지 */
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px; /* 버튼과 입력 필드 사이 간격 */
+}
+
+.find-id-container div:last-child input {
+    margin-bottom: 0; /* 마지막 입력 필드에서 추가 간격 제거 */
+}
+
+.find-id-container button {
+    padding: 10px 20px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+    margin-top: 10px; /* 버튼과 입력 필드 사이 간격 */
+}
+
+.find-id-container button:hover {
+    background-color: #357abd;
+}
+
+.required {
+    color: red;
+    font-size: 12px;
+}

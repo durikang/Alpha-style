@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이디 찾기</title>
+    <link rel="stylesheet" th:href="@{/user/css/find-id.css}">
+    <script th:src="@{/user/js/find-id.js}" th:inline="none" defer></script>
+</head>
+<body>
+<main class="find-id-container">
+    <h1>아이디 찾기</h1>
+    <form id="findIdForm">
+        <!-- 이메일 입력 -->
+        <div id="emailDiv">
+            <label for="email">등록된 이메일 주소 <span class="required">*</span></label>
+            <div style="display: flex; align-items: center;">
+                <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+                <button type="button" id="sendCodeButton">인증 코드 받기</button>
+            </div>
+            <div id="emailMessage" style="color: red; margin-top: 5px;"></div>
+        </div>
+
+        <!-- 인증 코드 입력 -->
+        <div id="verificationDiv" style="display: none;">
+            <label for="verificationCode">인증 코드 <span class="required">*</span></label>
+            <div style="display: flex; align-items: center;">
+                <input type="text" id="verificationCode" name="verificationCode" placeholder="인증 코드를 입력하세요">
+                <button type="button" id="verifyCodeButton">인증하기</button>
+            </div>
+            <div id="codeMessage" style="color: red; margin-top: 5px;"></div>
+            <div id="timerMessage" style="color: blue; margin-top: 5px;"></div>
+        </div>
+
+        <!-- 결과 메시지 -->
+        <div id="resultMessage" style="display: none; margin-top: 20px;">
+            <p style="font-weight: bold; font-size: 18px; text-align: center;">
+                아이디: <span id="userId" style="color: #4CAF50;"></span>
+            </p>
+        </div>
+    </form>
+</main>
+</body>
+</html>

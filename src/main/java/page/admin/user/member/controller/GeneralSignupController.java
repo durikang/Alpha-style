@@ -3,22 +3,23 @@ package page.admin.user.member.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.member.service.MemberService;
 import page.admin.common.utils.Alert;
+import page.admin.common.utils.email.EmailService;
 import page.admin.user.member.domain.SecurityQuestion;
 import page.admin.user.member.domain.dto.GeneralSignupDto;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class GeneralSignupController {
 
     private final MemberService memberService;
+    private final EmailService emailService; // 이메일 전송 서비스
 
     // 일반 회원 가입 폼
     @GetMapping("/general")
@@ -39,9 +41,6 @@ public class GeneralSignupController {
 
         return "user/member/signup/general-signup";
     }
-
-
-
 
     @PostMapping("/general")
     public String generalSignup(
@@ -107,6 +106,51 @@ public class GeneralSignupController {
     public boolean checkDuplicateId(String userId) {
         return memberService.findByUserId(userId).isPresent(); // true면 중복, false면 사용 가능
     }
+
+    // 아이디 찾기 폼
+    @GetMapping("/find-id")
+    public String findIdForm(Model model) {
+        return "user/member/find/find-id"; // 아이디 찾기 페이지
+    }
+
+    // 아이디 찾기 처리
+    @PostMapping("/find-id")
+    @ResponseBody
+    public ResponseEntity<String> findId(@RequestParam String email) {
+        log.debug("Finding ID for email: {}", email);
+
+        // 이메일로 등록된 사용자 조회
+        List<Member> members = memberService.findByEmail(email);
+
+        if (members.isEmpty()) {
+            log.warn("No members found with email: {}", email);
+            return ResponseEntity.badRequest().body("등록된 이메일이 없습니다.");
+        }
+
+        // 첫 번째 회원 아이디 가져오기 (여러 회원이 동일 이메일 사용 가능 시 주의)
+        Member member = members.get(0);
+        String userId = member.getUserId();
+        String maskedUserId = maskUserId(userId); // 아이디 마스킹
+
+        // 이메일로 인증 메일 전송
+        String emailMessage = "안녕하세요, 고객님. 요청하신 아이디는 다음과 같습니다: " + maskedUserId;
+        try {
+            emailService.sendEmail(email, "아이디 찾기 결과", emailMessage);
+            log.info("Email sent to: {}", email);
+            return ResponseEntity.ok("입력한 이메일로 아이디 정보를 전송했습니다.");
+        } catch (Exception e) {
+            log.error("Error sending email to: {}", email, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 아이디 마스킹 메서드
+    private String maskUserId(String userId) {
+        int visibleLength = userId.length() / 2; // 아이디 절반만 표시
+        return userId.substring(0, visibleLength) + "*".repeat(Math.max(0, userId.length() - visibleLength));
+    }
+
+
 
 
 

@@ -11,7 +11,7 @@ body {
     padding: 10px 20px;
     background-color: #fafafa;
     border-bottom: 1px solid #ddd;
-    position: fixed; /* 헤더 고정 */
+    /*position: fixed; !* 헤더 고정 *!*/
     top: 0; /* 브라우저 상단에 고정 */
     left: 0;
     right: 0;

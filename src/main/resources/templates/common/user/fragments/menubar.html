@@ -19,12 +19,17 @@
             <a th:href="@{/logout}" class="user-item">로그아웃</a>
             <a th:href="@{/user/order-check}" class="user-item">주문조회</a>
             <a th:href="@{/user/mypage}" class="user-item">마이페이지</a>
-        </div>
 
+            <!-- 관리자 권한일 경우 관리자 페이지 링크 추가 -->
+            <a th:if="${session.loginMember.role == 'admin' or session.loginMember.role == 'ADMIN'}"
+               th:href="@{/admin/adminHome}" class="user-item admin-item">
+                관리자 페이지
+            </a>
+        </div>
     </div>
     <div class="search-cart">
-        <input type="text" placeholder="검색어를 입력하세요">
-        <a th:href="@{/user/cart}" class="cart">🛒</a>
-        <a th:href="@{/user/profile}" class="user">👤</a>
+        <input type="text" placeholder="검색어를 입력하세요" class="search-input">
+        <a th:href="@{/user/cart}" class="cart" title="장바구니">🛒</a>
+        <a th:href="@{/user/profile}" class="user" title="프로필">👤</a>
     </div>
 </header>

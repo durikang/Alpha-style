@@ -29,4 +29,6 @@ public interface MemberService {
 
     Page<Member> searchMembers(String keyword, Pageable pageable);
 
+
+    List<Member> findByEmail(String email);
 }
