@@ -7,168 +7,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
+    <title>단계별 회원가입</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/user/css/general-signup.css}">
-    <link rel="stylesheet" th:href="@{/user/css/general-modal.css}">
 
-    <script type="module" th:src="@{/user/js/signup-form-main.js}" th:inline="none" defer></script>
-    <script th:src="@{/user/js/email-auth.js}" th:inline="none" defer></script>
-    <script th:src="@{/user/js/kakao-auth.js}" th:inline="none" defer></script>
-    <script th:src="@{/user/js/modal-handler.js}" th:inline="none" defer></script>
-    <script th:src="@{/user/js/general-address.js}" th:inline="none" defer></script>
-    <script th:src="@{/user/js/general-autoCursor.js}" th:inline="none" defer></script>
-
-
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-    <!--Daum API 스크립트-->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
-
+    <!-- JavaScript Modules -->
+    <script type="module" th:src="@{/user/js/main-general-signup.js}" defer></script>
 </head>
+
 <body>
 <main>
     <div class="signup-form">
-        <!-- 로고 이미지 추가 -->
+        <!-- 로고 이미지 -->
         <div style="text-align: center; margin-bottom: 20px;">
             <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
         </div>
         <h1>회원 가입</h1>
+
+        <!-- 단계별 폼 -->
         <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate>
-            <!-- 아이디 -->
-            <div>
-                <label for="userId">아이디 <span class="required">*</span></label>
-                <input type="text" id="userId" th:field="*{userId}" placeholder="영문소문자/숫자, 4~16자" required>
-                <div id="userIdMessage" style="color: red; margin-top: 5px;"></div>
-            </div>
-
-            <!-- 비밀번호 -->
-            <div>
-                <label for="password">비밀번호 <span class="required">*</span></label>
-                <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 4~16자로 입력해주세요." required>
-                <div id="passwordMessage" style="color: red; margin-top: 5px;"></div> <!-- 유효성 메시지 div -->
-            </div>
-
-            <!-- 비밀번호 확인 -->
-            <div>
-                <label for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
-                <input type="password" id="passwordConfirm" th:field="*{passwordConfirm}" required>
-                <div th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color: red;"></div>
-            </div>
-
-            <!-- 본인인증 -->
-            <div class="auth-div">
-                <button type="button" id="authButton">본인 인증</button>
-            </div>
-
-            <!-- 모달창 -->
-            <div id="authModal" class="modal">
-                <div class="modal-content">
-                    <h3>본인 인증 방법을 선택하세요</h3>
-                    <button type="button" id="emailAuthBtn">이메일 인증</button>
-                    <button type="button" id="kakaoAuthBtn">카카오 인증</button>
-                    <button type="button" id="closeModalBtn">닫기</button>
+            <!-- 1단계: 본인 인증 -->
+            <div class="step" id="step-1">
+                <h2>본인 인증</h2>
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder=" " required>
+                    <label class="floating-label" for="email">이메일 <span class="required">*</span></label>
                 </div>
-            </div>
-
-            <!-- 이메일 인증 -->
-            <div id="emailAuthDiv" style="display: none;">
-                <label for="email">이메일 <span class="required">*</span></label>
-                <input type="email" id="email" name="email" th:value="*{email}" placeholder="example@domain.com">
                 <button type="button" id="sendCodeBtn">인증 코드 받기</button>
-                <span id="emailLoading" style="display: none; margin-left: 10px;">🔄 전송 중...</span>
-                <div id="emailMessage" style="color: green; margin-top: 5px;"></div>
-                <div id="timerMessage" style="color: red; margin-top: 5px;"></div>
+                <div id="emailMessage" style="margin-top: 5px;"></div>
 
-                <label for="verificationCode">인증코드 <span class="required">*</span></label>
-                <input type="text" id="verificationCode" name="verificationCode" placeholder="인증코드 입력">
-                <button type="button" id="verifyCodeBtn">인증코드 확인</button>
-                <div id="codeMessage" style="color: red; margin-top: 5px;"></div>
-            </div>
-
-            <!-- 이메일 확인 모달 -->
-            <div id="emailConfirmModal" class="modal">
-                <div class="modal-content">
-                    <h3>입력한 이메일이 맞습니까?</h3>
-                    <p id="emailPreview" style="font-weight: bold;"></p>
-                    <button type="button" id="confirmEmailBtn">확인</button>
-                    <button type="button" id="cancelEmailBtn">취소</button>
+                <div class="form-group" id="verificationCodeContainer" style="display: none;">
+                    <input type="text" id="verificationCode" placeholder=" " required>
+                    <label class="floating-label" for="verificationCode">인증코드</label>
                 </div>
+                <button type="button" id="verifyCodeBtn" style="display: none;">인증코드 확인</button>
+
+                <!-- 타이머 메시지 -->
+                <div id="timerMessage" style="color: red; margin-top: 5px; display: none;"></div>
+                <div id="codeMessage" style="margin-top: 5px;"></div>
+                <button type="button" class="to-step" data-target-step="2" disabled>다음 단계</button>
             </div>
 
-            <!-- 인증 완료 메시지 -->
-            <div id="authCompleteMessage" style="display: none; color: green; font-weight: bold; margin-top: 20px;">
-                인증이 완료되었습니다! 🎉
+            <!-- 2단계: 계정 정보 -->
+            <div class="step" id="step-2" style="display: none;">
+                <h2>계정 정보</h2>
+                <div class="form-group">
+                    <input type="text" id="userId" name="userId" placeholder=" " required>
+                    <label class="floating-label" for="userId">아이디 <span class="required">*</span></label>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder=" " required>
+                    <label class="floating-label" for="password">비밀번호 <span class="required">*</span></label>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder=" " required>
+                    <label class="floating-label" for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
+                </div>
+                <button type="button" class="to-step" data-target-step="1">이전 단계</button>
+                <button type="button" class="to-step" data-target-step="3">다음 단계</button>
             </div>
 
-            <!-- 카카오 인증 -->
-            <div id="kakaoAuthDiv" style="display: none;">
-                <button type="button" id="startKakaoAuthBtn">카카오 인증 코드 받기</button>
-                <input type="text" id="kakaoAuthCode" placeholder="카카오 인증 코드를 입력하세요">
-                <button type="button" id="verifyKakaoAuthCodeBtn">인증코드 확인</button>
-                <div id="kakaoAuthMessage" style="color: red; margin-top: 5px;"></div>
+            <!-- 3단계: 부가 정보 -->
+            <div class="step" id="step-3" style="display: none;">
+                <h2>부가 정보</h2>
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder=" " required>
+                    <label class="floating-label" for="username">이름 <span class="required">*</span></label>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="mobilePhone" name="mobilePhone" placeholder=" " required>
+                    <label class="floating-label" for="mobilePhone">휴대전화 <span class="required">*</span></label>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="birthDate" name="birthDate" required>
+                    <label class="floating-label" for="birthDate">생년월일 <span class="required">*</span></label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="zipCode" name="zipCode" placeholder=" " readonly required>
+                    <label class="floating-label" for="zipCode">우편번호</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="basicAddress" name="address" placeholder=" " readonly required>
+                    <label class="floating-label" for="basicAddress">기본주소</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="secondaryAddress" name="secondaryAddress" placeholder=" ">
+                    <label class="floating-label" for="secondaryAddress">나머지주소</label>
+                </div>
+                <button type="button" class="to-step" data-target-step="2">이전 단계</button>
+                <button type="button" class="to-step" data-target-step="4">다음 단계</button>
             </div>
 
-            <!-- 휴대전화 -->
-            <div>
-                <label for="mobilePhone">휴대전화 <span class="required">*</span></label>
-                <input type="tel" id="mobilePhone" name="mobilePhone" th:value="*{mobilePhone}" placeholder="010-xxxx-xxxx" required>
-                <div id="mobilePhoneMessage" style="color: red; margin-top: 5px;"></div>
+            <!-- 4단계: 보안 질문 -->
+            <div class="step" id="step-4" style="display: none;">
+                <h2>보안 질문</h2>
+                <div class="form-group">
+                    <select id="securityQuestion" name="securityQuestion" required>
+                        <option value="" disabled selected>질문을 선택하세요</option>
+                        <option>내 첫 반려동물 이름은?</option>
+                        <option>내 초등학교 이름은?</option>
+                        <option>내 가장 친한 친구의 이름은?</option>
+                    </select>
+                    <label class="floating-label" for="securityQuestion">비밀번호 확인 질문</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="securityAnswer" name="securityAnswer" placeholder=" " required>
+                    <label class="floating-label" for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
+                </div>
+                <button type="button" class="to-step" data-target-step="3">이전 단계</button>
+                <button type="submit">회원 가입</button>
             </div>
-
-
-            <!-- 이름 -->
-            <div>
-                <label for="username">이름 <span class="required">*</span></label>
-                <input type="text" id="username" name="username" th:value="*{username}" required>
-            </div>
-
-            <!-- 생년월일 -->
-            <div>
-                <label for="birthDate">생년월일 <span class="required">*</span></label>
-                <input type="text" id="birthDate" name="birthDate" th:value="*{birthDate}" placeholder="YYYY-MM-DD">
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        flatpickr("#birthDate", {
-                            dateFormat: "Y-m-d",
-                            maxDate: "today", // 오늘 날짜 이전만 선택 가능
-                            defaultDate: "2000-01-01", // 기본값
-                            locale: "ko" // 한국어로 변경
-                        });
-                    });
-                </script>
-            </div>
-
-            <!-- 주소 -->
-            <div>
-                <label for="address">주소 <span class="required">*</span></label>
-                <input type="text" id="zipCode" name="zipCode" th:value="*{zipCode}" placeholder="우편번호" readonly required>
-                <input type="text" id="basicAddress" name="address" th:value="*{address}" placeholder="기본주소" readonly required>
-                <input type="text" id="secondaryAddress" name="secondaryAddress" th:value="*{secondaryAddress}" placeholder="나머지주소">
-                <button type="button" id="searchAddressBtn">주소 찾기</button>
-            </div>
-
-            <!-- 보안 질문 -->
-            <div>
-                <label for="securityQuestion">비밀번호 확인 질문</label>
-                <select id="securityQuestion" name="securityQuestion" th:field="*{securityQuestion}">
-                    <option value="" disabled selected>질문을 선택하세요</option>
-                    <option th:each="question : ${securityQuestions}" th:value="${question}" th:text="${question}"></option>
-                </select>
-                <div th:if="${#fields.hasErrors('securityQuestion')}" th:errors="*{securityQuestion}" class="error-message"></div>
-            </div>
-
-            <!-- 보안 답변 -->
-            <div>
-                <label for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
-                <input type="text" id="securityAnswer" name="securityAnswer" th:value="*{securityAnswer}" required>
-            </div>
-
-            <button type="submit">회원가입</button>
         </form>
     </div>
 </main>

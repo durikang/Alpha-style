@@ -2,14 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM 요소 참조
     const sendCodeBtn = document.getElementById('sendCodeBtn');
     const emailInput = document.getElementById('email');
+    const emailLabel = document.querySelector('label[for="email"]');
     const emailMessage = document.getElementById('emailMessage');
     const verifyCodeBtn = document.getElementById('verifyCodeBtn');
     const verificationCodeInput = document.getElementById('verificationCode');
+    const codeLabel = document.querySelector('label[for="verificationCode"]');
     const codeMessage = document.getElementById('codeMessage');
     const timerMessage = document.getElementById('timerMessage');
     const authCompleteMessage = document.getElementById('authCompleteMessage');
+    const mobilePhoneInput = document.getElementById('mobilePhone');
+    const authButton = document.getElementById('authButton'); // 본인 인증 버튼
 
-    let isEmailVerified = false; // 이메일 인증 상태 플래그
     let timerInterval;
 
     // 이메일 인증 요청
@@ -22,18 +25,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        fetch('/auth/send-code?email=' + encodeURIComponent(email), {
+        // 회원 가입용 인증 요청 경로로 수정
+        fetch('/auth/signup/send-code?email=' + encodeURIComponent(email), {
             method: 'POST',
         })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('서버 오류');
                 }
-                return response.text();
+                return response.json();
             })
-            .then((data) => {
-                emailMessage.textContent = data;
+            .then(() => {
+                emailMessage.textContent = '이메일이 발송되었습니다. 이메일을 확인하세요!';
                 emailMessage.style.color = 'green';
+
+                // 숨김 처리
+                emailInput.style.display = 'none';
+                emailLabel.style.display = 'none';
+                sendCodeBtn.style.display = 'none';
+                authButton.style.display = 'none'; // 본인 인증 버튼 숨김
+                emailMessage.style.display = 'none'; // 이메일 발송 메시지 숨김
+
+                // 인증 코드 관련 요소 표시
+                verificationCodeInput.style.display = 'block';
+                codeLabel.style.display = 'block';
+                verifyCodeBtn.style.display = 'block';
+
                 startTimer(300); // 5분 타이머 시작
             })
             .catch((error) => {
@@ -63,15 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return response.text();
             })
-            .then((data) => {
-                codeMessage.textContent = data; // 인증 성공 메시지
-                codeMessage.style.color = 'green';
-                authCompleteMessage.style.display = 'block'; // 인증 완료 메시지 표시
-                emailInput.disabled = true; // 이메일 입력 비활성화
-                verificationCodeInput.disabled = true; // 인증 코드 입력 비활성화
-                sendCodeBtn.disabled = true;
-                verifyCodeBtn.disabled = true;
-                clearInterval(timerInterval); // 타이머 종료
+            .then(() => {
+                // 폭죽 아이콘과 인증 완료 메시지 표시
+                authCompleteMessage.style.display = 'block';
+                authCompleteMessage.style.textAlign = 'center';
+                authCompleteMessage.innerHTML = '🎉 인증이 완료되었습니다!';
+
+                // 숨김 처리
+                clearInterval(timerInterval);
+                timerMessage.style.display = 'none';
+                verificationCodeInput.style.display = 'none';
+                codeLabel.style.display = 'none';
+                verifyCodeBtn.style.display = 'none';
+
+                // 다음 커서 이동
+                mobilePhoneInput.focus();
             })
             .catch((error) => {
                 codeMessage.textContent = error.message || '인증 실패! 올바른 코드를 입력해주세요.';
@@ -94,6 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (remainingTime < 0) {
                 clearInterval(timerInterval);
                 timerMessage.textContent = '인증 시간이 만료되었습니다. 다시 요청해주세요.';
+                timerMessage.style.color = 'red';
+
+                // 숨김 해제
+                emailInput.style.display = 'block';
+                emailLabel.style.display = 'block';
+                sendCodeBtn.style.display = 'block';
+                authButton.style.display = 'block'; // 본인 인증 버튼 표시
+
+                verificationCodeInput.style.display = 'none';
+                codeLabel.style.display = 'none';
+                verifyCodeBtn.style.display = 'none';
+
+                emailMessage.style.display = 'block'; // 이메일 메시지 재표시
                 emailMessage.textContent = '';
             }
         };

@@ -37,17 +37,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void validateAndSendCodeForPasswordReset(String email) {
+        if (!memberRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
+        }
+        sendVerificationEmail(email);
+    }
+
+    @Override
     public void validateAndSendCode(String email) {
         if (!memberRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
         }
-        sendVerificationEmail(email); // 비밀번호 찾기용 인증 코드 발송
+        sendVerificationEmail(email); // 통합된 인증 코드 발송
     }
 
     @Override
     public boolean verifyCode(String email, String code) {
+        System.out.println("Verifying code for email: " + email); // 디버깅 로그
+        System.out.println("Received code: " + code);             // 디버깅 로그
+
         VerificationCode verificationCode = verificationCodeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("인증 코드가 존재하지 않습니다."));
+
+        System.out.println("Stored code: " + verificationCode.getCode()); // 저장된 코드 확인
 
         if (verificationCode.getExpiryTime().isBefore(LocalDateTime.now())) {
             verificationCodeRepository.delete(verificationCode);
@@ -61,6 +74,7 @@ public class AuthServiceImpl implements AuthService {
         }
         return isVerified;
     }
+
 
     @Override
     public void resetPassword(String email, String newPassword) {
