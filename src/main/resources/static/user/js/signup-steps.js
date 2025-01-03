@@ -2,15 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const steps = document.querySelectorAll('.step');
     let currentStep = 0;
 
-    // 버튼 참조
-    const toStepButtons = {
-        step1Next: document.getElementById('toStep2'),
-        step2Prev: document.getElementById('toStep1'),
-        step2Next: document.getElementById('toStep3'),
-        step3Prev: document.getElementById('toStep2'),
-        step3Next: document.getElementById('toStep4'),
-        step4Prev: document.getElementById('toStep3'),
-    };
+    // 추가 방어 코드: 단계 초기화
+    if (!steps || steps.length === 0) {
+        console.error('No steps found in the DOM. Ensure steps are correctly defined.');
+        return;
+    }
 
     function showStep(index) {
         steps.forEach((step, i) => {
@@ -19,11 +15,27 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStep = index;
     }
 
-    // 다음 단계 이동
-    toStepButtons.step1Next.addEventListener('click', () => showStep(1));
-    toStepButtons.step2Prev.addEventListener('click', () => showStep(0));
-    toStepButtons.step2Next.addEventListener('click', () => showStep(2));
-    toStepButtons.step3Prev.addEventListener('click', () => showStep(1));
-    toStepButtons.step3Next.addEventListener('click', () => showStep(3));
-    toStepButtons.step4Prev.addEventListener('click', () => showStep(2));
+    // 페이지 로드 시 첫 번째 단계 표시
+    showStep(0);
+
+    // 이전/다음 버튼 로직 통합
+    const stepButtons = document.querySelectorAll('.to-step');
+
+    // 추가 방어 코드: 버튼 확인
+    if (!stepButtons || stepButtons.length === 0) {
+        console.error('No navigation buttons found. Ensure buttons have the class "to-step".');
+        return;
+    }
+
+    stepButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            const targetStep = parseInt(event.target.dataset.targetStep, 10);
+
+            if (!isNaN(targetStep) && targetStep >= 0 && targetStep < steps.length) {
+                showStep(targetStep);
+            } else {
+                console.error('Invalid target step:', targetStep);
+            }
+        });
+    });
 });

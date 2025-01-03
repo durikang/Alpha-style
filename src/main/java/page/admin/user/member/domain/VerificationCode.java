@@ -1,9 +1,6 @@
 package page.admin.user.member.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,9 +21,18 @@ public class VerificationCode {
     private String code;
     private LocalDateTime expiryTime;
 
+    @Column(nullable = false)
+    private String status = "PENDING"; // 초기 상태는 PENDING
+
     public VerificationCode(String email, String code, LocalDateTime expiryTime) {
         this.email = email;
         this.code = code;
         this.expiryTime = expiryTime;
+    }
+    public VerificationCode(String email, String code, LocalDateTime expiryTime, String status) {
+        this.email = email;
+        this.code = code;
+        this.expiryTime = expiryTime;
+        this.status = status;
     }
 }

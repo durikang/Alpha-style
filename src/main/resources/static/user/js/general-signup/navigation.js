@@ -8,9 +8,15 @@ export const Navigation = (() => {
         }
 
         buttons.forEach((button) => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (event) => {
+                const button = event.target;
                 const targetStep = parseInt(button.dataset.targetStep, 10);
-                if (!isNaN(targetStep)) showStep(steps, targetStep);
+
+                if (!isNaN(targetStep)) {
+                    showStep(steps, targetStep);
+                } else {
+                    console.error('Invalid target step for button:', button);
+                }
             });
         });
     };

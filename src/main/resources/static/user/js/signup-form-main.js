@@ -1,7 +1,7 @@
-import { validateUserId, validateMobilePhone, validateEmail, validatePassword } from './signup-form-validator.js';
-import { checkDuplicateId } from './signup-form-api.js';
-import { initPasswordValidation } from './signup-form-password.js';
-import { initPhoneFormatter } from './signup-form-phone-formatter.js';
+import { validateUserId, validateMobilePhone, validateEmail, validatePassword } from './general-signup/signup-form-validator.js';
+import { checkDuplicateId } from './general-signup/signup-form-api.js';
+import { initPasswordValidation } from './general-signup/signup-form-password.js';
+import { initPhoneFormatter } from './general-signup/signup-form-phone-formatter.js';
 
 /**
  * 유효성 검사 결과 표시 공통 함수

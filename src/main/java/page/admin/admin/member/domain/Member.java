@@ -59,6 +59,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false, length = 10)
+    private String gender;
+
     @OneToMany(mappedBy = "seller")
     @ToString.Exclude
     private List<Item> items;

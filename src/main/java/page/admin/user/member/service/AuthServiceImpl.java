@@ -1,6 +1,7 @@
 package page.admin.user.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.member.repository.MemberRepository;
@@ -11,6 +12,7 @@ import page.admin.user.member.repository.VerificationCodeRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,18 +64,41 @@ public class AuthServiceImpl implements AuthService {
 
         System.out.println("Stored code: " + verificationCode.getCode()); // 저장된 코드 확인
 
+        // 만료 시간 확인
         if (verificationCode.getExpiryTime().isBefore(LocalDateTime.now())) {
-            verificationCodeRepository.delete(verificationCode);
+            verificationCode.setStatus("EXPIRED"); // 상태를 만료로 설정
+            verificationCodeRepository.save(verificationCode);
             throw new IllegalStateException("인증 코드가 만료되었습니다.");
+        }
+
+        // 상태가 이미 VERIFIED인 경우
+        if ("VERIFIED".equals(verificationCode.getStatus())) {
+            throw new IllegalStateException("이미 사용된 인증 코드입니다.");
         }
 
         boolean isVerified = verificationCode.getCode().equals(code);
 
         if (isVerified) {
-            verificationCodeRepository.delete(verificationCode);
+            verificationCode.setStatus("VERIFIED"); // 상태를 검증됨으로 설정
+            verificationCodeRepository.save(verificationCode);
         }
         return isVerified;
     }
+
+    @Override
+    @Scheduled(cron = "0 0 * * * *") // 매시간 실행
+    public void cleanupExpiredCodes() {
+        LocalDateTime now = LocalDateTime.now();
+        List<VerificationCode> expiredCodes = verificationCodeRepository.findAllByStatusAndExpiryTimeBefore("EXPIRED", now);
+
+        if (!expiredCodes.isEmpty()) {
+            verificationCodeRepository.deleteAll(expiredCodes);
+            System.out.println("Expired verification codes have been cleaned up: " + expiredCodes.size());
+        } else {
+            System.out.println("No expired verification codes to clean up at " + now);
+        }
+    }
+
 
 
     @Override

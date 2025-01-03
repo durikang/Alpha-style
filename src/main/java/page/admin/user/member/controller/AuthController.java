@@ -18,7 +18,9 @@ public class AuthController {
 
     // 회원가입용 이메일 인증 코드 발송
     @PostMapping("/signup/send-code")
-    public ResponseEntity<Map<String, String>> sendCodeForSignup(@RequestParam String email) {
+    public ResponseEntity<Map<String, String>> sendCodeForSignup(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        System.out.println("Received email for signup: " + email); // 디버깅 로그
         Map<String, String> response = new HashMap<>();
         try {
             authService.validateAndSendCodeForSignup(email);
@@ -29,6 +31,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+
 
     // 아이디 찾기용 이메일 인증 코드 발송
     @PostMapping("/find-id/send-code")
