@@ -14,5 +14,6 @@ public class LoginSessionInfo {
     private String email;         // 이메일
     private String address;       // 주소
     private String phoneNumber;   // 전화번호
-    // 기타 사용자 전용 필드
+    private String gender;        // 성별
+    private String role;      // 사용자 역할
 }

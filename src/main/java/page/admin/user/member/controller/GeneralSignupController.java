@@ -168,8 +168,10 @@ public class GeneralSignupController {
         member.setSecurityQuestion(signupForm.getSecurityQuestion());
         member.setSecurityAnswer(signupForm.getSecurityAnswer());
         member.setRole("MEMBER");
+        member.setGender(signupForm.getGender()); // 추가된 라인
         return member;
     }
+
 
 
 

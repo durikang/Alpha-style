@@ -1,42 +1,99 @@
 .header {
     background-color: #f8f9fa;
     border-bottom: 1px solid #e5e5e5;
-    padding: 10px 0;
-}
-
-.header .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 10px 20px; /* 좌우 패딩 조정 */
     display: flex;
     align-items: center;
     justify-content: space-between;
+    max-width: 1200px; /* 헤더의 최대 너비 설정 */
+    margin: 0 auto; /* 중앙 정렬 */
 }
 
 .header .logo img {
     height: 50px;
 }
 
-.header .search-form {
+.header .nav {
     display: flex;
-    align-items: center;
+    gap: 20px; /* gap 줄이기 */
+    margin-left: 20px; /* margin 줄이기 */
+    flex: 1; /* nav가 남은 공간을 차지하도록 설정 */
+    max-width: 500px; /* nav의 최대 너비 설정 */
 }
 
-.header .search-form input {
+.header .nav .nav-item {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.header .nav .nav-item:hover {
+    color: #007bff;
+}
+
+.header .user-options {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* gap 줄이기 */
+    flex: 1; /* user-options가 남은 공간을 차지하도록 설정 */
+    max-width: 300px; /* user-options의 최대 너비 설정 */
+}
+
+.header .user-options .user-item {
+    text-decoration: none;
+    color: #333;
+}
+
+.header .user-options .user-item:hover {
+    color: #007bff;
+}
+
+.header .search-cart {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* 오른쪽 끝으로 밀기 */
+    flex-shrink: 0; /* 크기 축소 방지 */
+}
+
+.header .search-cart .search-input {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.header .search-form button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.header .search-cart .cart,
+.header .search-cart .user {
+    margin-left: 15px;
+    text-decoration: none;
+    font-size: 1.5rem;
 }
 
-.header .search-form button:hover {
-    background-color: #0056b3;
+.header .search-cart .cart:hover,
+.header .search-cart .user:hover {
+    color: #007bff;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-left: 0; /* 모바일에서는 간격 제거 */
+        max-width: none; /* 모바일에서는 최대 너비 제거 */
+    }
+
+    .user-options {
+        margin-top: 10px;
+        flex: none; /* 모바일에서는 flex-grow 제거 */
+        max-width: none; /* 모바일에서는 최대 너비 제거 */
+    }
+
+    .search-cart {
+        margin-top: 10px;
+        width: 100%;
+    }
 }

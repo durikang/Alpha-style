@@ -15,10 +15,10 @@ import page.admin.admin.item.domain.dto.ItemUpdateForm;
 import page.admin.admin.item.domain.dto.ItemViewForm;
 import page.admin.admin.item.repository.*;
 import page.admin.admin.member.domain.Member;
-import page.admin.admin.member.domain.dto.AdminSessionInfo;
 import page.admin.admin.member.repository.MemberRepository;
 import page.admin.common.utils.exception.DataNotFoundException;
 import page.admin.common.utils.file.FileStore;
+import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
     // 1) 상품 등록
     // ======================================
     @Override
-    public Item saveItem(ItemSaveForm form, AdminSessionInfo sellerInfo) {
+    public Item saveItem(ItemSaveForm form, LoginSessionInfo sellerInfo) {
 
         // (1) 메인 이미지
         UploadFile mainImage = fileStore.storeFile(form.getMainImage());
@@ -65,7 +65,6 @@ public class ItemServiceImpl implements ItemService {
         }
 
         // (3) 지역 -> regionCodes
-        // 기존에는 findAllById(...)를 썼지만, 이제 region.code가 String이므로 findByCodeIn(...) 사용
         Set<Region> regions = regionRepository.findByCodeIn(form.getRegionCodes());
         if (regions.isEmpty()) {
             throw new DataNotFoundException("유효한 지역 정보가 없습니다.");
@@ -132,11 +131,9 @@ public class ItemServiceImpl implements ItemService {
     // ======================================
     @Override
     public ItemEditForm getItemEditForm(Long id) {
-        // 1) regions, thumbnails, mainCategory, subCategory 등을 모두 페치해 오는 쿼리
         Item item = itemRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템이 없습니다. ID: " + id));
 
-        // 2) toItemEditForm
         return toItemEditForm(item);
     }
 

@@ -33,8 +33,9 @@ public class FileStore {
         if (uploadFile == null || uploadFile.getStoreFileName() == null) {
             return null; // 파일 정보가 없을 경우 null 반환
         }
-        return fileDir + uploadFile.getStoreFileName();
+        return "/files/" + uploadFile.getStoreFileName();
     }
+
 
     // 단일 파일 저장
     public UploadFile storeFile(MultipartFile multipartFile) {
@@ -163,5 +164,9 @@ public class FileStore {
                 throw new FileProcessingException("파일 저장 디렉토리를 생성할 수 없습니다: " + fileDir);
             }
         }
+    }
+
+    public String getFileDir() {
+        return fileDir;
     }
 }

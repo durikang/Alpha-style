@@ -1,34 +1,43 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const slides = document.querySelectorAll('.slide');
-    const prevButton = document.querySelector('.prev');
-    const nextButton = document.querySelector('.next');
-
-    if (!prevButton || !nextButton) {
-        console.error('prevButton 또는 nextButton을 찾을 수 없습니다.');
-        return; // 중단
-    }
-
-    let currentIndex = 0;
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelectorAll(".slider .slide");
+    const prevButton = document.querySelector(".slider .prev");
+    const nextButton = document.querySelector(".slider .next");
+    let currentSlide = 0;
+    const totalSlides = slides.length;
 
     function showSlide(index) {
         slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
+            if (i === index) {
+                slide.classList.add("active");
+            } else {
+                slide.classList.remove("active");
+            }
         });
     }
 
     function nextSlide() {
-        currentIndex = (currentIndex + 1) % slides.length;
-        showSlide(currentIndex);
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
     }
 
     function prevSlide() {
-        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-        showSlide(currentIndex);
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(currentSlide);
     }
 
-    nextButton.addEventListener('click', nextSlide);
-    prevButton.addEventListener('click', prevSlide);
+    // 초기 슬라이드 표시
+    if (totalSlides > 0) {
+        showSlide(currentSlide);
+        // 자동 슬라이드
+        setInterval(nextSlide, 5000); // 5초마다 슬라이드 변경
+    }
 
-    setInterval(nextSlide, 5000);
-    showSlide(currentIndex);
+    // 버튼 클릭 이벤트
+    if (nextButton) {
+        nextButton.addEventListener("click", nextSlide);
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener("click", prevSlide);
+    }
 });

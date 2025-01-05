@@ -26,6 +26,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             text-align: center;
+            margin-top: 300px;
         }
         .login-container h1 {
             font-size: 24px;
@@ -116,6 +117,7 @@
 <body>
 <main>
     <div class="login-container">
+        <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
         <h1>로그인</h1>
         <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()">
             <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>

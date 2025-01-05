@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>주문 조회</title>
+    <link rel="stylesheet" th:href="@{/user/css/order/orderView.css}"/>
+    <script th:src="@{/user/js/order/orderView.js}" th:inline="none"></script>
+</head>
+<body>
+<div class="board">
+    <h1>주문조회</h1>
+    <table class="post-list">
+        <thead>
+        <tr>
+            <th>주문번호</th> <th>주문날짜</th> <th>제품명</th> <th>제품기격</th> <th>도착예정일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td> <td>2025-01-02</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>2</td> <td>2025-01-03</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>3</td> <td>2025-01-04</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>4</td> <td>2025-01-05</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>5</td> <td>2025-01-06</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>6</td> <td>2025-01-07</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>7</td> <td>2025-01-08</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>8</td> <td>2025-01-09</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>9</td> <td>2025-01-10</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        <tr><td>10</td> <td>2025-01-11</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
+        </tbody>
+    </table>
+    <div class="page-nav">
+        <a href="#" class="prev">이전</a>
+        <a href="#" class="page">1</a>
+        <a href="#" class="page">2</a>
+        <a href="#" class="page">3</a>
+        <a href="#" class="next">다음</a>
+    </div>
+</div>
+</body>
+</html>

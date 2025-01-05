@@ -1,0 +1,32 @@
+.slider-management {
+    padding: 20px;
+}
+
+.slider-management h1 {
+    margin-bottom: 20px;
+}
+
+.slider-management .btn {
+    margin-bottom: 20px;
+}
+
+.slider-management .table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.slider-management .table th,
+.slider-management .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.slider-management .table th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+.slider-management img {
+    max-width: 100px;
+    height: auto;
+}

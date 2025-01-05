@@ -14,6 +14,14 @@
 
     <!-- JavaScript Modules -->
     <script type="module" th:src="@{/user/js/main-general-signup.js}" defer></script>
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <!-- Daum API 스크립트 -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <body>
@@ -27,24 +35,25 @@
 
         <!-- 단계별 폼 -->
         <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate onsubmit="return validateForm();">
-        <!-- 1단계: 본인 인증 -->
-            <div class="step" id="step-1">
-                <h2>본인 인증</h2>
+            <!-- 1단계: 본인 인증 -->
+            <div class="step" id="step-1" style="display: block;">
+                <h2>1단계: 본인 인증</h2>
                 <div class="form-group">
-                    <input type="email" id="email" name="email" placeholder=" " required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$">
-                    <label class="floating-label" for="email">이메일 <span class="required">*</span></label>
+                    <label for="email">이메일 <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" placeholder="이메일을 입력하세요">
                 </div>
                 <button type="button" id="sendCodeBtn">인증 코드 받기</button>
-                <div id="emailMessage" style="margin-top: 5px;"></div>
+
+                <div id="emailMessage" style="margin-top: 5px; display: none;"></div>
 
                 <div class="form-group" id="verificationCodeContainer" style="display: none;">
-                    <input type="text" id="verificationCode" placeholder=" " required>
-                    <label class="floating-label" for="verificationCode">인증코드</label>
+                    <label for="verificationCode">인증코드 <span class="required">*</span></label>
+                    <input type="text" id="verificationCode" required placeholder="인증코드를 입력하세요">
                 </div>
                 <button type="button" id="verifyCodeBtn" style="display: none;">인증코드 확인</button>
 
                 <!-- 타이머 메시지 -->
-                <div id="timerMessage" style="color: red; margin-top: 5px; display: none;">00:00</div>
+                <div id="timerMessage" style="color: red; margin-top: 5px; display: none;"></div>
                 <div id="codeMessage" style="margin-top: 5px;"></div>
 
                 <!-- 인증 완료 메시지 -->
@@ -56,76 +65,129 @@
             </div>
 
             <!-- 2단계: 계정 정보 -->
-            <div class="step" id="step-2" style="display: none;">
-                <h2>계정 정보</h2>
+            <div class="step" id="step-2">
+                <h2>2단계: 계정 정보</h2>
+                <!-- 아이디 입력 필드 -->
                 <div class="form-group">
-                    <input type="text" id="userId" name="userId" placeholder=" " required>
-                    <label class="floating-label" for="userId">아이디 <span class="required">*</span></label>
+                    <label for="userId">아이디 <span class="required">*</span></label>
+                    <input type="text" id="userId" th:field="*{userId}" placeholder="영문소문자/숫자, 4~16자" required>
+                    <!-- userIdMessage: 시작 시 display: none; -->
+                    <div id="userIdMessage" style="color: red; margin-top: 5px; display: none;"></div>
                 </div>
+
+                <!-- 비밀번호 입력 필드 -->
                 <div class="form-group">
-                    <input type="password" id="password" name="password" placeholder=" " required pattern=".{4,16}">
-                    <label class="floating-label" for="password">비밀번호 <span class="required">*</span></label>
+                    <label for="password">비밀번호 <span class="required">*</span></label>
+                    <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 4~16자로 입력해주세요." required>
+                    <!-- passwordMessage: 시작 시 display: none; -->
+                    <div id="passwordMessage" style="display: none;"></div>
                 </div>
+
+                <!-- 비밀번호 확인 입력 필드 -->
                 <div class="form-group">
-                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder=" " required>
-                    <label class="floating-label" for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
+                    <label for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
+                    <input type="password" id="passwordConfirm" th:field="*{passwordConfirm}" required placeholder="비밀번호를 다시 입력해주세요.">
+                    <div th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color: red;"></div>
                 </div>
+
+                <!-- 이전 단계는 index=0 (#step-1) -->
                 <button type="button" class="to-step" data-target-step="0">이전 단계</button>
+                <!-- 다음 단계는 index=2 (#step-3) -->
                 <button type="button" class="to-step" data-target-step="2">다음 단계</button>
             </div>
 
-            <!-- 3단계: 부가 정보 -->
-            <div class="step" id="step-3" style="display: none;">
-                <h2>부가 정보</h2>
+            <!-- 3단계: 일반 부가 정보 -->
+            <div class="step" id="step-3">
+                <h2>3단계: 일반 부가 정보</h2>
                 <div class="form-group">
-                    <input type="text" id="username" name="username" placeholder=" " required>
-                    <label class="floating-label" for="username">이름 <span class="required">*</span></label>
+                    <label for="username">이름 <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" th:value="*{username}" required placeholder="이름을 입력하세요">
                 </div>
+                <!-- 성별 -->
                 <div class="form-group">
-                    <input type="tel" id="mobilePhone" name="mobilePhone" placeholder=" " required pattern="010-\d{4}-\d{4}">
-                    <label class="floating-label" for="mobilePhone">휴대전화 <span class="required">*</span></label>
+                    <label for="gender">성별 <span class="required">*</span></label>
+                    <select id="gender" name="gender" th:field="*{gender}" required>
+                        <option value="" disabled selected>선택하세요</option>
+                        <option value="남">남</option>
+                        <option value="여">여</option>
+                        <option value="기타">기타</option>
+                    </select>
+                    <!-- 성별 검증 메시지 -->
+                    <div id="genderMessage" class="fadeable" style="color: red; margin-top: 5px; display: none;"></div>
                 </div>
+                <!-- 휴대전화 -->
                 <div class="form-group">
-                    <input type="date" id="birthDate" name="birthDate" required>
-                    <label class="floating-label" for="birthDate">생년월일 <span class="required">*</span></label>
+                    <label for="mobilePhone">휴대전화 <span class="required">*</span></label>
+                    <input type="tel" id="mobilePhone" name="mobilePhone" th:value="*{mobilePhone}" placeholder="010-xxxx-xxxx" required>
+                    <div id="mobilePhoneMessage" class="fadeable" style="color: red; margin-top: 5px; display: none;"></div>
                 </div>
+                <!-- 생년월일 -->
                 <div class="form-group">
-                    <input type="text" id="zipCode" name="zipCode" placeholder=" " readonly required>
-                    <label class="floating-label" for="zipCode">우편번호</label>
+                    <label for="birthDate">생년월일 <span class="required">*</span></label>
+                    <input type="text" id="birthDate" name="birthDate" th:value="*{birthDate}" placeholder="YYYY-MM-DD" required>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="basicAddress" name="address" placeholder=" " readonly required>
-                    <label class="floating-label" for="basicAddress">기본주소</label>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="secondaryAddress" name="secondaryAddress" placeholder=" ">
-                    <label class="floating-label" for="secondaryAddress">나머지주소</label>
-                </div>
+                <!-- 이전 단계는 index=1 (#step-2) -->
                 <button type="button" class="to-step" data-target-step="1">이전 단계</button>
+                <!-- 다음 단계는 index=4 (#step-4) -->
                 <button type="button" class="to-step" data-target-step="3">다음 단계</button>
             </div>
 
-            <!-- 4단계: 보안 질문 -->
-            <div class="step" id="step-4" style="display: none;">
-                <h2>보안 질문</h2>
+            <!-- 4단계: 주소 정보 -->
+            <div class="step" id="step-4">
+                <h2>4단계: 주소 정보</h2>
                 <div class="form-group">
-                    <select id="securityQuestion" name="securityQuestion" required>
-                        <option value="" disabled selected>질문을 선택하세요</option>
-                        <option>내 첫 반려동물 이름은?</option>
-                        <option>내 초등학교 이름은?</option>
-                        <option>내 가장 친한 친구의 이름은?</option>
-                    </select>
-                    <label class="floating-label" for="securityQuestion">비밀번호 확인 질문</label>
+                    <label for="zipCode">우편번호 <span class="required">*</span></label>
+                    <input type="text" id="zipCode" name="zipCode" th:value="*{zipCode}" placeholder="우편번호" readonly required>
                 </div>
                 <div class="form-group">
-                    <input type="text" id="securityAnswer" name="securityAnswer" placeholder=" " required>
-                    <label class="floating-label" for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
+                    <label for="basicAddress">기본주소 <span class="required">*</span></label>
+                    <input type="text" id="basicAddress" name="address" th:value="*{address}" placeholder="기본주소" readonly required>
                 </div>
+                <div class="form-group">
+                    <label for="secondaryAddress">나머지주소</label>
+                    <input type="text" id="secondaryAddress" name="secondaryAddress" th:value="*{secondaryAddress}" placeholder="나머지주소">
+                </div>
+                <button type="button" id="searchAddressBtn">주소 찾기</button>
+                <!-- 이전 단계는 index=2 (#step-3) -->
                 <button type="button" class="to-step" data-target-step="2">이전 단계</button>
-                <button type="submit">회원 가입</button>
+                <!-- 다음 단계는 index=5 (#step-5) -->
+                <button type="button" class="to-step" data-target-step="4">다음 단계</button>
+            </div>
+
+            <!-- 5단계: 보안 질문 -->
+            <div class="step" id="step-5">
+                <h2>5단계: 보안 질문</h2>
+                <div class="form-group">
+                    <label for="securityQuestion">비밀번호 확인 질문 <span class="required">*</span></label>
+                    <select id="securityQuestion" name="securityQuestion" th:field="*{securityQuestion}" required>
+                        <option value="" disabled selected>질문을 선택하세요</option>
+                        <option th:each="question : ${securityQuestions}" th:value="${question}" th:text="${question}"></option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('securityQuestion')}" th:errors="*{securityQuestion}" style="color: red;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="securityAnswer">비밀번호 확인 답변 <span class="required">*</span></label>
+                    <input type="text" id="securityAnswer" name="securityAnswer" th:value="*{securityAnswer}" required placeholder="답변을 입력하세요">
+                </div>
+                <!-- 이전 단계는 index=3 (#step-4) -->
+                <button type="button" class="to-step" data-target-step="3">이전 단계</button>
+                <!-- 제출 버튼 -->
+                <button type="submit">회원 가입 완료</button>
             </div>
         </form>
     </div>
 </main>
+
+<!-- Flatpickr Initialization -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#birthDate", {
+            dateFormat: "Y-m-d",
+            maxDate: "today", // 오늘 날짜 이전만 선택 가능
+            defaultDate: "2000-01-01", // 기본값
+            locale: "ko" // 한국어로 변경
+        });
+    });
+</script>
 </body>
 </html>

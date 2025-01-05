@@ -7,7 +7,7 @@ import page.admin.admin.item.domain.dto.ItemEditForm;
 import page.admin.admin.item.domain.dto.ItemSaveForm;
 import page.admin.admin.item.domain.dto.ItemUpdateForm;
 import page.admin.admin.item.domain.dto.ItemViewForm;
-import page.admin.admin.member.domain.dto.AdminSessionInfo;
+import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +16,7 @@ public interface ItemService {
     Page<Item> searchItems(String keyword, Pageable pageable);
 
     // 등록
-    Item saveItem(ItemSaveForm form, AdminSessionInfo seller);
+    Item saveItem(ItemSaveForm form, LoginSessionInfo seller);
 
     // 단일 엔티티 반환
     Item getItem(Long id);

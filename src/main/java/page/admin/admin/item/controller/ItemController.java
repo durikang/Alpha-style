@@ -20,8 +20,8 @@ import page.admin.admin.item.domain.Item;
 import page.admin.admin.item.domain.SubCategory;
 import page.admin.admin.item.domain.dto.*;
 import page.admin.admin.item.service.*;
-import page.admin.admin.member.domain.dto.AdminSessionInfo;
 import page.admin.common.utils.Alert;
+import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -108,7 +108,7 @@ public class ItemController {
     public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form,
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes,
-                          @SessionAttribute(name = "loginMember", required = false) AdminSessionInfo loginSessionInfo,
+                          @SessionAttribute(name = "loginMember", required = false) LoginSessionInfo loginSessionInfo,
                           Model model) {
 
         if (bindingResult.hasErrors()) {

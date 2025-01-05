@@ -1,0 +1,62 @@
+body, h1, table {
+    margin: 0;
+    padding: 0;
+}
+h1{
+    text-align: center;
+    margin-bottom: 20px;
+}
+body {
+    font-family: Arial, sans-serif;
+}
+
+.board {
+    width: 80%;
+    margin: 150px auto;
+    padding: 20px;
+    height: 80vh;
+}
+
+.post-list {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.post-list th, .post-list td {
+    border: 1px solid #f0f0f0;
+    padding: 8px;
+    text-align: center;
+}
+
+.post-list th {
+    background-color: #f2f2f2;
+}
+
+.page-nav {
+    text-align: center;
+}
+
+.page-nav a {
+    display: inline-block;
+    margin: 0 5px;
+    padding: 5px 10px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+}
+
+.page-nav .page {
+    background-color: #f2f2f2;
+}
+
+.page-nav a:hover {
+    background-color: #ddd;
+}
+
+.page-nav .prev,
+.page-nav .next {
+    font-weight: bold;
+}

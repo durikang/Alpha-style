@@ -1,6 +1,5 @@
 package page.admin.user.member.domain.dto;
 
-
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -46,4 +45,9 @@ public class GeneralSignupDto {
 
     @NotBlank(message = "보안 답변을 입력해주세요.")
     private String securityAnswer;
+
+    @NotBlank(message = "성별을 입력해주세요.")
+    @Pattern(regexp = "^(남|여|기타)$", message = "성별은 '남', '여', 또는 '기타'만 선택 가능합니다.")
+    private String gender;
+
 }

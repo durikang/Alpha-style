@@ -13,5 +13,5 @@ public class AdminSessionInfo {
     private String username;  // 사용자 이름
     private String role;      // 사용자 역할
     private String email;     // 이메일
+    private String gender;    // 성별
 }
-

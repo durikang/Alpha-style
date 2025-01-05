@@ -1,0 +1,28 @@
+.slider-form {
+    padding: 20px;
+}
+
+.slider-form h1 {
+    margin-bottom: 20px;
+}
+
+.slider-form .form-group {
+    margin-bottom: 15px;
+}
+
+.slider-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.slider-form input[type="text"],
+.slider-form input[type="number"],
+.slider-form input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.slider-form .btn {
+    margin-right: 10px;
+}

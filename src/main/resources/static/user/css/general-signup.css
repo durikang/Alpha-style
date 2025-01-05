@@ -4,7 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f7fc;
+    display: flex;
     align-items: center;
+    justify-content: center;
     min-height: 100vh;
 }
 
@@ -17,7 +19,6 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    margin-top: 70px;
 }
 
 .signup-form h1 {
@@ -89,25 +90,6 @@ body {
     transform: scale(1.02);
 }
 
-.signup-form button#authButton {
-    width: auto;
-    padding: 12px 25px;
-    background: linear-gradient(45deg, #ff6b6b, #f65f97);
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.signup-form button#authButton:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
 .signup-form .required {
     color: red;
     font-size: 12px;
@@ -174,19 +156,34 @@ body {
     animation: fadeIn 0.5s ease-in-out;
 }
 
+/* 추가: fadeable 클래스 (단계 전환에만 사용) */
+/*.fadeable {
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+.fadeable.visible {
+    opacity: 1;
+}*/
+
+
 /* 인증 코드 입력 컨테이너 */
 #verificationCodeContainer {
     display: none; /* 기본적으로 숨김 */
 }
 
-#verificationCodeContainer.active {
-    display: block !important; /* 활성화 시 표시 */
+/* 기존 .step 클래스 수정 */
+.step {
+    display: none; /* 기본적으로 숨김 */
+    /*opacity: 0;*/
+    /*transition: opacity 0.5s ease-in-out;*/
 }
 
-.hidden {
-    display: none !important;
-    visibility: hidden;
-}
+/*.step.visible {
+    display: block; !* 보이기 *!
+    !*opacity: 1;     !* 불투명하게 설정 *!*!
+}*/
+
 
 /* 애니메이션 효과 */
 @keyframes fadeIn {

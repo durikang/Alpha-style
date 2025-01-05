@@ -1,25 +1,29 @@
+// timer.js
 export const Timer = (() => {
-    const startTimer = (duration, timerMessage, onExpire) => {
-        let remainingTime = duration;
+    /**
+     * 타이머 시작
+     * @param {number} duration - 타이머 지속 시간 (초)
+     * @param {HTMLElement} displayElement - 타이머를 표시할 요소
+     * @param {Function} callback - 타이머 종료 시 실행할 콜백 함수
+     * @returns {number} - setInterval ID
+     */
+    const startTimer = (duration, displayElement, callback) => {
+        let timer = duration, minutes, seconds;
+        const intervalId = setInterval(() => {
+            minutes = Math.floor(timer / 60);
+            seconds = timer % 60;
 
-        const updateTimer = () => {
-            const minutes = Math.floor(remainingTime / 60);
-            const seconds = remainingTime % 60;
+            minutes = minutes < 10 ? `0${minutes}` : minutes;
+            seconds = seconds < 10 ? `0${seconds}` : seconds;
 
-            timerMessage.textContent = `남은 시간: ${minutes}분 ${seconds}초`;
-            remainingTime -= 1;
+            displayElement.textContent = `남은 시간: ${minutes}분 ${seconds}초`;
 
-            if (remainingTime < 0) {
-                clearInterval(timerInterval);
-                timerMessage.textContent = '인증 시간이 만료되었습니다.';
-                timerMessage.style.color = 'red';
-                if (typeof onExpire === 'function') onExpire();
+            if (--timer < 0) {
+                clearInterval(intervalId);
+                callback();
             }
-        };
-
-        const timerInterval = setInterval(updateTimer, 1000);
-        updateTimer();
-        return timerInterval;
+        }, 1000);
+        return intervalId;
     };
 
     return { startTimer };

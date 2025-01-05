@@ -30,26 +30,52 @@
     <!-- 왼쪽: 이미지 섹션 -->
     <div class="image-section">
         <div class="main-image-wrapper">
-            <!-- 메인 이미지 -->
-            <img th:src="${item.mainImage != null ? '/' + item.mainImage.storeFileName : 'https://via.placeholder.com/400x500.png?text=Main+Image'}"
-                 alt="상품 메인 이미지" class="main-image">
+            <!-- 상품 메인 이미지가 있는 경우 -->
+            <img th:if="${item.mainImage != null}"
+                 th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
+                 alt="상품 메인 이미지" class="main-image" />
+
+            <!-- 상품 메인 이미지가 없는 경우 기본 이미지 표시 -->
+            <img th:unless="${item.mainImage != null}"
+                 src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                 alt="기본 이미지" class="main-image" />
         </div>
         <div class="thumbnail-gallery">
             <div class="thumbnail-gallery">
                 <!-- 썸네일 1 -->
-                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 0 ? '/' + item.thumbnails[0].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'}"
+                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 0}"
+                     th:src="@{/files/{filename}(filename=${item.thumbnails[0].storeFileName})}"
+                     alt="썸네일 1" class="thumbnail">
+
+                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 0}"
+                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+1"
                      alt="썸네일 1" class="thumbnail">
 
                 <!-- 썸네일 2 -->
-                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 1 ? '/' + item.thumbnails[1].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'}"
+                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 1}"
+                     th:src="@{/files/{filename}(filename=${item.thumbnails[1].storeFileName})}"
+                     alt="썸네일 2" class="thumbnail">
+
+                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 1}"
+                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+2"
                      alt="썸네일 2" class="thumbnail">
 
                 <!-- 썸네일 3 -->
-                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 2 ? '/' + item.thumbnails[2].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'}"
+                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 2}"
+                     th:src="@{/files/{filename}(filename=${item.thumbnails[2].storeFileName})}"
+                     alt="썸네일 3" class="thumbnail">
+
+                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 2}"
+                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+3"
                      alt="썸네일 3" class="thumbnail">
 
                 <!-- 썸네일 4 -->
-                <img th:src="${item.thumbnails != null and item.thumbnails.size() > 3 ? '/' + item.thumbnails[3].storeFileName : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'}"
+                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 3}"
+                     th:src="@{/files/{filename}(filename=${item.thumbnails[3].storeFileName})}"
+                     alt="썸네일 4" class="thumbnail">
+
+                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 3}"
+                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+4"
                      alt="썸네일 4" class="thumbnail">
             </div>
 

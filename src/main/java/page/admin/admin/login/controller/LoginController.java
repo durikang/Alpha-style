@@ -9,9 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import page.admin.admin.member.domain.dto.AdminSessionInfo;
 import page.admin.admin.member.domain.dto.LoginForm;
 import page.admin.admin.member.service.MemberService;
+import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class LoginController {
     // 로그인 페이지
     @GetMapping("/login")
     public String loginPage(HttpSession session, Model model) {
-        AdminSessionInfo sessionInfo = (AdminSessionInfo) session.getAttribute("loginMember");
+        LoginSessionInfo sessionInfo = (LoginSessionInfo) session.getAttribute("loginMember");
 
         if (sessionInfo != null) {
             return redirectToHome(sessionInfo.getRole());
@@ -35,7 +35,7 @@ public class LoginController {
     // 로그인 처리
     @PostMapping("/login")
     public String login(
-            @Validated @ModelAttribute LoginForm loginForm,
+            @Validated @ModelAttribute("loginMember") LoginForm loginForm,
             BindingResult bindingResult,
             HttpSession session,
             Model model) {
@@ -47,12 +47,15 @@ public class LoginController {
 
         var member = memberService.findByUserIdAndPassword(loginForm.getUserId(), loginForm.getPassword());
         if (member.isPresent()) {
-            AdminSessionInfo sessionInfo = new AdminSessionInfo(
+            LoginSessionInfo sessionInfo = new LoginSessionInfo(
                     member.get().getUserNo(),
                     member.get().getUserId(),
                     member.get().getUsername(),
-                    member.get().getRole(),
-                    member.get().getEmail()
+                    member.get().getEmail(),
+                    member.get().getAddress(),
+                    member.get().getMobilePhone(),
+                    member.get().getGender(),
+                    member.get().getRole()
             );
             session.setAttribute("loginMember", sessionInfo);
             return redirectToHome(member.get().getRole());
@@ -62,6 +65,8 @@ public class LoginController {
         model.addAttribute("loginMember", loginForm);
         return "login";
     }
+
+
 
     // 로그아웃 처리
     @GetMapping("/logout")

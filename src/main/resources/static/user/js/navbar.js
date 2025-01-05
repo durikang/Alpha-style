@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     header.style.position = 'fixed';
     header.style.top = '0';
     header.style.left = '0';
-    header.style.width = '100%';
+    /*header.style.width = '100%';*/
     header.style.zIndex = '1000';
 
     let lastScrollTop = 0;

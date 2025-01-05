@@ -1,9 +1,6 @@
 package page.admin.admin.member.domain.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,4 +36,8 @@ public class UpdateForm {
 
     @NotBlank(message = "역할은 필수 입력 항목입니다.")
     private String role; // 역할
+
+    @NotBlank(message = "성별은 필수 입력 항목입니다.")
+    @Pattern(regexp = "^(남|여)$", message = "성별은 '남' 또는 '여'만 선택 가능합니다.")
+    private String gender; // 성별
 }

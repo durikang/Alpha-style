@@ -15,10 +15,14 @@
 
 <div class="slider">
     <div class="slides">
-        <div class="slide"><img th:src="'https://via.placeholder.com/1855x840.png?text=Slide+1'" alt="Slide 1"></div>
-        <div class="slide"><img th:src="'https://via.placeholder.com/1855x840.png?text=Slide+2'" alt="Slide 2"></div>
-        <div class="slide"><img th:src="'https://via.placeholder.com/1855x840.png?text=Slide+3'" alt="Slide 3"></div>
-        <div class="slide"><img th:src="'https://via.placeholder.com/1855x840.png?text=Slide+4'" alt="Slide 4"></div>
+        <div class="slide" th:each="slider : ${sliders}">
+            <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
+            <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+        </div>
+        <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
+        <div th:if="${#lists.isEmpty(sliders)}" class="slide">
+            <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+        </div>
     </div>
     <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
     <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
