@@ -31,6 +31,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath email = createString("email");
 
+    public final StringPath gender = createString("gender");
+
     public final ListPath<page.admin.admin.item.domain.Item, page.admin.admin.item.domain.QItem> items = this.<page.admin.admin.item.domain.Item, page.admin.admin.item.domain.QItem>createList("items", page.admin.admin.item.domain.Item.class, page.admin.admin.item.domain.QItem.class, PathInits.DIRECT2);
 
     public final StringPath mobilePhone = createString("mobilePhone");
