@@ -27,6 +27,8 @@ public class QVerificationCode extends EntityPathBase<VerificationCode> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath status = createString("status");
+
     public QVerificationCode(String variable) {
         super(VerificationCode.class, forVariable(variable));
     }

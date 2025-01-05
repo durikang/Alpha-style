@@ -5,8 +5,8 @@
       layout:decorate="~{common/admin/layouts/defaultLayout}"
       layout:fragment="Content">
 <head>
-    <meta charset="UTF-8">
-    <title>옵션</title>
+  <meta charset="UTF-8">
+  <title>옵션</title>
 </head>
 <body>
 <main>
@@ -50,7 +50,40 @@
     const uploadForm = document.getElementById('uploadForm');
     const insertForm = document.getElementById('insertForm');
     const resultDisplay = document.getElementById('result');
+    const analysisForm = document.getElementById('analysisForm'); // 분석하기 폼 선택
 
+    // 분석하기 폼 제출 이벤트
+    analysisForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Reset UI for Analysis
+      resetUI();
+      progressText.textContent = '분석 준비 중...';
+
+      try {
+        // Simulate analysis progress
+        await simulateProgress(100, '분석 진행 중', () => {
+          progressText.textContent = '분석 작업 중...';
+        });
+
+        // 서버 요청 처리 (분석)
+        const response = await fetch(analysisForm.action, {
+          method: 'POST'
+        });
+
+        // 응답 상태 확인
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+
+        // JSON 응답 파싱 및 UI 업데이트
+        const result = await response.json();
+        progressContainer.style.display = 'none';
+        resultDisplay.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        handleError(error);
+      }
+    });
     // 파일 선택 이벤트
     fileInput.addEventListener('change', function () {
       fileList.innerHTML = '';
@@ -165,7 +198,6 @@
         }, 300);
       });
     }
-
     // 에러 처리
     function handleError(error) {
       progressContainer.style.display = 'none';
