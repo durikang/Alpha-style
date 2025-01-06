@@ -6,140 +6,320 @@
       layout:fragment="Content">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>테스트페이지</title>
-    <link rel="stylesheet" th:href="@{/admin/css/financial/financial.css}"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
     <style>
+        /* 전체 컨테이너 */
+        .container {
+            font-family: Arial, sans-serif;
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 1200px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        /* 제목 */
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* 탭 네비게이션 버튼 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tabs button:hover {
+            background-color: #0056b3;
+        }
+
+        .tabs button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* 다운로드 버튼 */
+        form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #218838;
+        }
+
+        form button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+        }
+
+        .tab-content_map {
+            margin-top: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 400px;
+            overflow: hidden; /* 스크롤 바 제거 */
+        }
+
+        /* 로딩 메시지 스타일 */
+        .loading {
+            text-align: center;
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+        }
         .tab-row {
-            display: flex; /* 가로로 배치 */
-            width: 100%;
-            height: 500px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; /* 차트와 테이블 간격 */
+            margin-top: 20px;
         }
 
         .tab-content {
+            flex: 1; /* 각 콘텐츠를 동일한 비율로 배치 */
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            height: 500px; /* 고정 높이 */
+            overflow: hidden; /* 스크롤 제거 */
+        }
+
+        table {
             width: 100%;
-            height: 500px; /* 적절한 높이 설정 */
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
         }
     </style>
-
-
 </head>
 <body>
 <main class="container">
     <h1>연도별 데이터 그래프</h1>
+
     <!-- 탭 네비게이션 -->
     <div class="tabs">
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="2020">2020</button>
-        </form>
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="2021">2021</button>
-        </form>
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="2022">2022</button>
-        </form>
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="2023">2023</button>
-        </form>
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="2024">2024</button>
-        </form>
-        <form action="http://localhost:5000/graph" method="post">
-            <button type="submit" name="year" value="all">전체</button>
-        </form>
+        <button type="button" onclick="setYearAndLoadGraph('2020')">2020</button>
+        <button type="button" onclick="setYearAndLoadGraph('2021')">2021</button>
+        <button type="button" onclick="setYearAndLoadGraph('2022')">2022</button>
+        <button type="button" onclick="setYearAndLoadGraph('2023')">2023</button>
+        <button type="button" onclick="setYearAndLoadGraph('2024')">2024</button>
+        <button type="button" onclick="setYearAndLoadGraph('all')">전체</button>
     </div>
+
+    <!-- 다운로드 버튼 -->
+    <form action="http://localhost:5000/download" method="post">
+        <input type="hidden" id="selected-year" name="year" value="all">
+        <button type="submit">다운로드</button>
+    </form>
+
     <!-- 탭 콘텐츠 -->
-    <div class="tab-content" id="tab-content">
-        <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
-    </div>
-    <div class="tab-content" id="tab-content1">
-        <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content-additional">
+            <table id="data-table">
+                <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>매출</td>
+                    <td id="sales-value">N/A</td>
+                </tr>
+                <tr>
+                    <td>판관비</td>
+                    <td id="admin-cost-value">N/A</td>
+                </tr>
+                <tr>
+                    <td>당기순이익</td>
+                    <td id="net-income-value">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="tab-row">
-        <div class="tab-content" id="tab-content2">
+        <div class="tab-content" id="tab-content1"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content1-additional">
+            <table id="data-table2">
+                <thead>
+                <tr>
+                    <th>카테고리</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>상의</td>
+                    <td id="top_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>하의</td>
+                    <td id="bottom_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>운동화</td>
+                    <td id="running_shoes_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>단화</td>
+                    <td id="loafers_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>슬리퍼</td>
+                    <td id="slippers_value">N/A</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="tab-content" id="tab-content2-additional">
-        </div>
+    </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content2"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content2-additional"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
     </div>
     <div class="tab-content" id="tab-content3">
         <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
     </div>
-    <div class="tab-content" id="tab-content4">
+    <div class="tab-content_map" id="tab-content4">
         <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
     </div>
 </main>
 
 <script>
-    // 스크립트 실행 함수
-    function executeScripts(container) {
-        const scripts = container.querySelectorAll('script');
-        scripts.forEach((oldScript) => {
-            const newScript = document.createElement('script');
-            // 모든 속성 복사
-            [...oldScript.attributes].forEach(attr => {
-                newScript.setAttribute(attr.name, attr.value);
-            });
-            // src / textContent 복사
-            if (oldScript.src) {
-                newScript.src = oldScript.src;
-            } else {
-                newScript.textContent = oldScript.textContent;
-            }
-            // body에 새 script 추가
-            document.body.appendChild(newScript);
-            oldScript.remove();
-        });
-    }
-    document.querySelectorAll('.tabs form button').forEach(button => {
-        button.addEventListener('click', async (event) => {
-            event.preventDefault(); // 기본 제출 동작 방지
-            const year = event.target.value; // 버튼의 value 값 가져오기
+    async function setYearAndLoadGraph(year) {
+        // Hidden input에 선택한 연도 값 설정
+        document.getElementById('selected-year').value = year;
 
-            try {
-                // 로딩 메시지 표시
-                const contentIds = ['tab-content', 'tab-content1', 'tab-content2' , 'tab-content2-additional', 'tab-content3', 'tab-content4'];
-                contentIds.forEach(id => {
-                    document.getElementById(id).innerHTML = '<p>Loading...</p>';
-                });
+        const contentIds = [
+            'tab-content',
+            'tab-content1',
+            'tab-content2',
+            'tab-content2-additional',
+            'tab-content3',
+            'tab-content4'
+        ];
 
-                // 서버 요청
-                const response = await fetch(`http://127.0.0.1:5000/graph`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ year })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
+        try {
+            // 각 탭 콘텐츠에 로딩 메시지 표시
+            contentIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<p class="loading">Loading...</p>';
+                } else {
+                    console.warn(`Element with ID '${id}' not found. Skipping.`);
                 }
+            });
 
-                // JSON 데이터 받기
-                const result = await response.json();
-                console.log("Received result:", result); // 디버깅용
+            // 서버에 연도 데이터를 요청
+            const response = await fetch('http://127.0.0.1:5000/graph', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ year })
+            });
 
-                // 각 tab-content에 데이터 뿌리기
-                result.forEach((item, index) => {
-                    const contentElement = document.getElementById(contentIds[index]);
-                    if (contentElement) {
-                        contentElement.innerHTML = item.content || `<p>${item.path} 파일을 찾을 수 없습니다.</p>`;
-                        executeScripts(contentElement); // HTML 삽입 후 스크립트 실행
-                    }
-                });
-            } catch (error) {
-                // 에러 처리
-                const contentIds = ['tab-content', 'tab-content1', 'tab-content2', 'tab-content2-additional', 'tab-content3', 'tab-content4'];
-                contentIds.forEach(id => {
-                    document.getElementById(id).innerHTML = `<p>Error: ${error.message}</p>`;
-                });
-                console.error("Error fetching graph data:", error); // 디버깅용
+            if (!response.ok) {
+                throw new Error(`Server responded with status ${response.status}`);
             }
-        });
-    });
-</script>
 
+            // 서버에서 받은 JSON 데이터
+            const result = await response.json();
+
+            // HTML 콘텐츠 렌더링
+            result.html_results.forEach((item, index) => {
+                const contentElement = document.getElementById(contentIds[index]);
+                if (contentElement) {
+                    contentElement.innerHTML = item.content || `<p>${item.path} 파일을 찾을 수 없습니다.</p>`;
+                } else {
+                    console.warn(`Element with ID '${contentIds[index]}' not found.`);
+                }
+            });
+
+            // 테이블 데이터 렌더링
+            if (result.table_data) {
+                renderTableData(result.table_data);
+            }
+
+            console.log(`Data for year ${year} loaded successfully.`);
+        } catch (error) {
+            console.error("Error fetching graph data:", error);
+
+            // 에러 발생 시 각 탭 콘텐츠에 에러 메시지 표시
+            contentIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = `<p>Error: ${error.message}</p>`;
+                }
+            });
+        }
+    }
+
+    // 테이블에 데이터를 렌더링하는 함수
+    function renderTableData(data) {
+        // 매출, 판관비, 당기순이익 데이터 렌더링
+        if (data.summary && data.summary.length > 0) {
+            const summary = data.summary[0];
+            document.getElementById('sales-value').textContent = summary['매출']?.toLocaleString() || 'N/A';
+            document.getElementById('admin-cost-value').textContent = summary['판관비']?.toLocaleString() || 'N/A';
+            document.getElementById('net-income-value').textContent = summary['당기순이익']?.toLocaleString() || 'N/A';
+        }
+
+        // 카테고리별 판매량 데이터 렌더링
+        if (data.category_sales && data.category_sales.length > 0) {
+            data.category_sales.forEach(item => {
+                const categoryIdMap = {
+                    '상의': 'top_value',
+                    '하의': 'bottom_value',
+                    '운동화': 'running_shoes_value',
+                    '단화': 'loafers_value',
+                    '슬리퍼': 'slippers_value'
+                };
+                const elementId = categoryIdMap[item['카테고리']];
+                if (elementId) {
+                    document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+    }
+
+</script>
 </body>
 </html>
