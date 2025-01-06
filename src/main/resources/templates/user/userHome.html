@@ -2,8 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/user/layouts/defaultLayout}"
-      layout:fragment="Content">
+      layout:decorate="~{common/user/layouts/defaultLayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,23 +11,22 @@
     <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
 </head>
 <body>
-
-<div class="slider">
-    <div class="slides">
-        <div class="slide" th:each="slider : ${sliders}">
-            <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
-            <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+<div layout:fragment="content">
+    <div class="slider">
+        <div class="slides">
+            <div class="slide" th:each="slider : ${sliders}">
+                <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
+                <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+            </div>
+            <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
+            <div th:if="${#lists.isEmpty(sliders)}" class="slide">
+                <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+            </div>
         </div>
-        <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
-        <div th:if="${#lists.isEmpty(sliders)}" class="slide">
-            <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
-        </div>
+        <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-    <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
-    <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
 
-<main>
     <div class="container">
         <h1>BEST ITEM</h1>
 
@@ -59,10 +57,8 @@
         </div>
     </div>
 
-
-    <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
-
-</main>
+</div>
+        <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
 
 </body>
 </html>

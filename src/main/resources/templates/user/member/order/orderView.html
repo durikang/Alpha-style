@@ -9,37 +9,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>주문 조회</title>
     <link rel="stylesheet" th:href="@{/user/css/order/orderView.css}"/>
-    <script th:src="@{/user/js/order/orderView.js}" th:inline="none"></script>
+    <!-- Font Awesome (필요 시 추가) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-pap7...your-integrity-hash..."
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<div class="board">
-    <h1>주문조회</h1>
-    <table class="post-list">
-        <thead>
-        <tr>
-            <th>주문번호</th> <th>주문날짜</th> <th>제품명</th> <th>제품기격</th> <th>도착예정일</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr><td>1</td> <td>2025-01-02</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>2</td> <td>2025-01-03</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>3</td> <td>2025-01-04</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>4</td> <td>2025-01-05</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>5</td> <td>2025-01-06</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>6</td> <td>2025-01-07</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>7</td> <td>2025-01-08</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>8</td> <td>2025-01-09</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>9</td> <td>2025-01-10</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        <tr><td>10</td> <td>2025-01-11</td> <td><a href="#">코오트</a></td ><td>39800</td> <td>2025-01-05</td></tr>
-        </tbody>
-    </table>
-    <div class="page-nav">
-        <a href="#" class="prev">이전</a>
-        <a href="#" class="page">1</a>
-        <a href="#" class="page">2</a>
-        <a href="#" class="page">3</a>
-        <a href="#" class="next">다음</a>
+<main>
+    <div class="board">
+        <h1>주문 조회</h1>
+
+        <!-- 검색 및 필터 바 -->
+        <div th:replace="~{common/admin/fragments/searchBar(
+        actionUrl=${actionUrl},
+        keywordPlaceholder='검색어 입력...',
+        keyword=${keyword},
+        filters=null
+    )}"></div>
+
+
+        <!-- 주문 목록 테이블 -->
+        <table class="post-list">
+            <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>주문날짜</th>
+                <th>제품명</th>
+                <th>제품가격</th>
+                <th>도착예정일</th>
+                <th>배송 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 주문 데이터 반복 -->
+            <tr th:each="order : ${ordersPage.content}">
+                <td th:text="${order.orderNo}">1</td>
+                <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd')}">2025-01-02</td>
+                <td>
+                    <a th:if="${order.orderDetails != null and !order.orderDetails.isEmpty() and order.orderDetails[0].item != null}"
+                       th:href="@{/user/product/items/{id}(id=${order.orderDetails[0].item.itemId})}"
+                       th:text="${order.orderDetails[0].item.itemName}">
+                    </a>
+                    <span th:if="${order.orderDetails == null or order.orderDetails.isEmpty() or order.orderDetails[0].item == null}">
+            상품 정보 없음
+        </span>
+                </td>
+                <td th:text="${order.orderDetails != null and !order.orderDetails.isEmpty() ? order.orderDetails[0].getFormattedSubtotal() : ''}">
+                    39,800 원
+                </td>
+                <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd') + 3}">2025-01-05</td>
+                <td th:text="${order.deliveryStatus}">배송 중</td>
+            </tr>
+
+            <!-- 주문이 없을 경우 -->
+            <tr th:if="${ordersPage.content.empty}">
+                <td colspan="6">주문이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 특정 조건에 따라 pagination3.html 사용 -->
+        <!-- 예: 주문 데이터가 없을 때 별도의 페이지네이션 로직 적용 -->
+        <div th:if="${ordersPage.content.empty and totalPages > 0}"
+             th:replace="~{common/admin/fragments/pagination3(
+                startPage=${startPage},
+                endPage=${endPage},
+                totalPages=${totalPages},
+                currentPage=${currentPage},
+                url='/user/order-check/user/' + ${userId},
+                keyword=${keyword},
+                sortField=${sortField},
+                sortDirection=${sortDirection}
+            )}"></div>
+
+
     </div>
-</div>
+</main>
 </body>
 </html>

@@ -1,0 +1,84 @@
+body, h1, h2, p, table {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.board {
+    width: 80%;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.board h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.order-summary, .order-details {
+    margin-bottom: 30px;
+}
+
+.order-summary h2, .order-details h2 {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.order-summary p, .order-details p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.detail-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.detail-list th, .detail-list td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.detail-list th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .board {
+        width: 95%;
+    }
+
+    .detail-list th, .detail-list td {
+        padding: 8px;
+    }
+
+    .back-button {
+        padding: 8px 16px;
+    }
+}
