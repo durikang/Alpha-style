@@ -5,10 +5,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import page.admin.admin.item.domain.UploadFile;
 import page.admin.admin.manager.domain.Slider;
+import page.admin.admin.manager.exception.InvalidFileException;
+import page.admin.admin.manager.exception.SliderSaveException;
 import page.admin.admin.manager.repository.SliderRepository;
 import page.admin.admin.manager.service.SliderService;
 import page.admin.common.utils.file.FileStore;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -31,14 +34,23 @@ public class SliderServiceImpl implements SliderService {
 
     @Override
     public Slider saveSlider(Slider slider, MultipartFile imageFile) {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            UploadFile uploadFile = fileStore.storeFile(imageFile);
-            // imageUrl을 /files/{storeFileName} 형식으로 설정
-            slider.setImageUrl("/files/" + uploadFile.getStoreFileName());
-            // 필요 시, UploadFile 엔티티에 대한 추가 저장 로직
+        try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                UploadFile uploadFile = fileStore.storeFile(imageFile);
+
+                // 파일 저장이 실패했거나 유효하지 않다면 사용자 정의 예외 발생
+                if (uploadFile == null || !fileStore.isValidFile(uploadFile)) {
+                    throw new InvalidFileException("파일 형식이 유효하지 않습니다.");
+                }
+
+                slider.setImageUrl("/files/" + uploadFile.getStoreFileName());
+            }
+            return sliderRepository.save(slider);
+        } catch (IOException e) {
+            throw new SliderSaveException("파일 저장 중 오류 발생", e);
         }
-        return sliderRepository.save(slider);
     }
+
 
 
     @Override

@@ -6,11 +6,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import page.admin.admin.item.domain.UploadFile;
 import page.admin.admin.manager.domain.Slider;
+import page.admin.admin.manager.exception.InvalidFileException;
 import page.admin.admin.manager.service.SliderService;
 import page.admin.common.utils.Alert;
-import page.admin.common.utils.file.FileStore;
 
 import java.util.List;
 
@@ -38,15 +37,24 @@ public class SliderController {
 
     // 슬라이더 저장 (추가 및 수정)
     @PostMapping("/save")
-    public String saveSlider(@ModelAttribute Slider slider, @RequestParam("imageFile") MultipartFile imageFile, RedirectAttributes redirectAttributes) {
+    public String saveSlider(
+            @ModelAttribute Slider slider,
+            @RequestParam("imageFile") MultipartFile imageFile,
+            RedirectAttributes redirectAttributes) {
         try {
             sliderService.saveSlider(slider, imageFile);
-            redirectAttributes.addFlashAttribute("alert", new Alert("슬라이더가 성공적으로 저장되었습니다.", Alert.AlertType.SUCCESS));
+            redirectAttributes.addFlashAttribute("alert",
+                    new Alert("슬라이더가 성공적으로 저장되었습니다.", Alert.AlertType.SUCCESS));
+        } catch (InvalidFileException e) {
+            redirectAttributes.addFlashAttribute("alert",
+                    new Alert("유효하지 않은 파일 형식입니다.", Alert.AlertType.ERROR));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("alert", new Alert("슬라이더 저장 중 오류가 발생했습니다.", Alert.AlertType.ERROR));
+            redirectAttributes.addFlashAttribute("alert",
+                    new Alert("슬라이더 저장 중 알 수 없는 오류가 발생했습니다.", Alert.AlertType.ERROR));
         }
         return "redirect:/admin/user/slider";
     }
+
 
     // 슬라이더 수정 페이지
     @GetMapping("/edit/{id}")

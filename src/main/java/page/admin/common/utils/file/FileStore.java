@@ -46,6 +46,11 @@ public class FileStore {
             return null;
         }
 
+        // 파일 검증
+        if (!isValidFile(multipartFile)) {
+            throw new FileProcessingException("유효하지 않은 파일입니다.");
+        }
+
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
 
@@ -60,6 +65,7 @@ public class FileStore {
         }
     }
 
+
     // 다중 파일 저장
     public Set<UploadFile> storeFiles(Set<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
@@ -69,8 +75,8 @@ public class FileStore {
 
         Set<UploadFile> storedFiles = new HashSet<>();
         for (MultipartFile file : files) {
-            if (file.isEmpty()) {
-                log.warn("Empty file skipped: {}", file.getOriginalFilename());
+            if (file.isEmpty() || !isValidFile(file)) {
+                log.warn("유효하지 않은 파일: {}", file.getOriginalFilename());
                 continue;
             }
 
@@ -85,6 +91,7 @@ public class FileStore {
         }
         return storedFiles;
     }
+
 
     // 파일 교체
     public UploadFile replaceFile(UploadFile existingFile, MultipartFile newFile) {
@@ -179,4 +186,37 @@ public class FileStore {
     public String getFileDir() {
         return fileDir;
     }
+
+    // 파일 검증 메서드
+    private boolean isValidFile(MultipartFile file) {
+        // 허용된 파일 확장자
+        Set<String> allowedExtensions = Set.of("jpg", "jpeg", "png", "gif");
+
+        // 최대 파일 크기 (5MB 예제)
+        final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+        // 파일 이름 및 크기 확인
+        if (file == null || file.isEmpty()) {
+            log.warn("파일이 비어있습니다.");
+            return false;
+        }
+
+        // 파일 확장자 추출 및 검증
+        String originalFilename = file.getOriginalFilename();
+        String extension = extractExt(originalFilename).toLowerCase();
+        if (!allowedExtensions.contains(extension)) {
+            log.warn("허용되지 않은 파일 형식입니다: {}", extension);
+            return false;
+        }
+
+        // 파일 크기 검증
+        if (file.getSize() > MAX_FILE_SIZE) {
+            log.warn("파일 크기가 너무 큽니다. 크기: {} bytes", file.getSize());
+            return false;
+        }
+
+        return true;
+    }
+
+
 }
