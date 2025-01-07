@@ -226,7 +226,6 @@
 
 <script>
     async function setYearAndLoadGraph(year) {
-        // Hidden input에 선택한 연도 값 설정
         document.getElementById('selected-year').value = year;
 
         const contentIds = [
@@ -239,17 +238,15 @@
         ];
 
         try {
-            // 각 탭 콘텐츠에 로딩 메시지 표시
             contentIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
                     element.innerHTML = '<p class="loading">Loading...</p>';
                 } else {
-                    console.warn(Element with ID '${id}' not found. Skipping.);
+                    console.warn(`Element with ID '${id}' not found. Skipping.`);
                 }
             });
 
-            // 서버에 연도 데이터를 요청
             const response = await fetch('http://127.0.0.1:5000/graph', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -257,41 +254,59 @@
             });
 
             if (!response.ok) {
-                throw new Error(Server responded with status ${response.status});
+                throw new Error(`Server responded with status ${response.status}`);
             }
 
-            // 서버에서 받은 JSON 데이터
             const result = await response.json();
-
-            // HTML 콘텐츠 렌더링
-            result.html_results.forEach((item, index) => {
-                const contentElement = document.getElementById(contentIds[index]);
-                if (contentElement) {
-                    contentElement.innerHTML = item.content || <p>${item.path} 파일을 찾을 수 없습니다.</p>;
-                } else {
-                    console.warn(Element with ID '${contentIds[index]}' not found.);
-                }
-            });
 
             // 테이블 데이터 렌더링
             if (result.table_data) {
                 renderTableData(result.table_data);
             }
 
-            console.log(Data for year ${year} loaded successfully.);
+            // 그래프 데이터 렌더링
+            if (result.graph_data) {
+                renderGraphs(result.graph_data);
+            }
+
+            console.log(`Data for year ${year} loaded successfully.`);
         } catch (error) {
             console.error("Error fetching graph data:", error);
 
-            // 에러 발생 시 각 탭 콘텐츠에 에러 메시지 표시
             contentIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
-                    element.innerHTML = <p>Error: ${error.message}</p>;
+                    element.innerHTML = `<p>Error: ${error.message}</p>`;
                 }
             });
         }
     }
 
+    function renderGraphs(graphData) {
+        // 예시: Leaflet 지도를 tab-content에 렌더링
+        const mapContainer = document.getElementById('tab-content');
+        if (mapContainer && graphData.map) {
+            mapContainer.innerHTML = ''; // 기존 내용을 지우기
+
+            // Leaflet 맵 초기화
+            const map = L.map(mapContainer).setView([graphData.map.latitude, graphData.map.longitude], graphData.map.zoom);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // 마커 추가 (예시)
+            if (graphData.map.markers) {
+                graphData.map.markers.forEach(marker => {
+                    L.marker([marker.lat, marker.lng]).addTo(map)
+                        .bindPopup(marker.popup || '');
+                });
+            }
+        }
+
+        // 다른 그래프도 유사하게 렌더링
+        // 예: 'tab-content1'에 다른 유형의 그래프 렌더링
+    }
     // 테이블에 데이터를 렌더링하는 함수
     function renderTableData(data) {
         // 매출, 판관비, 당기순이익 데이터 렌더링
