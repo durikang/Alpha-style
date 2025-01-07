@@ -1,3 +1,5 @@
+/* userHome.css */
+
 /* 공통 변수 */
 :root {
     --slider-height: 90vh;
@@ -65,7 +67,7 @@
 .container {
     width: 90%;
     margin: 0 auto;
-    padding-left: 50px;
+    padding: 0 20px; /* 좌우 패딩으로 변경 */
 }
 
 h1 {
@@ -179,11 +181,10 @@ h1 {
     color: #007bff;
 }
 
-
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .container {
-        padding-left: 20px;
+        padding: 0 10px; /* 작은 화면에서 패딩 감소 */
     }
 
     .item img {
