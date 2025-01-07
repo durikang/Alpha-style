@@ -85,7 +85,7 @@
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 4px;
-            height: 400px;
+            height: 600px;
             overflow: hidden; /* 스크롤 바 제거 */
         }
 
@@ -109,7 +109,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 10px;
-            height: 500px; /* 고정 높이 */
+            height: 600px; /* 고정 높이 */
             overflow: hidden; /* 스크롤 제거 */
         }
 
@@ -126,6 +126,16 @@
 
         table th {
             background-color: #f2f2f2;
+        }
+        /* 테이블 가로 배치 */
+        #tab-content-additional3 {
+            display: flex; /* Flexbox 적용 */
+            gap: 20px; /* 테이블 간 간격 */
+        }
+
+        #tab-content-additional3 table {
+            flex: 1; /* 각 테이블이 동일한 너비를 차지하도록 설정 */
+            margin: 0; /* 테이블 외 여백 제거 */
         }
     </style>
 </head>
@@ -175,6 +185,20 @@
                 </tr>
                 </tbody>
             </table>
+            <table id="analysis-table1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td1" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="tab-row">
@@ -210,24 +234,134 @@
                 </tr>
                 </tbody>
             </table>
+            <table id="analysis-table2" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td2" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="tab-row">
         <div class="tab-content" id="tab-content2"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
         <div class="tab-content" id="tab-content2-additional"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
     </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content-additional3">
+            <table id="analysis-table3" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td3" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table4" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td4" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="tab-content" id="tab-content3">
         <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
+    </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content-additional4">
+            <table id="analysis-table5" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td5" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="tab-content_map" id="tab-content4">
         <p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p>
     </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content-additional5">
+            <table id="analysis-table6" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td6" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </main>
 
 <script>
-    async function setYearAndLoadGraph(year) {
-        document.getElementById('selected-year').value = year;
+    function setYearAndLoadGraph(year) {
+        console.log('버튼에서 넘긴 year 값:', year); // year 값 확인
+        loadDataAndRender(year);
+        showAnalysisTableByYear1(year);
+        showAnalysisTableByYear2(year);
+        showAnalysisTableByYear3(year);
+        showAnalysisTableByYear4(year);
+        showAnalysisTableByYear5(year);
+        showAnalysisTableByYear6(year);
 
+    }
+
+    // 스크립트 실행 함수
+    function executeScripts(container) {
+        const scripts = container.querySelectorAll('script');
+        scripts.forEach((oldScript) => {
+            const newScript = document.createElement('script');
+            [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            if (oldScript.src) {
+                newScript.src = oldScript.src;
+            } else {
+                newScript.textContent = oldScript.textContent;
+            }
+            document.body.appendChild(newScript);
+            oldScript.remove();
+        });
+    }
+
+    // 데이터를 로드하고 콘텐츠를 렌더링하는 함수
+    async function loadDataAndRender(year) {
         const contentIds = [
             'tab-content',
             'tab-content1',
@@ -238,6 +372,7 @@
         ];
 
         try {
+            // 로딩 메시지 표시
             contentIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
@@ -247,6 +382,7 @@
                 }
             });
 
+            // 서버 요청
             const response = await fetch('http://127.0.0.1:5000/graph', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -254,70 +390,52 @@
             });
 
             if (!response.ok) {
-                throw new Error(`Server responded with status ${response.status}`);
+                throw new Error(`Error: ${response.status}`);
             }
 
+            // JSON 데이터 파싱
             const result = await response.json();
+
+            // HTML 콘텐츠 렌더링
+            result.html_results.forEach((item, index) => {
+                const contentElement = document.getElementById(contentIds[index]);
+                if (contentElement) {
+                    contentElement.innerHTML = item.content || `<p>${item.path} 파일을 찾을 수 없습니다.</p>`;
+                    executeScripts(contentElement); // HTML 삽입 후 스크립트 실행
+                } else {
+                    console.warn(`Element with ID '${contentIds[index]}' not found.`);
+                }
+            });
 
             // 테이블 데이터 렌더링
             if (result.table_data) {
                 renderTableData(result.table_data);
             }
 
-            // 그래프 데이터 렌더링
-            if (result.graph_data) {
-                renderGraphs(result.graph_data);
-            }
-
             console.log(`Data for year ${year} loaded successfully.`);
         } catch (error) {
-            console.error("Error fetching graph data:", error);
-
+            // 에러 처리
             contentIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
                     element.innerHTML = `<p>Error: ${error.message}</p>`;
                 }
             });
+            console.error("Error fetching graph data:", error);
         }
     }
 
-    function renderGraphs(graphData) {
-        // 예시: Leaflet 지도를 tab-content에 렌더링
-        const mapContainer = document.getElementById('tab-content');
-        if (mapContainer && graphData.map) {
-            mapContainer.innerHTML = ''; // 기존 내용을 지우기
-
-            // Leaflet 맵 초기화
-            const map = L.map(mapContainer).setView([graphData.map.latitude, graphData.map.longitude], graphData.map.zoom);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // 마커 추가 (예시)
-            if (graphData.map.markers) {
-                graphData.map.markers.forEach(marker => {
-                    L.marker([marker.lat, marker.lng]).addTo(map)
-                        .bindPopup(marker.popup || '');
-                });
-            }
-        }
-
-        // 다른 그래프도 유사하게 렌더링
-        // 예: 'tab-content1'에 다른 유형의 그래프 렌더링
-    }
-    // 테이블에 데이터를 렌더링하는 함수
+    // 테이블 데이터 렌더링 함수
     function renderTableData(data) {
-        // 매출, 판관비, 당기순이익 데이터 렌더링
         if (data.summary && data.summary.length > 0) {
-            const summary = data.summary[0];
-            document.getElementById('sales-value').textContent = summary['매출']?.toLocaleString() || 'N/A';
-            document.getElementById('admin-cost-value').textContent = summary['판관비']?.toLocaleString() || 'N/A';
-            document.getElementById('net-income-value').textContent = summary['당기순이익']?.toLocaleString() || 'N/A';
+            const overall = data.summary.find(item => item.년도 === '전체') || {};
+            const summary = data.summary[0]; // 첫 번째 데이터 기준
+
+            document.getElementById('sales-value').textContent = overall['매출']?.toLocaleString() || summary['매출']?.toLocaleString() || 'N/A';
+            document.getElementById('admin-cost-value').textContent = overall['판관비']?.toLocaleString() || summary['판관비']?.toLocaleString() || 'N/A';
+            document.getElementById('net-income-value').textContent = overall['당기순이익']?.toLocaleString() || summary['당기순이익']?.toLocaleString() || 'N/A';
         }
 
-        // 카테고리별 판매량 데이터 렌더링
         if (data.category_sales && data.category_sales.length > 0) {
             data.category_sales.forEach(item => {
                 const categoryIdMap = {
@@ -335,6 +453,292 @@
         }
     }
 
+    // 버튼 클릭 이벤트 등록
+    document.querySelectorAll('.tabs button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const year = event.target.dataset.year || event.target.textContent === '전체' ? 'all' : event.target.textContent;
+            loadDataAndRender(year);
+        });
+    });
+
+    function showAnalysisTableByYear1(year) {
+        const td1 = document.getElementById('analysis-td1');
+
+
+        // 2. 연도별 텍스트 분기
+        let analysisText = '';
+        switch (year) {
+
+            case '2020':
+                analysisText = `<strong>2020년 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+매출 : 2020년의 매출 규모는 판관비 대비 상당히 높아,<br> 수익 창출 잠재력이 큰 해임을 보여줍니다.<br>
+판관비 : 판관비가 매출에 비해 큰 비중을 차지하여 비용 구조의 효율화 필요성이 제기됩니다.<br>
+당기순이익 : 당기순이익이 매출 및 판관비에 비해 매우 낮은 수준으로,<br> 수익성을 개선하기 위한 추가적인 전략이 필요합니다.<br>
+이 그래프는 2020년 한 해 동안의 매출, 판관비, 당기순이익의 관계를 명확히 보여주며, <br>비용 구조와 수익성을 개선하기 위한 기초 데이터를 제공합니다.<br>
+분석 결과 : 2020년의 데이터는 매출이 판관비를 약간 상회하나, <br>당기순이익이 낮은 수준에 머물러 있음을 보여줍니다. <br>이를 통해 효율적인 비용 관리와 수익성을 높이기 위한 매출 증대 전략이 절실히 요구됨을 알 수 있습니다.`;
+                break;
+            case '2021':
+                analysisText = `<strong>2021년 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+매출: 2021년 매출은 약 30억 원으로, 전년 대비 큰 폭으로 증가했습니다.<br>
+판관비: 판관비는 약 25억 원으로 매출 증가에 비례해<br> 상승했으나 효율적으로 관리된 모습입니다.<br>
+당기순이익: 당기순이익은 약 5억 원으로 전년 대비 크게 개선되었습니다.<br>
+분석 결과 : 2021년은 매출과 당기순이익이 모두 상승하며 수익성이 개선된 해입니다.<br>
+판관비가 증가했지만, 매출 증가율이 더 커<br> 비용 구조가 효율적으로 관리되었음을 확인할 수 있습니다.<br>
+이는 회사가 지속 가능한 성장을 위한 기반을 구축하고 있음을 나타냅니다.`;
+                break;
+            case '2022':
+                analysisText = `<strong>2022년 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+매출: 2022년 매출은 약 25억 원으로 전년 대비 소폭 감소했으며,<br> 이는 시장 수요 감소 또는 경쟁 심화로 인해 매출 성장세가 주춤했음을 보여줍니다.<br>
+판관비: 판관비는 약 22억 원으로 매출 감소와 비례하여 줄었지만,<br> 여전히 매출 대비 높은 비중을 차지하고 있어 비용 구조의 추가적인 개선이 필요합니다.<br>
+당기순이익: 당기순이익은 약 3억 원으로 전년 대비 소폭 감소했으며,<br> 매출 감소와 판관비 비중이 수익성에 부정적인 영향을 미쳤음을 시사합니다.<br>
+분석결과: 2022년은 매출과 당기순이익이 모두 감소한 해로,<br> 시장 변화에 민감하게 반응한 결과를 보여줍니다.<br>
+매출 감소로 인해 비용도 줄었지만, 판관비가 여전히 높은 수준을 유지하고 있어<br>
+효율적인 비용 구조 재검토와 매출 증대 전략이 필요합니다. <br>
+이는 회사가 성장 정체기를 맞이했음을 암시하며, <br>
+이를 돌파하기 위한 적극적인 마케팅 전략과 비용 관리가 중요합니다.`;
+                break;
+            case '2023':
+                analysisText = `<strong>2023년 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+매출: 2023년 매출은 약 30억 원으로, 전년 대비 뚜렷한 회복세를 보이며<br>
+안정적인 성장을 이루었습니다. <br>
+이는 시장 수요 회복이나 성공적인 비즈니스 전략의 결과로 보입니다.<br>
+판관비: 판관비는 약 25억 원으로, 매출 증가에 따라 함께 상승했으나<br>
+여전히 매출 대비 높은 비중을 차지하고 있습니다. <br>
+비용 관리의 개선 여지는 여전히 남아 있습니다.<br>
+당기순이익: 당기순이익은 약 5억 원으로, <br>
+전년 대비 증가하며 수익성이 다시 강화되었습니다.
+분석결과: 2023년은 매출이 뚜렷하게 회복되고 당기순이익이 개선된 해로, <br>
+비즈니스의 긍정적인 변화가 두드러졌습니다. <br>
+하지만 판관비의 비중이 여전히 높아 효율적인 비용 관리를 통해 <br>
+추가적인 수익성 강화를 이뤄야 할 필요가 있습니다. <br>
+회복된 성장세를 유지하기 위해 지속적인 투자와 전략적 접근이 중요합니다.`;
+                break;
+            case '2024':
+                analysisText = `<strong>2024년 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+매출: 2024년 매출은 약 50억 원으로, 전년도 대비 큰 폭으로 증가하며 <br>
+가파른 성장세를 보였습니다. <br>
+이는 시장 점유율 확대나 전략적 성공의 결과로 해석됩니다.<br>
+판관비: 판관비는 약 40억 원으로, 매출 증가에 따라 함께 상승했지만 <br>
+여전히 높은 비중을 차지하고 있어 비용 관리의 지속적인 개선이 필요합니다.<br>
+당기순이익: 당기순이익은 약 10억 원으로, <br>
+매출 증가와 함께 크게 상승하여 수익성이 눈에 띄게 개선되었습니다.<br>
+분석결과: 2024년은 매출과 수익성이 크게 향상된 해로, <br>
+사업의 전반적인 성장이 돋보이는 해입니다. <br>
+다만, 판관비가 높은 수준을 유지하고 있어 비용 효율화를 통해 수익성을 더욱 강화할 필요가 있습니다. <br>
+빠르게 증가하는 매출을 기반으로, <br>
+지속 가능한 성장을 위해 비용 구조 최적화와 투자 전략 수립이 중요합니다.`;
+                break;
+            case 'all':
+                analysisText = `<strong>전체년도 매출, 판관비 및 당기순이익 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            default:
+                analysisText = `분석 결과가 없습니다.`;
+        }
+
+        // 3. 셀에 HTML 삽입
+        td1.innerHTML = analysisText;
+    }
+    function showAnalysisTableByYear2(year) {
+        const td2 = document.getElementById('analysis-td2');
+
+        // 2. 연도별 텍스트 분기
+        let analysisText = '';
+        switch (year) {
+            case '2020':
+                analysisText = `<strong>2020년 카테고리별 분석 요약</strong><br><br>
+                            매출 대비 판관비 비율이 88.5%입니다.`;
+                break;
+            case '2021':
+                analysisText = `<strong>2021년 카테고리별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2022':
+                analysisText = `<strong>2022년 카테고리별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2023':
+                analysisText = `<strong>2023년 카테고리별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2024':
+                analysisText = `<strong>2024년 카테고리별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case 'all':
+                analysisText = `<strong>전체년도 카테고리별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            default:
+                analysisText = `분석 결과가 없습니다.`;
+        }
+
+        // 3. 셀에 HTML 삽입
+        td2.innerHTML = analysisText;
+    }
+    function showAnalysisTableByYear3(year) {
+        const td3 = document.getElementById('analysis-td3');
+
+
+        // 2. 연도별 텍스트 분기
+        let analysisText = '';
+        switch (year) {
+
+            case '2020':
+                analysisText = `<strong>2020년 나이대별 분석 요약</strong><br><br>
+                            매출 대비 판관비 비율이 88.5%입니다.`;
+                break;
+            case '2021':
+                analysisText = `<strong>2021년 나이대별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2022':
+                analysisText = `<strong>2022년 나이대별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2023':
+                analysisText = `<strong>2023년 나이대별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2024':
+                analysisText = `<strong>2024년 나이대별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case 'all':
+                analysisText = `<strong>전체년도 나이대별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            default:
+                analysisText = `분석 결과가 없습니다.`;
+        }
+
+        // 3. 셀에 HTML 삽입
+        td3.innerHTML = analysisText;
+    }
+        function showAnalysisTableByYear4(year) {
+            const td4 = document.getElementById('analysis-td4');
+
+
+            // 2. 연도별 텍스트 분기
+            let analysisText = '';
+            switch (year) {
+
+                case '2020':
+                    analysisText = `<strong>2020년 성별별 분석 요약</strong><br><br>
+                            매출 대비 판관비 비율이 88.5%입니다.`;
+                    break;
+                case '2021':
+                    analysisText = `<strong>2021년 성별별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                    break;
+                case '2022':
+                    analysisText = `<strong>2022년 성별별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                    break;
+                case '2023':
+                    analysisText = `<strong>2023년 성별별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                    break;
+                case '2024':
+                    analysisText = `<strong>2024년 성별별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                    break;
+                case 'all':
+                    analysisText = `<strong>전체년도 성별별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                    break;
+                default:
+                    analysisText = `분석 결과가 없습니다.`;
+            }
+
+            // 3. 셀에 HTML 삽입
+            td4.innerHTML = analysisText;
+        }
+
+            function showAnalysisTableByYear5(year) {
+                const td5 = document.getElementById('analysis-td5');
+
+
+                // 2. 연도별 텍스트 분기
+                let analysisText = '';
+                switch (year) {
+
+                    case '2020':
+                        analysisText = `<strong>2020년 상위 유저 소비 분석 요약</strong><br><br>
+                            매출 대비 판관비 비율이 88.5%입니다.`;
+                        break;
+                    case '2021':
+                        analysisText = `<strong>2021년 상위 유저 소비 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                        break;
+                    case '2022':
+                        analysisText = `<strong>2022년 상위 유저 소비 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                        break;
+                    case '2023':
+                        analysisText = `<strong>2023년 상위 유저 소비 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                        break;
+                    case '2024':
+                        analysisText = `<strong>2024년 상위 유저 소비 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                        break;
+                    case 'all':
+                        analysisText = `<strong>전체년도 상위 유저 소비 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                        break;
+                    default:
+                        analysisText = `분석 결과가 없습니다.`;
+                }
+
+                // 3. 셀에 HTML 삽입
+                td5.innerHTML = analysisText;
+            }
+
+    function showAnalysisTableByYear6(year) {
+        const td6 = document.getElementById('analysis-td6');
+
+
+        // 2. 연도별 텍스트 분기
+        let analysisText = '';
+        switch (year) {
+
+            case '2020':
+                analysisText = `<strong>2020년 지역별 분석 요약</strong><br><br>
+`;
+                break;
+            case '2021':
+                analysisText = `<strong>2021년 지역별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2022':
+                analysisText = `<strong>2022년 지역별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2023':
+                analysisText = `<strong>2023년 지역별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case '2024':
+                analysisText = `<strong>2024년 지역별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            case 'all':
+                analysisText = `<strong>전체년도 지역별 분석 요약</strong><br><br>
+                            ... (분석 내용)...`;
+                break;
+            default:
+                analysisText = `분석 결과가 없습니다.`;
+        }
+
+        // 3. 셀에 HTML 삽입
+        td6.innerHTML = analysisText;
+    }
+
 </script>
+
+
+
+
 </body>
 </html>
