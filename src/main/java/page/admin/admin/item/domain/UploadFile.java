@@ -1,12 +1,11 @@
 package page.admin.admin.item.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -20,12 +19,13 @@ public class UploadFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq")
-    @SequenceGenerator(name = "upload_file_seq", sequenceName = "UPLOAD_FILE_SEQ", allocationSize = 1)
     private Long id;
-
 
     private String uploadFileName;
     private String storeFileName;
+
+    @CreationTimestamp
+    private LocalDateTime uploadTime; // 업로드 시간
 
     // 기존 생성자
     public UploadFile(String uploadFileName, String storeFileName) {
@@ -33,9 +33,9 @@ public class UploadFile {
         this.storeFileName = storeFileName;
     }
 
-    // URL만 사용하는 생성자 추가
+    // URL만 사용하는 생성자 (필요에 따라 수정 또는 제거)
     public UploadFile(String url) {
-        this.uploadFileName = url; // 업로드 파일명에도 URL 설정
-        this.storeFileName = url; // 저장 파일명에도 URL 설정
+        this.uploadFileName = url;
+        this.storeFileName = url;
     }
 }

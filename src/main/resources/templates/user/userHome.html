@@ -7,9 +7,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
-    <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
+
 </head>
 <body>
+
+<div layout:fragment="pageStyles">
+    <link rel="stylesheet" th:href="@{/user/css/userHome.css}"/>
+    <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
+    <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
+</div>
 
 <!-- Slider 프래그먼트 정의 -->
 <div layout:fragment="slider">
@@ -31,7 +37,7 @@
 
 <!-- Content 프래그먼트 정의 -->
 <div layout:fragment="content">
-    <link rel="stylesheet" th:href="@{/user/css/userHome.css}"/>
+
     <div class="container">
         <h1>BEST ITEM</h1>
 
@@ -62,8 +68,5 @@
         </div>
     </div>
 </div>
-
-        <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
-
 </body>
 </html>
