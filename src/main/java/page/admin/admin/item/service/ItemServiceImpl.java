@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,12 +16,14 @@ import page.admin.admin.item.domain.dto.ItemSaveForm;
 import page.admin.admin.item.domain.dto.ItemUpdateForm;
 import page.admin.admin.item.domain.dto.ItemViewForm;
 import page.admin.admin.item.repository.*;
+import page.admin.admin.manager.domain.dto.CategoryWithItemsDTO;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.member.repository.MemberRepository;
 import page.admin.common.utils.exception.DataNotFoundException;
 import page.admin.common.utils.file.FileStore;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +44,7 @@ public class ItemServiceImpl implements ItemService {
     private final MemberRepository memberRepository;
     private final MainCategoryRepository mainCategoryRepository;
     private final SubCategoryRepository subCategoryRepository;
+
 
     // ======================================
     // 1) 상품 등록
@@ -189,6 +194,33 @@ public class ItemServiceImpl implements ItemService {
     }
 
     // ======================================
+    // 11) 메인 카테고리별로 최대 4개의 상품 조회
+    // ======================================
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryWithItemsDTO> getItemsGroupedByMainCategory(int limitPerCategory) {
+        List<MainCategory> mainCategories = mainCategoryRepository.findAll();
+        List<CategoryWithItemsDTO> result = new ArrayList<>();
+
+        for (MainCategory mainCategory : mainCategories) {
+            List<Item> items = itemRepository.findTop4ByMainCategoryIdAndOpenTrueOrderBySalePriceDesc(mainCategory.getId());
+            if (!items.isEmpty()) {
+                result.add(new CategoryWithItemsDTO(mainCategory, items));
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Item> findItemsByMainCategoryWithOffset(Long mainCategoryId, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("salePrice").descending());
+        return itemRepository.findByMainCategoryIdAndOpenTrue(mainCategoryId, pageable).getContent();
+    }
+
+
+    // ======================================
     // 8) 단일 삭제
     // ======================================
     @Override
@@ -223,7 +255,8 @@ public class ItemServiceImpl implements ItemService {
     /**
      * Item -> ItemViewForm 변환
      */
-    private ItemViewForm toItemViewForm(Item item) {
+
+    public ItemViewForm toItemViewForm(Item item) {
         return new ItemViewForm(
                 item.getItemId(),
                 item.getItemName(),

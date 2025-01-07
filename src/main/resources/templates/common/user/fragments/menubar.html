@@ -17,7 +17,11 @@
         <div th:if="${session.loginMember != null}">
             <span th:text="'안녕하세요, ' + ${session.loginMember.username} + '님!'"></span>
             <a th:href="@{/logout}" class="user-item">로그아웃</a>
-            <a th:href="@{/user/order-check}" class="user-item">주문조회</a>
+
+            <a th:href="@{/user/order-check/user/{userId}(userId=${session.loginMember.userId})}"
+               class="user-item"
+               th:if="${session.loginMember != null}">주문조회</a>
+
             <a th:href="@{/user/mypage}" class="user-item">마이페이지</a>
 
             <!-- 관리자 권한일 경우 관리자 페이지 링크 추가 -->

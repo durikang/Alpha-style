@@ -319,4 +319,43 @@ public class OrderServiceImpl implements OrderService {
         return query.fetch();
     }
 
+    @Override
+    public Page<Order> getOrdersByUserIdWithFilters(
+            String userId, String keyword, Pageable pageable, String sortField, String sortDirection
+    ) {
+        QOrder order = QOrder.order;
+        QMember user = QMember.member;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(user.userId.eq(userId)); // 로그인한 사용자 ID로 필터링
+
+        if (keyword != null && !keyword.isEmpty()) {
+            builder.and(
+                    user.username.containsIgnoreCase(keyword)
+                            .or(order.deliveryStatus.containsIgnoreCase(keyword))
+            );
+        }
+
+        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(sortField, sortDirection);
+
+        var query = queryFactory
+                .selectFrom(order)
+                .join(order.user, user)
+                .fetchJoin()
+                .where(builder)
+                .orderBy(orderSpecifier);
+
+        List<Order> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = query.fetchCount();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+
+
+
 }

@@ -7,7 +7,6 @@ import page.admin.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryChartDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -90,4 +89,5 @@ public interface OrderService {
      */
     List<OrderSummaryChartDTO> getOrderSummaryChartDataWithQuery(String keyword);
 
+    Page<Order> getOrdersByUserIdWithFilters(String userId, String keyword, Pageable pageable, String sortField, String sortDirection);
 }

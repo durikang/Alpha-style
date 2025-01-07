@@ -2,8 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/user/layouts/defaultLayout}"
-      layout:fragment="Content">
+      layout:decorate="~{common/user/layouts/defaultLayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,121 +11,54 @@
     <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
 </head>
 <body>
-
-<div class="slider">
-    <div class="slides">
-        <div class="slide" th:each="slider : ${sliders}">
-            <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
-            <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+<div layout:fragment="content">
+    <div class="slider">
+        <div class="slides">
+            <div class="slide" th:each="slider : ${sliders}">
+                <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
+                <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+            </div>
+            <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
+            <div th:if="${#lists.isEmpty(sliders)}" class="slide">
+                <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+            </div>
         </div>
-        <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
-        <div th:if="${#lists.isEmpty(sliders)}" class="slide">
-            <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
-        </div>
+        <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-    <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
-    <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
 
-<main>
     <div class="container">
         <h1>BEST ITEM</h1>
-        <div class="item-grid">
-            <!-- Item 1 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+1'" alt="Item 1">
-                <div class="info">
-                    <h2>엘리 헤링본 코트</h2>
-                    <p>35,900원</p>
-                    <p>따뜻한 스타일, 간편한 코디</p>
-                </div>
-            </div>
-            <!-- Item 2 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+2'" alt="Item 2">
-                <div class="info">
-                    <h2>플리스 안감 팬츠</h2>
-                    <p>14,900원</p>
-                    <p>부드러운 착용감과 보온성</p>
-                </div>
-            </div>
-            <!-- Item 3 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+3'" alt="Item 3">
-                <div class="info">
-                    <h2>러블리 플리스 조거 세트</h2>
-                    <p>32,900원</p>
-                    <p>트렌디한 조거 스타일</p>
-                </div>
-            </div>
-        </div>
 
-        <hr>
-
-        <div class="item-grid">
-            <!-- Item 1 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+1'" alt="Item 1">
-                <div class="info">
-                    <h2>엘리 헤링본 코트</h2>
-                    <p>35,900원</p>
-                    <p>따뜻한 스타일, 간편한 코디</p>
+        <!-- 메인 카테고리별 상품 리스트 -->
+        <div th:each="categoryWithItems : ${categoriesWithItems}" class="category-section" data-category-id="${categoryWithItems.mainCategory.id}">
+            <h2 th:text="${categoryWithItems.mainCategory.mainCategoryName}">카테고리 이름</h2>
+            <div class="item-grid" id="item-grid-${categoryWithItems.mainCategory.id}">
+                <div class="item" th:each="item : ${categoryWithItems.items}">
+                    <img th:if="${item.mainImage != null}"
+                         th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
+                         alt="상품 이미지"
+                         style="max-width: 300px; max-height: 300px;" />
+                    <img th:unless="${item.mainImage != null}"
+                         src="https://via.placeholder.com/300x300.png?text=No+Image"
+                         alt="기본 이미지"
+                         style="max-width: 300px; max-height: 300px;" />
+                    <div class="info">
+                        <h2 th:text="${item.itemName}">상품 이름</h2>
+                        <p class="price" th:text="${item.getFormattedSalePrice()}">가격</p>
+                        <!--<p th:text="${item.description}">상품 설명</p>-->
+                        <a th:href="@{/user/product/items/{id}(id=${item.itemId})}" class="btn-view">자세히 보기</a>
+                    </div>
                 </div>
             </div>
-            <!-- Item 2 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+2'" alt="Item 2">
-                <div class="info">
-                    <h2>플리스 안감 팬츠</h2>
-                    <p>14,900원</p>
-                    <p>부드러운 착용감과 보온성</p>
-                </div>
-            </div>
-            <!-- Item 3 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+3'" alt="Item 3">
-                <div class="info">
-                    <h2>러블리 플리스 조거 세트</h2>
-                    <p>32,900원</p>
-                    <p>트렌디한 조거 스타일</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="item-grid">
-            <!-- Item 1 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+1'" alt="Item 1">
-                <div class="info">
-                    <h2>남성용 루즈 레터 패턴 배럴 팬츠</h2>
-                    <p>35,900원</p>
-                    <p>가을 겨울 야외활동, 간편한 코디</p>
-                </div>
-            </div>
-            <!-- Item 2 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+2'" alt="Item 2">
-                <div class="info">
-                    <h2>클래식 블랙 & 그레이 진</h2>
-                    <p>14,900원</p>
-                    <p>부드러운 착용감과 보온성</p>
-                </div>
-            </div>
-            <!-- Item 3 -->
-            <div class="item">
-                <img th:src="'https://via.placeholder.com/300x300.png?text=item+3'" alt="Item 3">
-                <div class="info">
-                    <h2>트레이닝 팬츠</h2>
-                    <p>32,900원</p>
-                    <p>트렌디한 조거 스타일</p>
-                </div>
-            </div>
+            <!-- '더 보기' 버튼 추가 -->
+            <button class="btn-load-more" data-category-id="${categoryWithItems.mainCategory.id}" data-offset="4" data-limit="4">더 보기</button>
+            <span class="loader" id="loader-${categoryWithItems.mainCategory.id}" style="display:none;">Loading...</span>
         </div>
     </div>
 
-    <script th:src="@{/user/js/usermainpagescript.js}"></script>
-    <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
+</div>
+        <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
 
-</main>
 </body>
 </html>

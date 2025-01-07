@@ -1,5 +1,5 @@
 package page.admin.admin.item.service;
-
+import page.admin.admin.manager.domain.dto.CategoryWithItemsDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import page.admin.admin.item.domain.Item;
@@ -41,4 +41,11 @@ public interface ItemService {
 
     // 지역 코드 조회
     Set<String> getItemRegions(Long itemId);
+
+    /**
+     * 메인 카테고리별로 최대 4개의 상품을 조회하는 메서드
+     */
+    List<CategoryWithItemsDTO> getItemsGroupedByMainCategory(int limitPerCategory);
+
+    List<Item> findItemsByMainCategoryWithOffset(Long mainCategoryId, int offset, int limit);
 }
