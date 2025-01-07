@@ -2,13 +2,16 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/user/layouts/defaultLayout}"
-      layout:fragment="Content">
+      layout:decorate="~{common/user/layouts/defaultLayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>단계별 회원가입</title>
+</head>
+<body>
 
+<!-- Slider 프래그먼트 정의 -->
+<div layout:fragment="pageStyles">
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/user/css/general-signup.css}">
 
@@ -22,11 +25,9 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
     <!-- Daum API 스크립트 -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-</head>
-
-<body>
-<main>
-    <div class="signup-form">
+</div>
+<div layout:fragment="content">
+    <div class="signup-form" style="margin-top: 100px;">
         <!-- 로고 이미지 -->
         <div style="text-align: center; margin-bottom: 20px;">
             <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
@@ -176,18 +177,17 @@
             </div>
         </form>
     </div>
-</main>
-
-<!-- Flatpickr Initialization -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        flatpickr("#birthDate", {
-            dateFormat: "Y-m-d",
-            maxDate: "today", // 오늘 날짜 이전만 선택 가능
-            defaultDate: "2000-01-01", // 기본값
-            locale: "ko" // 한국어로 변경
+    <!-- Flatpickr Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#birthDate", {
+                dateFormat: "Y-m-d",
+                maxDate: "today", // 오늘 날짜 이전만 선택 가능
+                defaultDate: "2000-01-01", // 기본값
+                locale: "ko" // 한국어로 변경
+            });
         });
-    });
-</script>
+    </script>
+</div>
 </body>
 </html>

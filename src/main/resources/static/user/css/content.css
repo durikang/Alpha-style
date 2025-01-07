@@ -13,10 +13,54 @@ body {
     min-height: 100vh; /* 화면 전체 높이 */
 }
 
+/* Slider 영역 */
+.slider {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Navigation Buttons */
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255,255,255,0.7);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+}
+
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}
+
 /* Main content area */
 main {
     flex: 1; /* 남은 공간을 차지하여 footer를 하단에 위치 */
-    padding: 150px 0; /* 상하 여백 추가 */
+    padding: 20px 0; /* 상하 여백 추가 */
 }
 
 /* 내부 컨테이너 */
@@ -34,4 +78,12 @@ section {
 h2 {
     font-size: 1.5em;
     color: #333;
+}
+
+/* Footer 스타일 예시 */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
 }

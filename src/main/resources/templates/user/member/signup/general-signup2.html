@@ -2,12 +2,15 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/user/layouts/defaultLayout}"
-      layout:fragment="Content">
+      layout:decorate="~{common/user/layouts/defaultLayout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
+</head>
+<body>
+<!-- 페이지별 CSS 및 JS 삽입을 위한 프래그먼트 정의 -->
+<div layout:fragment="pageStyles">
     <link rel="stylesheet" th:href="@{/user/css/general-signup.css}">
     <link rel="stylesheet" th:href="@{/user/css/general-modal.css}">
 
@@ -18,7 +21,6 @@
     <script th:src="@{/user/js/general-address.js}" th:inline="none" defer></script>
     <script th:src="@{/user/js/general-autoCursor.js}" th:inline="none" defer></script>
 
-
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Flatpickr JS -->
@@ -27,10 +29,9 @@
     <!--Daum API 스크립트-->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
+</div>
 
-</head>
-<body>
-<main>
+<div layout:fragment="content">
     <div class="signup-form">
         <!-- 로고 이미지 추가 -->
         <div style="text-align: center; margin-bottom: 20px;">
@@ -171,6 +172,6 @@
             <button type="submit">회원가입</button>
         </form>
     </div>
-</main>
+</div>
 </body>
 </html>

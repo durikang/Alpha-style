@@ -7,11 +7,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
-    <link rel="stylesheet" th:href="@{/user/css/userHome.css}"/>
     <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
 </head>
 <body>
-<div layout:fragment="content">
+
+<!-- Slider 프래그먼트 정의 -->
+<div layout:fragment="slider">
     <div class="slider">
         <div class="slides">
             <div class="slide" th:each="slider : ${sliders}">
@@ -26,7 +27,11 @@
         <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
+</div>
 
+<!-- Content 프래그먼트 정의 -->
+<div layout:fragment="content">
+    <link rel="stylesheet" th:href="@{/user/css/userHome.css}"/>
     <div class="container">
         <h1>BEST ITEM</h1>
 
@@ -56,8 +61,8 @@
             <span class="loader" id="loader-${categoryWithItems.mainCategory.id}" style="display:none;">Loading...</span>
         </div>
     </div>
-
 </div>
+
         <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
 
 </body>
