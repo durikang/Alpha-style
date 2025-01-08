@@ -42,11 +42,6 @@ public class FileStore {
 
     // 단일 파일 저장
     public UploadFile storeFile(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) {
-            return null;
-        }
-
-        // 파일 검증
         if (!isValidFile(multipartFile)) {
             throw new FileProcessingException("유효하지 않은 파일입니다.");
         }
@@ -64,6 +59,7 @@ public class FileStore {
             throw new FileProcessingException("파일 저장 중 오류가 발생했습니다.", e);
         }
     }
+
 
 
     // 다중 파일 저장

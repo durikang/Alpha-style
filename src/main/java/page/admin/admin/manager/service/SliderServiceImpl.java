@@ -9,6 +9,7 @@ import page.admin.admin.manager.exception.InvalidFileException;
 import page.admin.admin.manager.exception.SliderSaveException;
 import page.admin.admin.manager.repository.SliderRepository;
 import page.admin.admin.manager.service.SliderService;
+import page.admin.common.utils.exception.FileProcessingException;
 import page.admin.common.utils.file.FileStore;
 
 import java.io.IOException;
@@ -34,22 +35,23 @@ public class SliderServiceImpl implements SliderService {
 
     @Override
     public Slider saveSlider(Slider slider, MultipartFile imageFile) {
-        try {
-            if (imageFile != null && !imageFile.isEmpty()) {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                // FileStore에서 검증 및 저장
                 UploadFile uploadFile = fileStore.storeFile(imageFile);
 
-                // 파일 저장이 실패했거나 유효하지 않다면 사용자 정의 예외 발생
-                if (uploadFile == null || !fileStore.isValidFile(uploadFile)) {
-                    throw new InvalidFileException("파일 형식이 유효하지 않습니다.");
-                }
-
-                slider.setImageUrl("/files/" + uploadFile.getStoreFileName());
+                // 파일 URL 설정
+                slider.setImageUrl(fileStore.getFileUrl(uploadFile));
+            } catch (FileProcessingException e) {
+                // FileStore에서 발생한 예외를 SliderSaveException으로 변환
+                throw new SliderSaveException("파일 처리 중 오류가 발생했습니다.", e);
             }
-            return sliderRepository.save(slider);
-        } catch (IOException e) {
-            throw new SliderSaveException("파일 저장 중 오류 발생", e);
         }
+
+        // Slider 저장
+        return sliderRepository.save(slider);
     }
+
 
 
 
