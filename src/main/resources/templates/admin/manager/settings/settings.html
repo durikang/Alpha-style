@@ -46,24 +46,12 @@
                 <button type="submit" class="options-button-primary">설정 저장</button>
             </form>
 
-            <!-- 메시지 표시 -->
-            <div th:if="${message}" class="success-message">
-                <p th:text="${message}" style="color: green;"></p>
-            </div>
-
-            <div th:if="${error}" class="error-message">
-                <p th:text="${error}" style="color: red;"></p>
-            </div>
         </div>
     </div>
 </main>
 
 <!-- 에러 메시지 스타일링을 위한 CSS 추가 -->
 <style>
-    .success-message, .error-message {
-        margin-top: 20px;
-        text-align: center;
-    }
     .form-text {
         display: block;
         margin-top: 5px;

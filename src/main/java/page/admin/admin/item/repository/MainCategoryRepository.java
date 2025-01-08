@@ -1,11 +1,15 @@
 package page.admin.admin.item.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import page.admin.admin.item.domain.MainCategory;
 
-@Repository
+import java.util.List;
+
 public interface MainCategoryRepository extends JpaRepository<MainCategory, Long> {
-    MainCategory findByMainCategoryName(String mainCategoryName);
+
+    @Override
+    @EntityGraph(attributePaths = "subCategories")
+    List<MainCategory> findAll();
 }
 

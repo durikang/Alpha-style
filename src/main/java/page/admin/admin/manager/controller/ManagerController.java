@@ -28,23 +28,17 @@ public class ManagerController {
         return "admin/manager/settings/settings"; // Thymeleaf 템플릿 경로
     }
 
-    // 설정 업데이트
     @PostMapping("/option")
     public String updateSettings(@RequestParam("maxFileSizeMB") Long maxFileSizeMB,
                                  @RequestParam("allowedExtensions") String allowedExtensions,
-                                 Model model,
                                  RedirectAttributes redirectAttributes) {
         // 최대 설정 가능 크기 제한 (200MB)
         final long MAX_SETTING_MB = 200;
 
         if (maxFileSizeMB > MAX_SETTING_MB) {
-            model.addAttribute("error", "최대 설정 가능 파일 크기는 " + MAX_SETTING_MB + "MB 입니다.");
-            // 현재 설정 값을 다시 모델에 추가
-            FileSettings settings = fileSettingsService.getSettings();
-            long currentMaxFileSizeMB = settings.getMaxFileSize() / (1024 * 1024);
-            model.addAttribute("settings", settings);
-            model.addAttribute("maxFileSizeMB", currentMaxFileSizeMB);
-            return "admin/manager/settings/settings";
+            Alert alert = new Alert("최대 설정 가능 파일 크기는 " + MAX_SETTING_MB + "MB 입니다.", Alert.AlertType.ERROR);
+            redirectAttributes.addFlashAttribute("alert", alert);
+            return "redirect:/admin/manager/option";
         }
 
         // 바이트 단위로 변환
@@ -60,7 +54,10 @@ public class ManagerController {
 
         // 설정 업데이트
         fileSettingsService.updateSettings(settings);
-        model.addAttribute("message", "설정이 성공적으로 업데이트되었습니다.");
-        return "admin/manager/settings/settings";
+
+        Alert alert = new Alert("설정이 성공적으로 업데이트되었습니다.", Alert.AlertType.SUCCESS);
+        redirectAttributes.addFlashAttribute("alert", alert);
+        return "redirect:/admin/manager/option";
     }
+
 }
