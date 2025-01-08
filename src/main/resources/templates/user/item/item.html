@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}">
+<head>
+    <title th:text="${item.itemName}">상품 상세</title>
+
+</head>
+<body>
+
+<div layout:fragment="pageStyles">
+    <link rel="stylesheet" th:href="@{/user/css/item/item.css}"> <!-- 필요한 CSS 추가 -->
+    <script th:src="@{/user/js/item/item.js}"></script> <!-- 필요한 JS 추가 -->
+</div>
+<!-- Content 프래그먼트 정의 -->
+<div layout:fragment="content">
+<div class="container">
+    <h1 th:text="${item.itemName}">상품명</h1>
+    <img th:src="@{${item.mainImage.storeFileName}}" alt="메인 이미지" class="main-image">
+    <div class="item-details">
+        <p>매입가: <span th:text="${item.formattedPurchasePrice}">₩0</span></p>
+        <p>판매가: <span th:text="${item.formattedSalePrice}">₩0</span></p>
+        <p>수량: <span th:text="${item.quantity}">0</span></p>
+        <p>평균 평점: <span th:text="${averageRating}">0.0</span></p>
+        <p>조회수: <span th:text="${item.viewCount}">0</span></p>
+        <p>판매량: <span th:text="${item.salesCount}">0</span></p>
+    </div>
+
+    <div class="thumbnails">
+        <h2>썸네일</h2>
+        <div class="thumbnail-images">
+            <img th:each="thumb : ${item.thumbnails}" th:src="@{${thumb.storeFileName}}" alt="썸네일 이미지" class="thumbnail">
+        </div>
+    </div>
+
+    <div class="regions">
+        <h2>지역</h2>
+        <ul>
+            <li th:each="region : ${item.regions}" th:text="${region.displayName}">지역명</li>
+        </ul>
+    </div>
+
+    <!-- 리뷰 섹션 -->
+    <h2>리뷰</h2>
+    <div class="reviews">
+        <ul>
+            <li th:each="review : ${reviews}">
+                <strong th:text="${review.member.username}">Username</strong>
+                <span>평점: <span th:text="${review.rating}">5</span></span>
+                <p th:text="${review.comment}">리뷰 내용</p>
+                <form th:action="@{/admin/product/items/reviews/delete}" method="post">
+                    <input type="hidden" name="reviewId" th:value="${review.reviewId}">
+                    <input type="hidden" name="itemId" th:value="${item.itemId}">
+                    <button type="submit">삭제</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div class="average-rating">
+        <p>평균 평점: <span th:text="${averageRating}">0.0</span></p>
+    </div>
+
+    <h3>리뷰 작성</h3>
+    <form th:action="@{/admin/product/items/{itemId}/reviews(itemId=${item.itemId})}" method="post">
+        <label for="rating">평점:</label>
+        <select name="rating" id="rating" required>
+            <option value="">선택</option>
+            <option value="1">1점</option>
+            <option value="2">2점</option>
+            <option value="3">3점</option>
+            <option value="4">4점</option>
+            <option value="5">5점</option>
+        </select>
+        <br>
+        <label for="comment">리뷰:</label>
+        <textarea name="comment" id="comment" rows="4" cols="50" required></textarea>
+        <br>
+        <button type="submit">리뷰 작성</button>
+    </form>
+</div>
+</div>
+</body>
+</html>

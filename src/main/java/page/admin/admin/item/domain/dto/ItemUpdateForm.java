@@ -45,7 +45,7 @@ public class ItemUpdateForm {
     @NotNull(message = "세부 카테고리는 필수 입력값입니다.")
     private Long subCategory;
 
-    private MultipartFile mainImage;
+    private MultipartFile newMainImage;
     private String mainImagePath;
 
     @Size(max = 4, message = "썸네일 이미지는 최대 4개까지만 업로드할 수 있습니다.")

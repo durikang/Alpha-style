@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.admin.item.domain.Item;
+import page.admin.admin.item.domain.Review;
 import page.admin.admin.item.domain.SubCategory;
 import page.admin.admin.item.domain.dto.*;
 import page.admin.admin.item.service.*;
@@ -39,6 +40,7 @@ public class ItemController {
     private final DeliveryCodeService deliveryCodeService;
     private final MainCategoryService mainCategoryService;
     private final SubCategoryService subCategoryService;
+    private final ReviewService reviewService;
 
     /**
      * 상품 목록
@@ -73,15 +75,71 @@ public class ItemController {
     }
 
     /**
-     * 단일 상품 조회
+     * 단일 상품 조회 (상세 페이지)
+     * - 조회 시 조회수를 증가시킵니다.
      */
     @GetMapping("/{itemId}")
     public String item(@PathVariable("itemId") Long itemId,
                        @ModelAttribute("alert") Alert alert,
-                       Model model) {
+                       @RequestParam(value = "page", defaultValue = "1") int page,
+                       Model model,
+                       @SessionAttribute(name = "loginMember", required = false) LoginSessionInfo loginSessionInfo) {
+        // 조회수 증가
+        itemService.incrementViewCount(itemId);
+
+        // 아이템 조회
         ItemViewForm item = itemService.getItemViewForm(itemId);
         model.addAttribute("item", item); // 상세보기용 DTO
+
+        // 리뷰 페이징 처리
+        int pageSize = 10; // 한 페이지당 리뷰 수
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Page<Review> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
+        List<ReviewDTO> reviews = reviewPage.stream()
+                .map(review -> new ReviewDTO(
+                        review.getReviewId(),
+                        review.getMember().getUsername(),
+                        review.getRating(),
+                        review.getReviewComment(),
+                        review.getCreatedDate()
+                ))
+                .collect(Collectors.toList());
+
+        // 페이지네이션 정보
+        int currentPage = reviewPage.getNumber() + 1;
+        int totalPages = reviewPage.getTotalPages();
+
+        // 페이지 블록 계산 (1~10, 11~20, ...)
+        int blockSize = 10;
+        int startPage = ((currentPage - 1) / blockSize) * blockSize + 1;
+        int endPage = Math.min(startPage + blockSize - 1, totalPages);
+
+        // 모델에 추가
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("sortField", "createdDate");
+        model.addAttribute("sortDirection", "DESC");
+
         return "admin/product/item"; // 선행 슬래시 제거
+    }
+
+
+    // ======================================
+    // 3) 인기상품 조회
+    // ======================================
+    /**
+     * 인기상품 페이지
+     */
+    @GetMapping("/popular")
+    public String popularItems(
+            @PageableDefault(size = 10, sort = "viewCount", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+        List<Item> popularItems = itemService.getPopularItems(pageable);
+        model.addAttribute("popularItems", popularItems);
+        return "admin/product/popularItems";
     }
 
     /**
@@ -228,6 +286,8 @@ public class ItemController {
                 .collect(Collectors.toList());
     }
 
+
+
     /**
      * 폼에서 필요한 공통 모델 데이터 세팅
      */
@@ -247,5 +307,7 @@ public class ItemController {
             log.debug("Main Category ID is null, skipping subCategories.");
         }
     }
+
+
 
 }

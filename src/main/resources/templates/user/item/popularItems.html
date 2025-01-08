@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/user/layouts/defaultLayout}">
+<head>
+    <title>인기상품</title>
+</head>
+<body>
+<div layout:fragment="pageStyles">
+    <link rel="stylesheet" th:href="@{user/css/item/popularItems.css}"> <!-- 필요한 CSS 추가 -->
+</div>
+<!-- Content 프래그먼트 정의 -->
+<div layout:fragment="content">
+<div class="container">
+    <h1>인기상품</h1>
+    <div class="popular-items">
+        <div th:each="item : ${popularItems}" class="item-card">
+            <img th:src="@{${item.mainImage.storeFileName}}" alt="상품 이미지" class="item-image">
+            <h2 th:text="${item.itemName}">상품명</h2>
+            <p>판매가: <span th:text="${item.formattedSalePrice}">₩0</span></p>
+            <p>조회수: <span th:text="${item.viewCount}">0</span></p>
+            <p>판매량: <span th:text="${item.salesCount}">0</span></p>
+            <p>평균 평점: <span th:text="${#numbers.formatDecimal(item.reviews.?avg(r -> r.rating), 1, 'POINT', 1)}">0.0</span></p>
+            <a th:href="@{/admin/product/items/{id}(id=${item.itemId})}">상세보기</a>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

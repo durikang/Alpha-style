@@ -27,6 +27,11 @@ public class UploadFile {
     @CreationTimestamp
     private LocalDateTime uploadTime; // 업로드 시간
 
+    // 추가된 필드: Item과의 다대일 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
     // 기존 생성자
     public UploadFile(String uploadFileName, String storeFileName) {
         this.uploadFileName = uploadFileName;
