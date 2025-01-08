@@ -1,27 +1,28 @@
 package page.admin.common.utils.file;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import page.admin.admin.item.domain.UploadFile;
+import page.admin.admin.manager.service.FileSettingsService;
 import page.admin.common.utils.exception.FileProcessingException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class FileStore {
 
     @Value("${file.dir}")
     private String fileDir;
 
-    private static final int MAX_THUMBNAILS = 4; // 최대 썸네일 수
+    private final FileSettingsService fileSettingsService;
 
     // 파일 저장 경로 반환
     public String getFullPath(String filename) {
@@ -178,18 +179,17 @@ public class FileStore {
             throw new FileProcessingException("파일 저장 경로가 디렉토리가 아니거나 쓰기 권한이 없습니다: " + fileDir);
         }
     }
-
-    public String getFileDir() {
-        return fileDir;
-    }
-
     // 파일 검증 메서드
     private boolean isValidFile(MultipartFile file) {
-        // 허용된 파일 확장자
-        Set<String> allowedExtensions = Set.of("jpg", "jpeg", "png", "gif");
+        // 설정에서 허용된 파일 확장자 가져오기
+        String allowedExtensionsStr = fileSettingsService.getSettings().getAllowedExtensions();
+        Set<String> allowedExtensions = Arrays.stream(allowedExtensionsStr.split(","))
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
 
-        // 최대 파일 크기 (5MB 예제)
-        final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        // 설정에서 최대 파일 크기 가져오기
+        long maxFileSize = fileSettingsService.getSettings().getMaxFileSize(); // 바이트 단위
 
         // 파일 이름 및 크기 확인
         if (file == null || file.isEmpty()) {
@@ -206,7 +206,7 @@ public class FileStore {
         }
 
         // 파일 크기 검증
-        if (file.getSize() > MAX_FILE_SIZE) {
+        if (file.getSize() > maxFileSize) {
             log.warn("파일 크기가 너무 큽니다. 크기: {} bytes", file.getSize());
             return false;
         }
