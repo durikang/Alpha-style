@@ -19,7 +19,7 @@
                 <a th:href="@{/user/new-products}" class="nav-link">신상품</a>
             </li>
             <!-- 동적 메인 카테고리 -->
-            <li th:each="mainCategory : ${mainCategories}" class="nav-item dropdown">
+            <li th:each="mainCategory : ${navMainCategories}" class="nav-item dropdown">
                 <a th:href="@{/user/products/main/{id}(id=${mainCategory.id})}" class="nav-link" th:text="${mainCategory.mainCategoryName}">메인 카테고리</a>
                 <ul class="dropdown-menu">
                     <li th:each="subCategory : ${mainCategory.subCategories}">
