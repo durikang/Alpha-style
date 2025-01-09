@@ -48,13 +48,19 @@ public class QItem extends EntityPathBase<Item> {
 
     public final SetPath<Region, QRegion> regions = this.<Region, QRegion>createSet("regions", Region.class, QRegion.class, PathInits.DIRECT2);
 
+    public final SetPath<Review, QReview> reviews = this.<Review, QReview>createSet("reviews", Review.class, QReview.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> salePrice = createNumber("salePrice", Integer.class);
+
+    public final NumberPath<Long> salesCount = createNumber("salesCount", Long.class);
 
     public final page.admin.admin.member.domain.QMember seller;
 
     public final QSubCategory subCategory;
 
     public final SetPath<UploadFile, QUploadFile> thumbnails = this.<UploadFile, QUploadFile>createSet("thumbnails", UploadFile.class, QUploadFile.class, PathInits.DIRECT2);
+
+    public final NumberPath<Long> viewCount = createNumber("viewCount", Long.class);
 
     public QItem(String variable) {
         this(Item.class, forVariable(variable), INITS);
@@ -77,7 +83,7 @@ public class QItem extends EntityPathBase<Item> {
         this.deliveryCode = inits.isInitialized("deliveryCode") ? new QDeliveryCode(forProperty("deliveryCode")) : null;
         this.itemType = inits.isInitialized("itemType") ? new QItemType(forProperty("itemType")) : null;
         this.mainCategory = inits.isInitialized("mainCategory") ? new QMainCategory(forProperty("mainCategory")) : null;
-        this.mainImage = inits.isInitialized("mainImage") ? new QUploadFile(forProperty("mainImage")) : null;
+        this.mainImage = inits.isInitialized("mainImage") ? new QUploadFile(forProperty("mainImage"), inits.get("mainImage")) : null;
         this.seller = inits.isInitialized("seller") ? new page.admin.admin.member.domain.QMember(forProperty("seller")) : null;
         this.subCategory = inits.isInitialized("subCategory") ? new QSubCategory(forProperty("subCategory"), inits.get("subCategory")) : null;
     }
