@@ -1,7 +1,7 @@
+/* 기존 스타일 유지 */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-
 }
 
 .header {
@@ -11,7 +11,7 @@ body {
     padding: 10px 20px;
     background-color: #fafafa;
     border-bottom: 1px solid #ddd;
-    /*position: fixed; !* 헤더 고정 *!*/
+    position: fixed; /* 헤더 고정 */
     top: 0; /* 브라우저 상단에 고정 */
     left: 0;
     right: 0;
@@ -23,25 +23,56 @@ body {
     height: 30px;
 }
 
-.nav {
+.nav ul {
+    list-style: none;
     display: flex;
-    flex: 1;
-    justify-content: flex-start;
-    gap: 50px;
-    margin-left: 50px;
+    margin: 0;
+    padding: 0;
 }
 
 .nav .nav-item {
-    margin-right: 3px;
+    position: relative;
+}
+
+.nav .nav-link {
+    display: block;
+    padding: 10px 15px;
     text-decoration: none;
     color: #000;
     font-size: 14px;
     font-weight: 600;
 }
 
-.nav .nav-item:hover {
+.nav .nav-link:hover {
     color: #007bff; /* 호버 시 색상 변경 */
     text-decoration: underline;
+}
+
+.nav .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* 메인 카테고리 바로 아래 */
+    left: 0;
+    background-color: #fff;
+    min-width: 150px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+.nav .dropdown-item {
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #000;
+    display: block;
+}
+
+.nav .dropdown-item:hover {
+    background-color: #f1f1f1;
+    color: #007bff;
+}
+
+.nav .nav-item:hover .dropdown-menu {
+    display: block;
 }
 
 .user-options {
@@ -83,4 +114,61 @@ body {
     font-size: 20px;
     text-decoration: none;
     color: #000;
+}
+
+/* 드롭다운 메뉴 애니메이션 (선택 사항) */
+.dropdown-menu {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.nav .nav-item:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+}
+/* 모바일 스타일링 */
+@media (max-width: 768px) {
+    .nav ul {
+        flex-direction: column;
+        display: none;
+    }
+
+    .nav ul.show {
+        display: flex;
+    }
+
+    .nav .nav-item {
+        width: 100%;
+    }
+
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+    }
+
+    .dropdown-item {
+        padding-left: 30px;
+    }
+
+    /* 햄버거 메뉴 버튼 추가 */
+    .nav-toggle {
+        display: block;
+        cursor: pointer;
+    }
+
+    .nav-toggle .bar {
+        display: block;
+        width: 25px;
+        height: 3px;
+        margin: 5px auto;
+        transition: all 0.3s ease-in-out;
+        background-color: #333;
+    }
+}
+
+@media (min-width: 769px) {
+    .nav-toggle {
+        display: none;
+    }
 }

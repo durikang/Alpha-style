@@ -47,7 +47,7 @@ public class ItemEditForm {
     private Long subCategory;
 
     private UploadFile mainImage;
-    private Set<UploadFile> thumbnails;
+    private List<UploadFile> thumbnails; // Changed to List
 
     private String mainImagePath;
     private List<String> thumbnailPaths;

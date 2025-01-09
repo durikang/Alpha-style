@@ -24,7 +24,7 @@ import page.admin.common.utils.file.FileStore;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final ReviewRepository reviewRepository; // 리뷰 리포지토리 추가
+    private final ReviewService reviewService; // 리뷰 서비스 추가
     private final RegionRepository regionRepository;
     private final ItemTypeRepository itemTypeRepository;
     private final DeliveryCodeRepository deliveryCodeRepository;
@@ -44,7 +46,6 @@ public class ItemServiceImpl implements ItemService {
     private final MemberRepository memberRepository;
     private final MainCategoryRepository mainCategoryRepository;
     private final SubCategoryRepository subCategoryRepository;
-
 
     // ======================================
     // 1) 상품 등록
@@ -56,17 +57,15 @@ public class ItemServiceImpl implements ItemService {
         UploadFile mainImage = fileStore.storeFile(form.getMainImage());
 
         // (2) 썸네일 처리 (최대 4개)
-        Set<UploadFile> thumbnails = new HashSet<>();
-        List<MultipartFile> thumbnailFiles = form.getThumbnails().stream()
+        Set<UploadFile> thumbnails = form.getThumbnails().stream()
                 .limit(4)
-                .collect(Collectors.toList());
-        for (int i = 0; i < 4; i++) {
-            if (i < thumbnailFiles.size() && thumbnailFiles.get(i) != null && !thumbnailFiles.get(i).isEmpty()) {
-                thumbnails.add(fileStore.storeFile(thumbnailFiles.get(i)));
-            } else {
-                // Placeholder 이미지로 채우기
-                thumbnails.add(new UploadFile("https://via.placeholder.com/80x100.png?text=Thumbnail+" + (i + 1)));
-            }
+                .filter(file -> file != null && !file.isEmpty())
+                .map(file -> fileStore.storeFile(file))
+                .collect(Collectors.toSet());
+
+        // Placeholder 이미지로 채우기 (최대 4개)
+        for (int i = thumbnails.size(); i < 4; i++) {
+            thumbnails.add(new UploadFile("https://via.placeholder.com/80x100.png?text=Thumbnail+" + (i + 1)));
         }
 
         // (3) 지역 -> regionCodes
@@ -108,6 +107,9 @@ public class ItemServiceImpl implements ItemService {
                 seller
         );
 
+        // 메인 이미지와 Item 연관 설정
+        mainImage.setItem(item);
+
         return itemRepository.save(item);
     }
 
@@ -128,7 +130,10 @@ public class ItemServiceImpl implements ItemService {
     public ItemViewForm getItemViewForm(Long id) {
         Item item = itemRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템이 없습니다. ID: " + id));
-        return toItemViewForm(item);
+        ItemViewForm form = toItemViewForm(item);
+        Double averageRating = getAverageRating(id);
+        form.setAverageRating(averageRating);
+        return form;
     }
 
     // ======================================
@@ -141,7 +146,6 @@ public class ItemServiceImpl implements ItemService {
 
         return toItemEditForm(item);
     }
-
 
     // ======================================
     // 5) 수정 로직 (ItemUpdateForm)
@@ -163,6 +167,9 @@ public class ItemServiceImpl implements ItemService {
 
         // (5) 연관 엔티티 업데이트 (지역, 카테고리, 배송 등)
         updateAssociations(item, form);
+
+        // (6) 판매량 업데이트
+        // 판매량은 OrderDetail을 통해 자동으로 업데이트되므로 별도의 로직은 필요하지 않습니다.
 
         itemRepository.save(item);
         log.info("아이템 업데이트 완료: {}", item);
@@ -194,6 +201,44 @@ public class ItemServiceImpl implements ItemService {
     }
 
     // ======================================
+    // 8) 인기상품 조회
+    // ======================================
+    @Override
+    @Transactional(readOnly = true)
+    public List<Item> getPopularItems(Pageable pageable) {
+        // 인기상품 기준: 조회수 DESC, 판매량 DESC, 평균 평점 DESC
+        return itemRepository.findPopularItems(pageable);
+    }
+
+    // ======================================
+    // 9) 조회수 증가
+    // ======================================
+    @Override
+    @Transactional
+    public void incrementViewCount(Long itemId) {
+        Item item = getItem(itemId);
+        item.setViewCount(item.getViewCount() + 1);
+        itemRepository.save(item);
+        log.info("조회수 증가: Item ID={}, New View Count={}", itemId, item.getViewCount());
+    }
+
+    // ======================================
+    // 10) 평균 평점 계산
+    // ======================================
+    @Override
+    @Transactional(readOnly = true)
+    public Double getAverageRating(Long itemId) {
+        Page<Review> reviews = reviewService.getReviewsByItemId(itemId, Pageable.unpaged());
+        if (reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    // ======================================
     // 11) 메인 카테고리별로 최대 4개의 상품 조회
     // ======================================
     @Override
@@ -203,6 +248,7 @@ public class ItemServiceImpl implements ItemService {
         List<CategoryWithItemsDTO> result = new ArrayList<>();
 
         for (MainCategory mainCategory : mainCategories) {
+            Pageable pageable = PageRequest.of(0, limitPerCategory, Sort.by("salePrice").descending());
             List<Item> items = itemRepository.findTop4ByMainCategoryIdAndOpenTrueOrderBySalePriceDesc(mainCategory.getId());
             if (!items.isEmpty()) {
                 result.add(new CategoryWithItemsDTO(mainCategory, items));
@@ -212,6 +258,15 @@ public class ItemServiceImpl implements ItemService {
         return result;
     }
 
+    // ======================================
+    // 12) 상품 검색
+    // ======================================
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Item> searchItems(String keyword, Pageable pageable) {
+        return itemRepository.searchItems(keyword, pageable);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Item> findItemsByMainCategoryWithOffset(Long mainCategoryId, int offset, int limit) {
@@ -219,10 +274,18 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByMainCategoryIdAndOpenTrue(mainCategoryId, pageable).getContent();
     }
 
+    // ======================================
+    // 13) 리뷰 관련 메서드 추가
+    // ======================================
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Review> getReviewsByItemId(Long itemId, Pageable pageable) {
+        return reviewRepository.findByItemItemId(itemId, pageable);
+    }
 
-    // ======================================
-    // 8) 단일 삭제
-    // ======================================
+    // ---------------------------------------
+    // 삭제 시 첨부 파일 제거
+    // ---------------------------------------
     @Override
     public void deleteItem(Long id) {
         Item item = getItem(id); // 내부적으로 findByIdWithThumbnails
@@ -230,9 +293,6 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.delete(item);
     }
 
-    // ======================================
-    // 9) 다수 삭제
-    // ======================================
     @Override
     public void deleteItems(List<Long> ids) {
         List<Item> items = itemRepository.findAllById(ids);
@@ -240,22 +300,42 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteAll(items);
     }
 
-    // ======================================
-    // 10) 검색
-    // ======================================
-    @Override
-    public Page<Item> searchItems(String keyword, Pageable pageable) {
-        return itemRepository.findByItemNameContainingIgnoreCase(keyword, pageable);
+    private void deleteItemInternal(Item item) {
+        // 메인 이미지 삭제
+        if (item.getMainImage() != null) {
+            boolean mainImageDeleted = fileStore.deleteFile(item.getMainImage().getStoreFileName());
+            if (!mainImageDeleted) {
+                log.warn("메인 이미지 삭제 실패: {}", item.getMainImage().getStoreFileName());
+            }
+        }
+
+        // 썸네일 삭제
+        if (item.getThumbnails() != null) {
+            for (UploadFile thumbnail : item.getThumbnails()) {
+                boolean thumbnailDeleted = fileStore.deleteFile(thumbnail.getStoreFileName());
+                if (!thumbnailDeleted) {
+                    log.warn("썸네일 삭제 실패: {}", thumbnail.getStoreFileName());
+                }
+            }
+            item.getThumbnails().clear();
+        }
+
+        // 리뷰 삭제
+        if (item.getReviews() != null && !item.getReviews().isEmpty()) {
+            reviewRepository.deleteByItemItemId(item.getItemId());
+            log.info("아이템 리뷰 삭제 완료: Item ID={}", item.getItemId());
+        }
+
+        log.info("아이템 내부 파일 삭제 완료: {}", item.getItemId());
     }
 
-    // ----------------------------------------------------------------------
-    // 아래는 내부 helper 메서드들
-    // ----------------------------------------------------------------------
+    // ---------------------------------------
+    // 내부 helper 메서드들
+    // ---------------------------------------
 
     /**
      * Item -> ItemViewForm 변환
      */
-
     public ItemViewForm toItemViewForm(Item item) {
         return new ItemViewForm(
                 item.getItemId(),
@@ -270,9 +350,13 @@ public class ItemServiceImpl implements ItemService {
                 item.getMainCategory(),
                 item.getSubCategory(),
                 item.getMainImage(),
-                item.getThumbnails() != null ? item.getThumbnails() : Set.of()
+                item.getThumbnails() != null ? new ArrayList<>(item.getThumbnails()) : List.<UploadFile>of(),
+                item.getViewCount(),
+                item.getSalesCount(),
+                null // averageRating set in getItemViewForm
         );
     }
+
 
     /**
      * Item -> ItemEditForm 변환
@@ -329,135 +413,102 @@ public class ItemServiceImpl implements ItemService {
         return dto;
     }
 
-
-    // 만약 Update 시, 기존 썸네일 유지/삭제 로직 처리를 위한 `toItemUpdateForm`이 필요하다면 추가
-    // 생략 가능
-
-    // ---------------------------------------
-    // updateItem() 내 세부 메서드
-    // ---------------------------------------
     private void updateBasicDetails(Item item, ItemUpdateForm form) {
         item.setItemName(form.getItemName());
         item.setPurchasePrice(form.getPurchasePrice());
         item.setSalePrice(form.getSalePrice());
         item.setQuantity(form.getQuantity());
         item.setOpen(form.getOpen());
-        log.info("아이템 기본 정보 업데이트 완료: {}", item);
     }
 
     private void handleMainImageUpdate(Item item, ItemUpdateForm form) {
-        if (form.getMainImage() != null && !form.getMainImage().isEmpty()) {
-            UploadFile updatedMainImage = fileStore.replaceFile(item.getMainImage(), form.getMainImage());
+        MultipartFile newMainImage = form.getNewMainImage();
+        if (newMainImage != null && !newMainImage.isEmpty()) {
+            // 기존 메인 이미지 삭제
+            if (item.getMainImage() != null) {
+                boolean mainImageDeleted = fileStore.deleteFile(item.getMainImage().getStoreFileName());
+                if (!mainImageDeleted) {
+                    log.warn("메인 이미지 삭제 실패: {}", item.getMainImage().getStoreFileName());
+                }
+            }
+            // 새로운 메인 이미지 저장
+            UploadFile updatedMainImage = fileStore.storeFile(newMainImage);
             item.setMainImage(updatedMainImage);
-            log.info("메인 이미지 업데이트 완료: {}", updatedMainImage);
         }
     }
 
     private void handleThumbnailsUpdate(Item item, ItemUpdateForm form) {
-        // 로그 추가: 기존 썸네일 확인
-        log.debug("Handling thumbnails update. ExistingThumbnails: {}", form.getExistingThumbnails());
-
-        // 1) 새로 업로드/기존유지 등을 바탕으로 `updatedThumbnails`를 만든다 (UploadFile들의 Set)
-        Set<UploadFile> updatedThumbnails = new HashSet<>();
-        List<MultipartFile> newThumbnails = (form.getThumbnails() != null)
-                ? form.getThumbnails().stream().limit(4).collect(Collectors.toList())
-                : List.of();
-
-        List<String> existingThumbnails = form.getExistingThumbnails();
-        if (existingThumbnails != null) {
-            log.debug("Number of existing thumbnails: {}", existingThumbnails.size());
-        }
-
-        for (int i = 0; i < 4; i++) {
-            if (i < newThumbnails.size()
-                    && newThumbnails.get(i) != null
-                    && !newThumbnails.get(i).isEmpty()) {
-                // 새로운 썸네일 저장
-                UploadFile newFile = fileStore.storeFile(newThumbnails.get(i));
-                updatedThumbnails.add(newFile);
-                log.debug("Added new thumbnail: {}", newFile.getStoreFileName());
-            } else if (existingThumbnails != null
-                    && i < existingThumbnails.size()
-                    && existingThumbnails.get(i) != null
-                    && !existingThumbnails.get(i).isEmpty()
-                    && !existingThumbnails.get(i).startsWith("https://")
-                    && !existingThumbnails.get(i).startsWith("http://")) {
-                // 기존 썸네일 유지 (URL이 아닌 경우만)
-                String existingPath = existingThumbnails.get(i);
-                updatedThumbnails.add(new UploadFile(existingPath));
-                log.debug("Maintained existing thumbnail: {}", existingPath);
-            } else {
-                // 빈 공간은 플레이스홀더 URL 사용 (UploadFile로 추가하지 않음)
-                // 플레이스홀더는 템플릿에서 직접 설정
-                // 따라서, 이 부분에서는 아무것도 추가하지 않음
-                log.debug("No thumbnail available for index {}. Using placeholder.", i + 1);
+        List<MultipartFile> newThumbnailFiles = form.getThumbnails();
+        if (newThumbnailFiles != null && !newThumbnailFiles.isEmpty()) {
+            // 기존 썸네일 삭제
+            if (item.getThumbnails() != null && !item.getThumbnails().isEmpty()) {
+                for (UploadFile thumbnail : item.getThumbnails()) {
+                    boolean thumbnailDeleted = fileStore.deleteFile(thumbnail.getStoreFileName());
+                    if (!thumbnailDeleted) {
+                        log.warn("썸네일 삭제 실패: {}", thumbnail.getStoreFileName());
+                    }
+                }
+                item.getThumbnails().clear();
             }
+
+            // 새로운 썸네일 저장 (최대 4개)
+            Set<UploadFile> updatedThumbnails = newThumbnailFiles.stream()
+                    .filter(file -> file != null && !file.isEmpty())
+                    .limit(4)
+                    .map(file -> fileStore.storeFile(file))
+                    .collect(Collectors.toSet());
+
+            // Placeholder 이미지로 채우기 (최대 4개)
+            for (int i = updatedThumbnails.size(); i < 4; i++) {
+                updatedThumbnails.add(new UploadFile("https://via.placeholder.com/80x100.png?text=Thumbnail+" + (i + 1)));
+            }
+
+            // Set the item in each UploadFile
+            updatedThumbnails.forEach(thumbnail -> thumbnail.setItem(item));
+
+            item.setThumbnails(updatedThumbnails);
         }
-
-        // 2) 기존 컬렉션을 clear하고 updatedThumbnails를 추가
-        Set<UploadFile> originalThumbnails = item.getThumbnails(); // 원본 컬렉션
-        originalThumbnails.clear();             // 기존 엔티티들 제거 -> orphan으로 인식 -> DB에서 삭제됨
-        originalThumbnails.addAll(updatedThumbnails); // 새 엔티티들 추가 -> DB에 INSERT됨
-
-        log.info("썸네일 업데이트 완료: {} thumbnails updated.", updatedThumbnails.size());
     }
 
 
 
     private void updateAssociations(Item item, ItemUpdateForm form) {
-        // 1) 지역
-        Set<Region> regions = regionRepository.findByCodeIn(form.getRegionCodes());
-        if (regions.isEmpty()) {
-            throw new DataNotFoundException("유효한 지역 정보가 없습니다.");
-        }
-        item.setRegions(regions);
-
-        // 2) 상품타입
-        ItemType itemType = itemTypeRepository.findById(form.getItemType())
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 ItemType ID입니다."));
-        item.setItemType(itemType);
-
-        // 3) 배송코드
-        DeliveryCode deliveryCode = deliveryCodeRepository.findByCode(form.getDeliveryCode())
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 DeliveryCode 코드입니다."));
-        item.setDeliveryCode(deliveryCode);
-
-        // 4) 카테고리
-        MainCategory mainCategory = mainCategoryRepository.findById(form.getMainCategory())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 메인 카테고리입니다."));
-        item.setMainCategory(mainCategory);
-
-        SubCategory subCategory = subCategoryRepository.findById(form.getSubCategory())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 세부 카테고리입니다."));
-        item.setSubCategory(subCategory);
-
-        log.info("연관 엔티티 업데이트 완료: 지역={}, 상품 종류={}, 배송 방식={}, 메인 카테고리={}, 세부 카테고리={}",
-                item.getRegions(), item.getItemType(), item.getDeliveryCode(),
-                item.getMainCategory(), item.getSubCategory());
-    }
-
-    // ---------------------------------------
-    // 삭제 시 첨부 파일 제거
-    // ---------------------------------------
-    private void deleteItemInternal(Item item) {
-        // 메인 이미지 삭제
-        if (item.getMainImage() != null) {
-            boolean mainImageDeleted = fileStore.deleteFile(item.getMainImage().getStoreFileName());
-            if (!mainImageDeleted) {
-                log.warn("메인 이미지 삭제 실패: {}", item.getMainImage().getStoreFileName());
+        // 지역 업데이트
+        if (form.getRegionCodes() != null && !form.getRegionCodes().isEmpty()) {
+            Set<Region> updatedRegions = regionRepository.findByCodeIn(form.getRegionCodes());
+            if (!updatedRegions.isEmpty()) {
+                item.setRegions(updatedRegions);
+            } else {
+                throw new DataNotFoundException("유효한 지역 정보가 없습니다.");
             }
         }
 
-        // 썸네일 삭제
-        if (item.getThumbnails() != null) {
-            for (UploadFile thumbnail : item.getThumbnails()) {
-                boolean thumbnailDeleted = fileStore.deleteFile(thumbnail.getStoreFileName());
-                if (!thumbnailDeleted) {
-                    log.warn("썸네일 삭제 실패: {}", thumbnail.getStoreFileName());
-                }
-            }
+        // 상품 타입 업데이트
+        if (form.getItemType() != null) {
+            ItemType updatedItemType = itemTypeRepository.findById(form.getItemType())
+                    .orElseThrow(() -> new DataNotFoundException("잘못된 ItemType ID입니다."));
+            item.setItemType(updatedItemType);
         }
 
-        log.info("아이템 내부 파일 삭제 완료: {}", item.getItemId());
+        // 배송 방식 업데이트
+        if (form.getDeliveryCode() != null) {
+            DeliveryCode updatedDeliveryCode = deliveryCodeRepository.findByCode(form.getDeliveryCode())
+                    .orElseThrow(() -> new DataNotFoundException("잘못된 DeliveryCode입니다."));
+            item.setDeliveryCode(updatedDeliveryCode);
+        }
+
+        // 메인 카테고리 업데이트
+        if (form.getMainCategory() != null) {
+            MainCategory updatedMainCategory = mainCategoryRepository.findById(form.getMainCategory())
+                    .orElseThrow(() -> new DataNotFoundException("유효하지 않은 메인 카테고리입니다."));
+            item.setMainCategory(updatedMainCategory);
+        }
+
+        // 서브 카테고리 업데이트
+        if (form.getSubCategory() != null) {
+            SubCategory updatedSubCategory = subCategoryRepository.findById(form.getSubCategory())
+                    .orElseThrow(() -> new DataNotFoundException("유효하지 않은 세부 카테고리입니다."));
+            item.setSubCategory(updatedSubCategory);
+        }
     }
 }

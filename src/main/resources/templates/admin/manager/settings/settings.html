@@ -9,6 +9,7 @@
     <title>파일 설정 관리</title>
     <link rel="stylesheet" th:href="@{/admin/css/options/options.css}"/> <!-- 옵션 페이지용 CSS -->
     <script th:src="@{/admin/js/options/options.js}" th:inline="none"></script>
+    <script th:src="@{/admin/js/options/fileSettingsValidation.js}" th:inline="none"></script> <!-- 새 JS 파일 추가 -->
 </head>
 <body>
 <main class="container">
@@ -25,11 +26,13 @@
         <div class="options-tab-pane active" id="file-settings">
             <h3>파일 설정</h3>
             <!-- 설정 저장 폼 -->
-            <form th:action="@{/admin/manager/option}" method="post" class="options-form">
+            <form th:action="@{/admin/manager/option}" method="post" class="options-form" id="file-settings-form">
                 <div class="options-form-group">
                     <label for="maxFileSizeMB" class="options-label">최대 파일 크기 (MB)</label>
                     <input type="number" id="maxFileSizeMB" name="maxFileSizeMB"
-                           th:value="${maxFileSizeMB}" min="1" class="options-input" required>
+                           th:value="${maxFileSizeMB}" min="1" max="200" class="options-input" required>
+                    <!-- 동적으로 최대 설정 가능 크기 표시 -->
+                    <small th:text="'최대 설정 가능 크기는 200MB 입니다.'" class="form-text text-muted"></small>
                 </div>
 
                 <div class="options-form-group">
@@ -43,23 +46,17 @@
                 <button type="submit" class="options-button-primary">설정 저장</button>
             </form>
 
-            <!-- 메시지 표시 -->
-            <div th:if="${message}" class="success-message">
-                <p th:text="${message}" style="color: green;"></p>
-            </div>
-
-            <div th:if="${error}" class="error-message">
-                <p th:text="${error}" style="color: red;"></p>
-            </div>
         </div>
     </div>
 </main>
 
 <!-- 에러 메시지 스타일링을 위한 CSS 추가 -->
 <style>
-    .success-message, .error-message {
-        margin-top: 20px;
-        text-align: center;
+    .form-text {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9em;
+        color: #6c757d; /* Bootstrap의 muted 텍스트 색상 */
     }
 </style>
 </body>

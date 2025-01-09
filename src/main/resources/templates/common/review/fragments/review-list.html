@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="reviewList(reviews, currentPage, totalPages, itemId, sortField, sortDirection)">
+<head>
+    <style>
+        .review {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .review:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .review-username {
+            font-weight: bold;
+        }
+
+        .review-rating {
+            color: #ffc107; /* 별 색상 */
+        }
+
+        .review-comment {
+            margin: 5px 0;
+        }
+
+        .review-date {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .delete-button {
+            background-color: transparent;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div id="review-section">
+    <h2>리뷰</h2>
+    <div id="reviews">
+        <div th:each="review : ${reviews}" class="review">
+            <div class="review-header">
+                <span class="review-username" th:text="${review.username}">Username</span>
+                <span class="review-rating">
+                    <span th:each="i : ${#numbers.sequence(1,5)}">
+                        <span th:if="${i <= review.rating}" style="color: #ffc107;">&#9733;</span>
+                        <span th:unless="${i <= review.rating}" style="color: #ddd;">&#9733;</span>
+                    </span>
+                </span>
+            </div>
+            <div class="review-comment" th:text="${review.comment}">리뷰 내용</div>
+            <div class="review-date" th:text="${#dates.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>
+            <div th:if="${#authorization.expression('isAuthenticated()')}">
+                <button class="delete-button" th:data-review-id="${review.reviewId}" th:data-item-id="${itemId}">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 페이징 프래그먼트 포함 -->
+    <div th:replace="~{common/admin/fragments/pagination :: pagination(
+    startPage=${startPage},
+    endPage=${endPage},
+    totalPages=${totalPages},
+    currentPage=${currentPage},
+    url='/admin/product/items/' + ${item.itemId} + '/reviews',
+    keyword='',
+    sortField=${sortField},
+    sortDirection='DESC'
+)}"></div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 삭제 버튼 클릭 이벤트
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const reviewId = this.getAttribute("data-review-id");
+                const itemId = this.getAttribute("data-item-id");
+                if (confirm("리뷰를 삭제하시겠습니까?")) {
+                    fetch(`/admin/product/items/${itemId}/reviews/delete?reviewId=${reviewId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                        .then(({ status, body }) => {
+                            alert(body.message);
+                            if (status >= 200 && status < 300) {
+                                // 페이지 새로고침 또는 리뷰 목록 업데이트
+                                window.location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('리뷰 삭제 중 오류가 발생했습니다.');
+                        });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 상세</title>
     <link rel="stylesheet" th:href="@{/admin/css/item/item.css}" href="../css/item.css">
+    <link rel="stylesheet" th:href="@{/admin/css/item/star-rating.css}" href="../css/item.css">
+
+    <script th:src="@{/admin/js/item/star-rating.js}" defer></script>
     <style>
         .thumbnail {
             border: 2px solid transparent;
@@ -42,43 +45,19 @@
         </div>
         <div class="thumbnail-gallery">
             <div class="thumbnail-gallery">
-                <!-- 썸네일 1 -->
-                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 0}"
-                     th:src="@{/files/{filename}(filename=${item.thumbnails[0].storeFileName})}"
-                     alt="썸네일 1" class="thumbnail">
-
-                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 0}"
-                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+1"
-                     alt="썸네일 1" class="thumbnail">
-
-                <!-- 썸네일 2 -->
-                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 1}"
-                     th:src="@{/files/{filename}(filename=${item.thumbnails[1].storeFileName})}"
-                     alt="썸네일 2" class="thumbnail">
-
-                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 1}"
-                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+2"
-                     alt="썸네일 2" class="thumbnail">
-
-                <!-- 썸네일 3 -->
-                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 2}"
-                     th:src="@{/files/{filename}(filename=${item.thumbnails[2].storeFileName})}"
-                     alt="썸네일 3" class="thumbnail">
-
-                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 2}"
-                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+3"
-                     alt="썸네일 3" class="thumbnail">
-
-                <!-- 썸네일 4 -->
-                <img th:if="${item.thumbnails != null and item.thumbnails.size() > 3}"
-                     th:src="@{/files/{filename}(filename=${item.thumbnails[3].storeFileName})}"
-                     alt="썸네일 4" class="thumbnail">
-
-                <img th:unless="${item.thumbnails != null and item.thumbnails.size() > 3}"
-                     src="https://via.placeholder.com/80x100.png?text=Thumbnail+4"
-                     alt="썸네일 4" class="thumbnail">
+                <th:block th:each="i : ${#numbers.sequence(1,4)}">
+                    <th:block th:if="${item.thumbnails != null and item.thumbnails.size() >= i}">
+                        <img th:src="@{/files/{filename}(filename=${item.thumbnails[i - 1].storeFileName})}"
+                             th:alt="'썸네일 ' + i"
+                             class="thumbnail">
+                    </th:block>
+                    <th:block th:unless="${item.thumbnails != null and item.thumbnails.size() >= i}">
+                        <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
+                             th:alt="'썸네일 ' + i"
+                             class="thumbnail">
+                    </th:block>
+                </th:block>
             </div>
-
         </div>
     </div>
 
@@ -101,13 +80,13 @@
         <!-- 가격 -->
         <div class="detail-row">
             <label>구매가</label>
-            <p class="price" th:text="${item.getFormattedPurchasePrice}">₩20,000</p>
+            <p class="price" th:text="${item.formattedPurchasePrice}">₩20,000</p>
         </div>
 
         <!-- 판매가 -->
         <div class="detail-row">
             <label>판매가</label>
-            <p class="price" th:text="${item.getFormattedSalePrice}">₩26,000</p>
+            <p class="price" th:text="${item.formattedSalePrice}">₩26,000</p>
         </div>
 
         <!-- 수량 -->
@@ -119,7 +98,13 @@
         <!-- 판매 여부 -->
         <div class="detail-row">
             <label>판매 여부</label>
-            <p th:text="${item.getOpenStatus}">판매 중</p>
+            <p th:text="${item.openStatus}">판매 중</p>
+        </div>
+
+        <!-- 평균 평점 -->
+        <div class="detail-row" th:if="${item.averageRating != null}">
+            <label>평균 평점</label>
+            <p th:text="${#numbers.formatDecimal(item.averageRating, 1, 'POINT', 1, 'NONE')}">4.5</p>
         </div>
 
         <!-- 등록 지역 -->
@@ -147,13 +132,13 @@
         <!-- 상품 종류 -->
         <div class="detail-row">
             <label>상품 종류</label>
-            <p th:text="${item.getItemTypeDescription}">도서</p>
+            <p th:text="${item.itemTypeDescription}">도서</p>
         </div>
 
         <!-- 배송 방식 -->
         <div class="detail-row">
             <label>배송 방식</label>
-            <p th:text="${item.getDeliveryDisplayName}">빠른 배송</p>
+            <p th:text="${item.deliveryDisplayName}">빠른 배송</p>
         </div>
 
         <!-- 버튼 -->
@@ -164,6 +149,36 @@
     </div>
 
 </div>
+
+<!-- 리뷰 섹션 -->
+<div class="review-section">
+    <div th:replace="~{common/review/fragments/review-list :: reviewList(reviews=${reviews}, currentPage=${currentPage}, totalPages=${totalPages}, itemId=${item.itemId}, sortField='createdDate', sortDirection='DESC')}"></div>
+
+    <!-- 리뷰 작성 폼 -->
+    <div class="add-review">
+        <h2>리뷰 작성</h2>
+        <form th:action="@{/admin/product/items/{itemId}/reviews(itemId=${item.itemId})}" method="post">
+            <div>
+                <label for="rating">평점</label>
+                <div id="star-rating">
+                    <input type="hidden" name="rating" id="rating" value="0">
+                    <span class="star" data-value="1">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                    <span class="star" data-value="4">&#9733;</span>
+                    <span class="star" data-value="5">&#9733;</span>
+                </div>
+            </div>
+            <div>
+                <label for="comment">댓글</label>
+                <textarea name="comment" id="comment" rows="4" required></textarea>
+            </div>
+            <button type="submit">리뷰 작성</button>
+        </form>
+    </div>
+</div>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const mainImage = document.querySelector(".main-image");
@@ -174,6 +189,10 @@
         function updateMainImage() {
             // 모든 썸네일의 하이라이트 제거
             thumbnails.forEach(thumbnail => thumbnail.classList.remove("active"));
+
+            if (currentIndex >= thumbnails.length) {
+                currentIndex = 0;
+            }
 
             // 현재 썸네일을 메인 이미지로 설정
             const currentThumbnail = thumbnails[currentIndex];
@@ -196,6 +215,8 @@
                 updateMainImage();
             });
         });
+
+
     });
 </script>
 

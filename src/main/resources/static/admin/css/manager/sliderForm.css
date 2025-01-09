@@ -26,3 +26,10 @@
 .slider-form .btn {
     margin-right: 10px;
 }
+
+.form-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #6c757d; /* Bootstrap의 muted 텍스트 색상 */
+}

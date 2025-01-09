@@ -1,4 +1,6 @@
 package page.admin.admin.item.service;
+
+import page.admin.admin.item.domain.Review;
 import page.admin.admin.manager.domain.dto.CategoryWithItemsDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +50,16 @@ public interface ItemService {
     List<CategoryWithItemsDTO> getItemsGroupedByMainCategory(int limitPerCategory);
 
     List<Item> findItemsByMainCategoryWithOffset(Long mainCategoryId, int offset, int limit);
+
+    // 인기상품 조회
+    List<Item> getPopularItems(Pageable pageable);
+
+    // 조회수 증가
+    void incrementViewCount(Long itemId);
+
+    // 평균 평점 계산
+    Double getAverageRating(Long itemId);
+
+    Page<Review> getReviewsByItemId(Long itemId, Pageable pageable);
+
 }

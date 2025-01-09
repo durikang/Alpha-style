@@ -1,47 +1,36 @@
 package page.admin.admin.item.domain.dto;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import page.admin.admin.item.domain.*;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemViewForm {
 
-    private final Long itemId;
-    private final String itemName;
-    private final Integer purchasePrice;
-    private final Integer salePrice;
-    private final Integer quantity;
-    private final Boolean open;
-    private final Set<Region> regions;
-    private final ItemType itemType;
-    private final DeliveryCode deliveryCode;
-    private final MainCategory mainCategory;
-    private final SubCategory subCategory;
-    private final UploadFile mainImage;
-    private final Set<UploadFile> thumbnails;
-
-    public ItemViewForm(Long itemId, String itemName, Integer purchasePrice, Integer salePrice, Integer quantity,
-                        Boolean open, Set<Region> regions, ItemType itemType, DeliveryCode deliveryCode,
-                        MainCategory mainCategory, SubCategory subCategory, UploadFile mainImage,
-                        Set<UploadFile> thumbnails) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.purchasePrice = purchasePrice;
-        this.salePrice = salePrice;
-        this.quantity = quantity;
-        this.open = open;
-        this.regions = regions;
-        this.itemType = itemType;
-        this.deliveryCode = deliveryCode;
-        this.mainCategory = mainCategory;
-        this.subCategory = subCategory;
-        this.mainImage = mainImage;
-        this.thumbnails = thumbnails;
-    }
+    private Long itemId;
+    private String itemName;
+    private Integer purchasePrice;
+    private Integer salePrice;
+    private Integer quantity;
+    private Boolean open;
+    private Set<Region> regions;
+    private ItemType itemType;
+    private DeliveryCode deliveryCode;
+    private MainCategory mainCategory;
+    private SubCategory subCategory;
+    private UploadFile mainImage;
+    private List<UploadFile> thumbnails;
+    private Long viewCount;
+    private Long salesCount;
+    private Double averageRating;
 
     // 판매 여부
     public String getOpenStatus() {
@@ -65,5 +54,14 @@ public class ItemViewForm {
     // 배송 방식 설명 추가
     public String getDeliveryDisplayName() {
         return deliveryCode != null ? deliveryCode.getDisplayName() : "정보 없음";
+    }
+
+    // 추가된 필드에 대한 포맷팅 메서드
+    public String getFormattedViewCount() {
+        return String.format("%,d회", viewCount != null ? viewCount : 0);
+    }
+
+    public String getFormattedSalesCount() {
+        return String.format("%,d개", salesCount != null ? salesCount : 0);
     }
 }

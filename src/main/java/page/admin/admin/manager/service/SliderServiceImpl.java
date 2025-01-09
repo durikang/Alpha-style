@@ -53,8 +53,6 @@ public class SliderServiceImpl implements SliderService {
     }
 
 
-
-
     @Override
     public void deleteSlider(Long id) {
         sliderRepository.deleteById(id);

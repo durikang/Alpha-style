@@ -19,7 +19,7 @@ public class FileSettingsServiceImpl implements FileSettingsService {
         if (!fileSettingsRepository.existsById(1L)) {
             FileSettings defaultSettings = new FileSettings();
             defaultSettings.setId(1L);
-            defaultSettings.setMaxFileSize(10485760L); // 10MB
+            defaultSettings.setMaxFileSize(104857600L); // 100MB (200MB으로 변경 필요)
             defaultSettings.setAllowedExtensions("jpg,png,pdf,docx");
             fileSettingsRepository.save(defaultSettings);
         }

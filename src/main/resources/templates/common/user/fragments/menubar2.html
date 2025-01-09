@@ -1,33 +1,12 @@
-<!-- menu.html -->
 <header class="header" th:fragment="menu">
     <div class="logo">
         <span><a th:href="@{/}"><img th:src="@{/user/img/alpha_Style.png}" alt="logo"></a></span>
     </div>
-    <!-- 햄버거 메뉴 버튼 -->
-    <div class="nav-toggle" onclick="toggleNav()">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-    </div>
     <nav class="nav">
-        <ul id="navMenu">
-            <!-- 정적 링크: 인기상품, 신상품 -->
-            <li class="nav-item">
-                <a th:href="@{/user/popular-products}" class="nav-link">인기상품</a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/user/new-products}" class="nav-link">신상품</a>
-            </li>
-            <!-- 동적 메인 카테고리 -->
-            <li th:each="mainCategory : ${navMainCategories}" class="nav-item dropdown">
-                <a th:href="@{/user/products/main/{id}(id=${mainCategory.id})}" class="nav-link" th:text="${mainCategory.mainCategoryName}">메인 카테고리</a>
-                <ul class="dropdown-menu">
-                    <li th:each="subCategory : ${mainCategory.subCategories}">
-                        <a th:href="@{/user/products/sub/{id}(id=${subCategory.id})}" class="dropdown-item" th:text="${subCategory.subCategoryName}">서브 카테고리</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <a th:href="@{/user/popular-products}" class="nav-item">인기상품</a>
+        <a th:href="@{/user/new-products}" class="nav-item">신상품</a>
+        <a th:href="@{/user/winter-products}" class="nav-item">겨울상품</a>
+        <a th:href="@{/user/summer-products}" class="nav-item">여름상품</a>
     </nav>
     <div class="user-options">
         <!-- 로그인 여부에 따라 메뉴 표시 -->
@@ -58,11 +37,3 @@
         <a th:href="@{/user/profile}" class="user" title="프로필">👤</a>
     </div>
 </header>
-
-<!-- 네비게이션 토글 스크립트 -->
-<script>
-    function toggleNav() {
-        const navMenu = document.getElementById('navMenu');
-        navMenu.classList.toggle('show');
-    }
-</script>
