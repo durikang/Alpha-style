@@ -1,41 +1,38 @@
 // src/main/resources/static/js/star-rating.js
 
 document.addEventListener("DOMContentLoaded", function () {
-    const stars = document.querySelectorAll("#star-rating .star");
+    // 별점 선택 기능
+    const stars = document.querySelectorAll(".add-review #star-rating .star");
     const ratingInput = document.getElementById("rating");
 
     stars.forEach(star => {
-        star.addEventListener("click", function () {
-            const rating = this.getAttribute("data-value");
+        star.addEventListener("click", () => {
+            const rating = star.getAttribute("data-value");
             ratingInput.value = rating;
+
             stars.forEach(s => {
                 if (s.getAttribute("data-value") <= rating) {
-                    s.style.color = "#ffc107";
+                    s.classList.add("selected");
                 } else {
-                    s.style.color = "#ddd";
+                    s.classList.remove("selected");
                 }
             });
         });
 
-        star.addEventListener("mouseover", function () {
-            const hoverValue = this.getAttribute("data-value");
+        star.addEventListener("mouseover", () => {
+            const rating = star.getAttribute("data-value");
             stars.forEach(s => {
-                if (s.getAttribute("data-value") <= hoverValue) {
-                    s.style.color = "#ffc107";
+                if (s.getAttribute("data-value") <= rating) {
+                    s.classList.add("hover");
                 } else {
-                    s.style.color = "#ddd";
+                    s.classList.remove("hover");
                 }
             });
         });
 
-        star.addEventListener("mouseout", function () {
-            const currentRating = ratingInput.value;
+        star.addEventListener("mouseout", () => {
             stars.forEach(s => {
-                if (s.getAttribute("data-value") <= currentRating) {
-                    s.style.color = "#ffc107";
-                } else {
-                    s.style.color = "#ddd";
-                }
+                s.classList.remove("hover");
             });
         });
     });

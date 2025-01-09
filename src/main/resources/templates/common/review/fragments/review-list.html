@@ -49,7 +49,11 @@
 <body>
 <div id="review-section">
     <h2>리뷰</h2>
-    <div id="reviews">
+    <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
+        작성된 리뷰가 없습니다.
+    </div>
+    <div th:unless="${#lists.isEmpty(reviews)}">
+        <!-- 리뷰 리스트 -->
         <div th:each="review : ${reviews}" class="review">
             <div class="review-header">
                 <span class="review-username" th:text="${review.username}">Username</span>
@@ -62,24 +66,19 @@
             </div>
             <div class="review-comment" th:text="${review.comment}">리뷰 내용</div>
             <div class="review-date" th:text="${#dates.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>
-            <div th:if="${#authorization.expression('isAuthenticated()')}">
-                <button class="delete-button" th:data-review-id="${review.reviewId}" th:data-item-id="${itemId}">삭제</button>
-            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:replace="~{common/admin/fragments/pagination_review ::
+            pagination(
+                startPage=${startPage},
+                endPage=${endPage},
+                totalPages=${totalPages},
+                currentPage=${currentPage},
+                url='/admin/product/items/{itemId}(itemId=${itemId})'
+            )}">
         </div>
     </div>
-
-    <!-- 페이징 프래그먼트 포함 -->
-    <div th:replace="~{common/admin/fragments/pagination :: pagination(
-    startPage=${startPage},
-    endPage=${endPage},
-    totalPages=${totalPages},
-    currentPage=${currentPage},
-    url='/admin/product/items/' + ${item.itemId} + '/reviews',
-    keyword='',
-    sortField=${sortField},
-    sortDirection='DESC'
-)}"></div>
-
 </div>
 
 <script>

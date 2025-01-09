@@ -63,11 +63,6 @@ public class ItemServiceImpl implements ItemService {
                 .map(file -> fileStore.storeFile(file))
                 .collect(Collectors.toSet());
 
-        // Placeholder 이미지로 채우기 (최대 4개)
-        for (int i = thumbnails.size(); i < 4; i++) {
-            thumbnails.add(new UploadFile("https://via.placeholder.com/80x100.png?text=Thumbnail+" + (i + 1)));
-        }
-
         // (3) 지역 -> regionCodes
         Set<Region> regions = regionRepository.findByCodeIn(form.getRegionCodes());
         if (regions.isEmpty()) {
@@ -337,6 +332,8 @@ public class ItemServiceImpl implements ItemService {
      * Item -> ItemViewForm 변환
      */
     public ItemViewForm toItemViewForm(Item item) {
+        int thumbnailCount = item.getThumbnails() != null ? item.getThumbnails().size() : 0;
+        log.debug("Item ID {} has {} thumbnails.", item.getItemId(), thumbnailCount);
         return new ItemViewForm(
                 item.getItemId(),
                 item.getItemName(),
@@ -356,6 +353,7 @@ public class ItemServiceImpl implements ItemService {
                 null // averageRating set in getItemViewForm
         );
     }
+
 
 
     /**
@@ -457,11 +455,6 @@ public class ItemServiceImpl implements ItemService {
                     .limit(4)
                     .map(file -> fileStore.storeFile(file))
                     .collect(Collectors.toSet());
-
-            // Placeholder 이미지로 채우기 (최대 4개)
-            for (int i = updatedThumbnails.size(); i < 4; i++) {
-                updatedThumbnails.add(new UploadFile("https://via.placeholder.com/80x100.png?text=Thumbnail+" + (i + 1)));
-            }
 
             // Set the item in each UploadFile
             updatedThumbnails.forEach(thumbnail -> thumbnail.setItem(item));

@@ -1,15 +1,21 @@
 package page.admin.admin.item.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @SequenceGenerator(
         name = "upload_file_seq_generator",
         sequenceName = "upload_file_seq", // Oracle 시퀀스 이름
@@ -18,7 +24,7 @@ import java.time.LocalDateTime;
 public class UploadFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "upload_file_seq_generator")
     private Long id;
 
     private String uploadFileName;
@@ -28,6 +34,8 @@ public class UploadFile {
     private LocalDateTime uploadTime; // 업로드 시간
 
     // 추가된 필드: Item과의 다대일 관계
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;

@@ -1,0 +1,24 @@
+
+/*
+/admin/css/review/star-rating.css
+/* 별점 시스템 스타일 (optional, 보완) */
+#star-rating {
+    display: flex;
+    flex-direction: row;
+}
+
+#star-rating .star {
+    font-size: 1.5em;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+/* 리뷰 작성 폼의 별점 호버 효과 */
+.add-review #star-rating .star.hover,
+.add-review #star-rating .star.selected {
+    color: #FFD700; /* 금색 */
+}
+#star-rating .star:hover,
+#star-rating .star.active {
+    color: #ffc107;
+}

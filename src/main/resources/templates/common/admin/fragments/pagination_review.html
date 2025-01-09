@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="pagination(startPage, endPage, totalPages, currentPage, url)">
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 5px;
+    }
+
+    .pagination a {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #007bff;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .pagination a.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .pagination a:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+
+    .pagination span.disabled {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #ccc;
+        cursor: not-allowed;
+    }
+</style>
+<div class="pagination">
+    <!-- 이전 페이지 블록 이동 -->
+    <span th:if="${currentPage <= 1}" class="disabled">&laquo;</span>
+    <a th:if="${currentPage > 1}"
+       th:href="@{${url}(page=${currentPage - 2})}">
+        &laquo;
+    </a>
+
+    <!-- 페이지 번호 -->
+    <a th:each="i : ${#numbers.sequence(startPage ?: 1, endPage ?: 1)}"
+       th:href="@{${url}(page=${i - 1})}"
+       th:classappend="${currentPage == i} ? 'active' : ''"
+       th:text="${i}"></a>
+
+    <!-- 다음 페이지 블록 이동 -->
+    <span th:if="${currentPage >= totalPages}" class="disabled">&raquo;</span>
+    <a th:if="${currentPage < totalPages}"
+       th:href="@{${url}(page=${currentPage)}}">
+        &raquo;
+    </a>
+</div>
+</html>

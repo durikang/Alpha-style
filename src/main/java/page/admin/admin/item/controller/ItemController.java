@@ -89,12 +89,13 @@ public class ItemController {
 
         // 아이템 조회
         ItemViewForm item = itemService.getItemViewForm(itemId);
-        model.addAttribute("item", item); // 상세보기용 DTO
+        model.addAttribute("item", item);
 
         // 리뷰 페이징 처리
         int pageSize = 10; // 한 페이지당 리뷰 수
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), pageSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Page<Review> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
+
         List<ReviewDTO> reviews = reviewPage.stream()
                 .map(review -> new ReviewDTO(
                         review.getReviewId(),
@@ -108,23 +109,37 @@ public class ItemController {
         // 페이지네이션 정보
         int currentPage = reviewPage.getNumber() + 1;
         int totalPages = reviewPage.getTotalPages();
+        // totalPages가 0인 경우 페이지네이션 초기화
+        int startPage = 1;
+        int endPage = 1;
 
-        // 페이지 블록 계산 (1~10, 11~20, ...)
-        int blockSize = 10;
-        int startPage = ((currentPage - 1) / blockSize) * blockSize + 1;
-        int endPage = Math.min(startPage + blockSize - 1, totalPages);
 
-        // 모델에 추가
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
+
+
+
+        // 페이지네이션 조건 추가
+        if (totalPages > 0) {
+            int blockSize = 10; // 한 번에 표시할 페이지 수
+            startPage = ((currentPage - 1) / blockSize) * blockSize + 1;
+            endPage = Math.min(startPage + blockSize - 1, totalPages);
+            model.addAttribute("reviews", reviews);
+            model.addAttribute("currentPage", currentPage);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("startPage", startPage);
+            model.addAttribute("endPage", endPage);
+        } else {
+            // 리뷰가 없으면 빈 리스트 전달
+            model.addAttribute("reviews", List.of());
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+        }
+
         model.addAttribute("sortField", "createdDate");
         model.addAttribute("sortDirection", "DESC");
 
         return "admin/product/item"; // 선행 슬래시 제거
     }
+
 
 
     // ======================================
