@@ -94,17 +94,9 @@ public class ItemController {
         // 리뷰 페이징 처리
         int pageSize = 10; // 한 페이지당 리뷰 수
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), pageSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Review> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
+        Page<ReviewDTO> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
 
-        List<ReviewDTO> reviews = reviewPage.stream()
-                .map(review -> new ReviewDTO(
-                        review.getReviewId(),
-                        review.getMember().getUsername(),
-                        review.getRating(),
-                        review.getReviewComment(),
-                        review.getCreatedDate()
-                ))
-                .collect(Collectors.toList());
+        List<ReviewDTO> reviews = reviewPage.getContent();
 
         // 페이지네이션 정보
         int currentPage = reviewPage.getNumber() + 1;
@@ -112,10 +104,6 @@ public class ItemController {
         // totalPages가 0인 경우 페이지네이션 초기화
         int startPage = 1;
         int endPage = 1;
-
-
-
-
 
         // 페이지네이션 조건 추가
         if (totalPages > 0) {
@@ -139,6 +127,7 @@ public class ItemController {
 
         return "admin/product/item"; // 선행 슬래시 제거
     }
+
 
 
 

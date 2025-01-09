@@ -1,7 +1,5 @@
 package page.admin.admin.item.service;
 
-// package page.admin.admin.item.service;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,11 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import page.admin.admin.item.domain.Item;
 import page.admin.admin.item.domain.Review;
+import page.admin.admin.item.domain.dto.ReviewDTO;
 import page.admin.admin.item.repository.ItemRepository;
 import page.admin.admin.item.repository.ReviewRepository;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.member.repository.MemberRepository;
 import page.admin.common.utils.exception.DataNotFoundException;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Review> getReviewsByItemId(Long itemId, Pageable pageable) {
-        return reviewRepository.findByItemItemId(itemId, pageable);
+    public Page<ReviewDTO> getReviewsByItemId(Long itemId, Pageable pageable) {
+        Page<Review> reviewPage = reviewRepository.findByItemItemId(itemId, pageable);
+        return reviewPage.map(review -> new ReviewDTO(
+                review.getReviewId(),
+                review.getMember().getUsername(),
+                review.getRating(),
+                review.getReviewComment(),
+                review.getCreatedDate()
+        ));
     }
 
     @Override
@@ -60,4 +68,12 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new DataNotFoundException("해당 리뷰를 찾을 수 없습니다. ID: " + reviewId));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Double getAverageRating(Long itemId) {
+        Double averageRating = reviewRepository.findAverageRatingByItemId(itemId);
+        return averageRating != null ? averageRating : 0.0;
+    }
+
 }

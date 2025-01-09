@@ -1,14 +1,12 @@
 /* /admin/css/review/review.css */
 
 /* 리뷰 섹션 전체 스타일 */
+/* Removed max-width and margin to match product-container's width */
 .review-section {
-    margin-top: 40px;
+    /* padding, background, border-radius 유지 */
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    /* 상품 상세 섹션과 동일한 너비와 중앙 정렬을 적용 */
-    max-width: 1200px;
-    margin: 40px auto 0 auto; /* 위 마진은 동일, 좌우 중앙 정렬 */
     box-sizing: border-box;
 }
 
@@ -147,7 +145,6 @@
 .add-review button:hover {
     background-color: #218838;
 }
-
 
 /* 추가적인 스타일링 조정 */
 .review-section .add-review {

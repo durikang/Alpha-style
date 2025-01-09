@@ -64,4 +64,14 @@ public class ItemViewForm {
     public String getFormattedSalesCount() {
         return String.format("%,d개", salesCount != null ? salesCount : 0);
     }
+
+
+    // 평균 평점 포맷팅
+    public String getFormattedAverageRating() {
+        if (averageRating == null) {
+            return "0.0";
+        }
+        return String.format("%.1f", averageRating);
+    }
+
 }

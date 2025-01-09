@@ -21,7 +21,8 @@ public class AdminInterceptor implements HandlerInterceptor {
 
         LoginSessionInfo sessionInfo = (LoginSessionInfo) session.getAttribute("loginMember");
 
-        if (sessionInfo == null || !"admin".equalsIgnoreCase(sessionInfo.getRole())) {
+        if (sessionInfo == null || sessionInfo.getRole() == null ||
+                (!"admin".equalsIgnoreCase(sessionInfo.getRole()))) {
             // 일반 사용자는 user 홈으로 리다이렉트
             response.sendRedirect(sessionInfo == null ? "/login" : "/user/home");
             return false;

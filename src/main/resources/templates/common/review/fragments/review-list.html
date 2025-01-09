@@ -65,7 +65,7 @@
                 </span>
             </div>
             <div class="review-comment" th:text="${review.comment}">리뷰 내용</div>
-            <div class="review-date" th:text="${#dates.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>
+            <div class="review-date" th:text="${#temporals.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>
         </div>
 
         <!-- 페이지네이션 -->

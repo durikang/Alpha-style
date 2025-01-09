@@ -90,7 +90,7 @@
             <div class="additional-info hidden">
                 <div class="detail-row" th:if="${item.averageRating != null}">
                     <label>평균 평점</label>
-                    <p th:text="${#numbers.formatDecimal(item.averageRating, 1, 'POINT', 1, 'NONE')}">4.5</p>
+                    <p th:text="${item.formattedAverageRating}">4.5</p>
                 </div>
                 <div class="detail-row">
                     <label>등록 지역</label>
@@ -154,7 +154,6 @@
             </form>
         </div>
     </div>
-
 </div>
 </body>
 </html>

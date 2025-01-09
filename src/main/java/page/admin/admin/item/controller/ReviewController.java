@@ -1,4 +1,4 @@
-package page.admin.admin.item.controller;// package page.admin.admin.item.controller;
+package page.admin.admin.item.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,7 @@ import page.admin.common.utils.Alert;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -40,24 +38,14 @@ public class ReviewController {
                                         @RequestParam(value = "page", defaultValue = "0") int page,
                                         @RequestParam(value = "size", defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Review> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
-        List<ReviewDTO> reviews = reviewPage.stream()
-                .map(review -> new ReviewDTO(
-                        review.getReviewId(),
-                        review.getMember().getUsername(),
-                        review.getRating(),
-                        review.getReviewComment(),
-                        review.getCreatedDate()
-                ))
-                .collect(Collectors.toList());
+        Page<ReviewDTO> reviewPage = reviewService.getReviewsByItemId(itemId, pageable);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("reviews", reviews);
+        response.put("reviews", reviewPage.getContent());
         response.put("currentPage", reviewPage.getNumber());
         response.put("totalPages", reviewPage.getTotalPages());
 
         return ResponseEntity.ok(response);
-
     }
 
     /**
@@ -106,7 +94,7 @@ public class ReviewController {
         try {
             Review review = reviewService.getReviewById(reviewId);
             if (!review.getMember().getUserNo().equals(loginSessionInfo.getUserNo()) &&
-                    !"ADMIN".equals(loginSessionInfo.getRole())) {
+                    !"ADMIN".equalsIgnoreCase(loginSessionInfo.getRole())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", "권한이 없습니다."));
             }

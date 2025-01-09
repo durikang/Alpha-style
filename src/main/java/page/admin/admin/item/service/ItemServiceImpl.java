@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import page.admin.admin.item.domain.*;
-import page.admin.admin.item.domain.dto.ItemEditForm;
-import page.admin.admin.item.domain.dto.ItemSaveForm;
-import page.admin.admin.item.domain.dto.ItemUpdateForm;
-import page.admin.admin.item.domain.dto.ItemViewForm;
+import page.admin.admin.item.domain.dto.*;
 import page.admin.admin.item.repository.*;
 import page.admin.admin.manager.domain.dto.CategoryWithItemsDTO;
 import page.admin.admin.member.domain.Member;
@@ -223,15 +220,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public Double getAverageRating(Long itemId) {
-        Page<Review> reviews = reviewService.getReviewsByItemId(itemId, Pageable.unpaged());
+        Page<ReviewDTO> reviews = reviewService.getReviewsByItemId(itemId, Pageable.unpaged());
         if (reviews.isEmpty()) {
             return 0.0;
         }
         return reviews.stream()
-                .mapToInt(Review::getRating)
+                .mapToInt(ReviewDTO::getRating)
                 .average()
                 .orElse(0.0);
     }
+
 
     // ======================================
     // 11) 메인 카테고리별로 최대 4개의 상품 조회

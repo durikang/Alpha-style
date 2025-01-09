@@ -11,6 +11,8 @@ import page.admin.admin.item.domain.ItemType;
 import page.admin.admin.item.domain.Region;
 import page.admin.common.utils.converter.StringToItemTypeConverter;
 import page.admin.common.utils.converter.StringToRegionConverter;
+import page.admin.common.utils.config.AdminInterceptor;
+import page.admin.common.utils.config.UserInterceptor;
 
 import java.util.List;
 
@@ -41,10 +43,22 @@ public class WebConfig implements WebMvcConfigurer {
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseTrailingSlashMatch(true);
     }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // /files/** 경로로 오는 요청을 C:/fileRepository/file/ 디렉토리로 매핑
         registry.addResourceHandler("/files/**")
                 .addResourceLocations("file:///C:/fileRepository/file/");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // AdminInterceptor를 /admin/** 경로에 등록
+        registry.addInterceptor(adminInterceptor)
+                .addPathPatterns("/admin/**");
+
+        // UserInterceptor를 필요한 경로에 등록 (예: /user/**)
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/user/**");
     }
 }
