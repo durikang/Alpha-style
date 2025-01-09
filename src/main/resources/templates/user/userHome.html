@@ -1,72 +1,73 @@
-<!doctype html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/user/layouts/defaultLayout}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <!doctype html>
+    <html lang="en"
+          xmlns:th="http://www.thymeleaf.org"
+          xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+          layout:decorate="~{common/user/layouts/defaultLayout}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Document</title>
 
-</head>
-<body>
+    </head>
+    <body>
 
-<div layout:fragment="pageStyles">
-    <link rel="stylesheet" th:href="@{/user/css/userHome.css}"/>
-    <script th:src="@{/user/js/usermainpagescript.js}" th:inline="none"></script>
-    <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
-</div>
-
-<!-- Slider 프래그먼트 정의 -->
-<div layout:fragment="slider">
-    <div class="slider">
-        <div class="slides">
-            <div class="slide" th:each="slider : ${sliders}">
-                <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
-                <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
-            </div>
-            <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
-            <div th:if="${#lists.isEmpty(sliders)}" class="slide">
-                <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
-            </div>
-        </div>
-        <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
-        <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
+    <div layout:fragment="pageStyles">
+        <link rel="stylesheet" th:href="@{/user/css/userHome/userHome.css}"/>
+        <script th:src="@{/user/js/userHome/usermainpagescript.js}" th:inline="none" defer></script>
+        <script th:src="@{/user/js/userHome/slider.js}" th:inline="none" defer></script>
+        <script src="https://kit.fontawesome.com/4c4a9d7990.js" crossorigin="anonymous"></script>
     </div>
-</div>
 
-<!-- Content 프래그먼트 정의 -->
-<div layout:fragment="content">
-
-    <div class="container">
-        <h1>BEST ITEM</h1>
-
-        <!-- 메인 카테고리별 상품 리스트 -->
-        <div th:each="categoryWithItems : ${categoriesWithItems}" class="category-section" data-category-id="${categoryWithItems.mainCategory.id}">
-            <h2 th:text="${categoryWithItems.mainCategory.mainCategoryName}">카테고리 이름</h2>
-            <div class="item-grid" id="item-grid-${categoryWithItems.mainCategory.id}">
-                <div class="item" th:each="item : ${categoryWithItems.items}">
-                    <img th:if="${item.mainImage != null}"
-                         th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
-                         alt="상품 이미지"
-                         style="max-width: 300px; max-height: 300px;" />
-                    <img th:unless="${item.mainImage != null}"
-                         src="https://via.placeholder.com/300x300.png?text=No+Image"
-                         alt="기본 이미지"
-                         style="max-width: 300px; max-height: 300px;" />
-                    <div class="info">
-                        <h2 th:text="${item.itemName}">상품 이름</h2>
-                        <p class="price" th:text="${item.getFormattedSalePrice()}">가격</p>
-                        <!--<p th:text="${item.description}">상품 설명</p>-->
-                        <a th:href="@{/user/product/items/{id}(id=${item.itemId})}" class="btn-view">자세히 보기</a>
-                    </div>
+    <!-- Slider 프래그먼트 정의 -->
+    <div layout:fragment="slider">
+        <div class="slider">
+            <div class="slides">
+                <div class="slide" th:each="slider : ${sliders}">
+                    <img th:if="${slider.imageUrl != null}" th:src="@{${slider.imageUrl}}" th:alt="'Slide ' + ${slider.id}" />
+                    <img th:unless="${slider.imageUrl != null}" src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
+                </div>
+                <!-- 기본 슬라이더 이미지 (슬라이더가 비어있을 경우) -->
+                <div th:if="${#lists.isEmpty(sliders)}" class="slide">
+                    <img src="https://via.placeholder.com/1855x840.png?text=Slide+Default" alt="Default Slide" />
                 </div>
             </div>
-            <!-- '더 보기' 버튼 추가 -->
-            <button class="btn-load-more" data-category-id="${categoryWithItems.mainCategory.id}" data-offset="4" data-limit="4">더 보기</button>
-            <span class="loader" id="loader-${categoryWithItems.mainCategory.id}" style="display:none;">Loading...</span>
+            <button class="prev"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="next"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
     </div>
-</div>
-</body>
-</html>
+
+    <!-- Content 프래그먼트 정의 -->
+    <div layout:fragment="content">
+
+        <div class="container">
+            <h1>BEST ITEM</h1>
+
+            <!-- 메인 카테고리별 상품 리스트 -->
+            <div th:each="categoryWithItems : ${categoriesWithItems}" class="category-section" data-category-id="${categoryWithItems.mainCategory.id}">
+                <h2 th:text="${categoryWithItems.mainCategory.mainCategoryName}">카테고리 이름</h2>
+                <div class="item-grid" id="item-grid-${categoryWithItems.mainCategory.id}">
+                    <div class="item" th:each="item : ${categoryWithItems.items}">
+                        <img th:if="${item.mainImage != null}"
+                             th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
+                             alt="상품 이미지"
+                             style="max-width: 300px; max-height: 300px;" />
+                        <img th:unless="${item.mainImage != null}"
+                             src="https://via.placeholder.com/300x300.png?text=No+Image"
+                             alt="기본 이미지"
+                             style="max-width: 300px; max-height: 300px;" />
+                        <div class="info">
+                            <h2 th:text="${item.itemName}">상품 이름</h2>
+                            <p class="price" th:text="${item.getFormattedSalePrice()}">가격</p>
+                            <!--<p th:text="${item.description}">상품 설명</p>-->
+                            <a th:href="@{/user/product/items/{id}(id=${item.itemId})}" class="btn-view">자세히 보기</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- '더 보기' 버튼 추가 -->
+                <button class="btn-load-more" data-category-id="${categoryWithItems.mainCategory.id}" data-offset="4" data-limit="4">더 보기</button>
+                <span class="loader" id="loader-${categoryWithItems.mainCategory.id}" style="display:none;">Loading...</span>
+            </div>
+        </div>
+    </div>
+    </body>
+    </html>
