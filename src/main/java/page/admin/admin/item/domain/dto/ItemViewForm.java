@@ -40,12 +40,21 @@ public class ItemViewForm {
     // 가격 포맷팅 메서드 추가
     public String getFormattedPurchasePrice() {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
-        return purchasePrice != null ? currencyFormat.format(purchasePrice) : "가격 정보 없음";
+        if (purchasePrice != null) {
+            // 포맷팅된 결과에서 ₩ 기호 제거
+            return currencyFormat.format(purchasePrice).replace("₩", "").trim();
+        }
+        return "가격 정보 없음";
     }
 
     public String getFormattedSalePrice() {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.KOREA);
-        return salePrice != null ? currencyFormat.format(salePrice) : "가격 정보 없음";
+
+        if(salePrice != null) {
+            return currencyFormat.format(salePrice).replace("₩","").trim();
+        }
+
+        return "가격 정보 없음";
     }
     // 상품 종류 설명 추가
     public String getItemTypeDescription() {

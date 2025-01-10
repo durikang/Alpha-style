@@ -1,24 +1,26 @@
-
-/*
-/admin/css/review/star-rating.css
-/* 별점 시스템 스타일 (optional, 보완) */
 #star-rating {
     display: flex;
-    flex-direction: row;
+    gap: 5px;
+    cursor: pointer;
 }
 
 #star-rating .star {
-    font-size: 1.5em;
-    color: #ddd;
-    cursor: pointer;
-    transition: color 0.2s;
+    width: 30px;
+    height: 30px;
+    background: #ddd; /* 기본 배경색 */
+    mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>') no-repeat;
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>') no-repeat;
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    background-size: contain;
+    background-position: center;
+    transition: background 0.3s;
 }
-/* 리뷰 작성 폼의 별점 호버 효과 */
-.add-review #star-rating .star.hover,
-.add-review #star-rating .star.selected {
-    color: #FFD700; /* 금색 */
+
+#star-rating .star.filled-left {
+    background: linear-gradient(to right, #FFD700 50%, #ddd 50%);
 }
-#star-rating .star:hover,
-#star-rating .star.active {
-    color: #ffc107;
+
+#star-rating .star.filled-right {
+    background: #FFD700;
 }

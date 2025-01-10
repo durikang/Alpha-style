@@ -2,53 +2,126 @@
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="reviewList(reviews, currentPage, totalPages, itemId, sortField, sortDirection)">
 <head>
     <style>
+        /* 리뷰 섹션 컨테이너 */
+        #review-section {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        /* 리뷰가 없을 때 메시지 */
+        .no-reviews {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        /* 리뷰 항목 스타일 */
         .review {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
+            padding: 20px;
+            margin-bottom: 15px;
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s;
         }
 
-        .review:last-child {
-            border-bottom: none;
+        .review:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* 리뷰 헤더 */
         .review-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
         }
 
         .review-username {
+            font-size: 1.2em;
             font-weight: bold;
+            color: #343a40;
         }
 
-        .review-rating {
+        .review-rating span {
+            font-size: 1.2em;
             color: #ffc107; /* 별 색상 */
         }
 
+        /* 리뷰 본문 */
         .review-comment {
-            margin: 5px 0;
+            font-size: 1em;
+            color: #495057;
+            margin: 15px 0;
+            line-height: 1.6;
+            padding: 10px;
+            background-color: #F1F3F5;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
         }
 
+        /* 리뷰 날짜 */
         .review-date {
             font-size: 0.9em;
-            color: #888;
+            color: #868e96;
+            text-align: right;
+            margin-top: 10px;
         }
 
+        /* 삭제 버튼 */
         .delete-button {
             background-color: transparent;
             border: none;
-            color: #dc3545;
+            color: #e03131;
             cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px;
+            text-decoration: underline;
+            transition: color 0.3s;
         }
 
-        .delete-button:hover {
-            text-decoration: underline;
+        /* 페이지네이션 스타일 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            color: #343a40;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .pagination .active {
+            background-color: #007bff;
+            color: #ffffff;
+            border-color: #007bff;
+            pointer-events: none;
         }
     </style>
+
 </head>
 <body>
 <div id="review-section">
-    <h2>리뷰</h2>
     <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
         작성된 리뷰가 없습니다.
     </div>
@@ -66,10 +139,11 @@
             </div>
             <div class="review-comment" th:text="${review.comment}">리뷰 내용</div>
             <div class="review-date" th:text="${#temporals.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>
+            <button class="delete-button" th:data-review-id="${review.reviewId}" th:data-item-id="${itemId}">삭제</button>
         </div>
 
         <!-- 페이지네이션 -->
-        <div th:replace="~{common/admin/fragments/pagination_review ::
+        <div class="pagination" th:replace="~{common/admin/fragments/pagination_review ::
             pagination(
                 startPage=${startPage},
                 endPage=${endPage},
@@ -80,10 +154,8 @@
         </div>
     </div>
 </div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // 삭제 버튼 클릭 이벤트
         const deleteButtons = document.querySelectorAll(".delete-button");
         deleteButtons.forEach(button => {
             button.addEventListener("click", function () {
@@ -100,7 +172,6 @@
                         .then(({ status, body }) => {
                             alert(body.message);
                             if (status >= 200 && status < 300) {
-                                // 페이지 새로고침 또는 리뷰 목록 업데이트
                                 window.location.reload();
                             }
                         })
