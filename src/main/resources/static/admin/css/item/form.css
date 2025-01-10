@@ -121,6 +121,7 @@ a.btn-cancel:hover {
 
 /* 썸네일 갤러리 */
 .thumbnail-gallery {
+    justify-content: center;
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
@@ -151,6 +152,26 @@ a.btn-cancel:hover {
 .thumbnail-preview:hover {
     background-color: #f1f1f1;
     border-color: #aaa;
+}
+
+.file-input {
+    display: none;
+}
+
+/* 업로드 버튼 */
+#thumbnailUploadButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#thumbnailUploadButton:hover {
+    background-color: #0056b3;
 }
 
 /* 체크박스 및 라디오 버튼 */
@@ -199,4 +220,89 @@ input[type="file"] {
 .btn-lg {
     font-size: 1.2em;
     padding: 10px;
+}
+/* 이미지 섹션 스타일 */
+.image-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 메인 이미지 스타일 */
+.main-image-wrapper {
+    position: relative;
+    text-align: center;
+}
+
+.main-image {
+    width: 400px;
+    height: 500px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 메인 이미지 */
+.main-image-wrapper {
+    text-align: center;
+    cursor: pointer;
+}
+
+.main-image-wrapper img {
+    width: 400px;
+    height: 500px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.main-image:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+.main-image-wrapper:hover img {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+
+
+/* 썸네일 갤러리 */
+.thumbnail-gallery {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.thumbnail-preview {
+    position: relative;
+    width: 80px;
+    height: 100px;
+    border: 1px dashed #ddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.thumbnail-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.thumbnail-preview:hover {
+    background-color: #f1f1f1;
+    border-color: #007bff;
+}
+
+/* 파일 업로드 숨기기 */
+.file-input {
+    display: none;
 }

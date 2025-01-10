@@ -15,7 +15,6 @@
 <main class="container">
     <h1>상품 수정</h1>
     <div>
-
         <!-- 수정 폼, th:object -> ItemUpdateForm or ItemEditForm -->
         <form th:action="${formAction}" th:object="${item}" method="post" enctype="multipart/form-data">
 
@@ -132,106 +131,48 @@
                       th:text="${#fields.errors('deliveryCode')}"></span>
             </div>
 
-            <!-- 메인 이미지 -->
-            <div class="form-group">
-                <label>메인 이미지</label>
-                <div class="image-preview" id="mainImagePreview"
-                     onclick="document.getElementById('mainImageInput').click();">
-                    <img th:src="${
-                        (item.mainImagePath != null)
-                          ? (
-                              #strings.contains(item.mainImagePath, '://')
-                                ? item.mainImagePath
-                                : '/images/' + item.mainImagePath
-                            )
-                          : 'https://via.placeholder.com/400x500.png?text=Main+Image'
-                    }"
-                         alt="메인 이미지"/>
-                    <!-- 기존 메인 이미지 경로를 서버로 전달 -->
-                    <input type="hidden" th:name="existingMainImage" th:value="${item.mainImagePath}"/>
+            <div class="image-section">
+                <!-- 메인 이미지 -->
+                <div class="main-image-wrapper" id="mainImagePreview" draggable="true">
+                    <img th:if="${item.mainImagePath != null}"
+                         th:src="@{'/files/' + ${item.mainImagePath}}"
+                         alt="상품 메인 이미지" />
+                    <img th:unless="${item.mainImagePath != null}"
+                         src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                         alt="기본 이미지" />
+                    <!-- 메인 이미지 파일 업로드 -->
+                    <input type="file" id="mainImageInput" class="file-input" name="newMainImage" accept="image/*">
                 </div>
-                <input type="file" id="mainImageInput" name="mainImage" accept="image/*">
-            </div>
 
-            <!-- 썸네일 이미지 4개 -->
-            <div class="form-group">
-                <label>썸네일 이미지</label>
+                <!-- 썸네일 갤러리 -->
                 <div class="thumbnail-gallery">
+                    <th:block th:each="thumbnailPath, iter : ${item.thumbnailPaths}">
+                        <div class="thumbnail-preview" th:id="'thumb' + ${iter.index + 1}" draggable="true">
+                            <img th:src="@{'/files/' + ${thumbnailPath}}"
+                                 th:alt="'썸네일 ' + ${iter.index + 1}" />
+                            <!-- 썸네일 파일 업로드 -->
+                            <input type="file" th:id="'thumbnailInput' + ${iter.index + 1}"
+                                   class="file-input" th:name="'thumbnails[' + ${iter.index} + ']'" accept="image/*">
+                        </div>
+                    </th:block>
 
-                    <!-- 썸네일 #1 -->
-                    <div class="thumbnail-preview" id="thumb1Preview"
-                         onclick="document.getElementById('thumbnailInput1').click();">
-                        <img th:src="${
-                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 0)
-                            ? (
-                                #strings.contains(item.thumbnailPaths[0], '://')
-                                  ? item.thumbnailPaths[0]
-                                  : '/images/' + item.thumbnailPaths[0]
-                              )
-                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'
-                        }"
-                             alt="썸네일 1"/>
-                        <!-- 기존 썸네일 #1 경로를 서버로 전달 -->
-                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 0 ? item.thumbnailPaths[0] : ''}"/>
-                    </div>
-                    <input type="file" id="thumbnailInput1" name="thumbnails[0]" accept="image/*">
-
-                    <!-- 썸네일 #2 -->
-                    <div class="thumbnail-preview" id="thumb2Preview"
-                         onclick="document.getElementById('thumbnailInput2').click();">
-                        <img th:src="${
-                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 1)
-                            ? (
-                                #strings.contains(item.thumbnailPaths[1], '://')
-                                  ? item.thumbnailPaths[1]
-                                  : '/images/' + item.thumbnailPaths[1]
-                              )
-                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'
-                        }"
-                             alt="썸네일 2"/>
-                        <!-- 기존 썸네일 #2 경로를 서버로 전달 -->
-                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 1 ? item.thumbnailPaths[1] : ''}"/>
-                    </div>
-                    <input type="file" id="thumbnailInput2" name="thumbnails[1]" accept="image/*">
-
-                    <!-- 썸네일 #3 -->
-                    <div class="thumbnail-preview" id="thumb3Preview"
-                         onclick="document.getElementById('thumbnailInput3').click();">
-                        <img th:src="${
-                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 2)
-                            ? (
-                                #strings.contains(item.thumbnailPaths[2], '://')
-                                  ? item.thumbnailPaths[2]
-                                  : '/images/' + item.thumbnailPaths[2]
-                              )
-                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'
-                        }"
-                             alt="썸네일 3"/>
-                        <!-- 기존 썸네일 #3 경로를 서버로 전달 -->
-                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 2 ? item.thumbnailPaths[2] : ''}"/>
-                    </div>
-                    <input type="file" id="thumbnailInput3" name="thumbnails[2]" accept="image/*">
-
-                    <!-- 썸네일 #4 -->
-                    <div class="thumbnail-preview" id="thumb4Preview"
-                         onclick="document.getElementById('thumbnailInput4').click();">
-                        <img th:src="${
-                          (item.thumbnailPaths != null and item.thumbnailPaths.size() > 3)
-                            ? (
-                                #strings.contains(item.thumbnailPaths[3], '://')
-                                  ? item.thumbnailPaths[3]
-                                  : '/images/' + item.thumbnailPaths[3]
-                              )
-                            : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'
-                        }"
-                             alt="썸네일 4"/>
-                        <!-- 기존 썸네일 #4 경로를 서버로 전달 -->
-                        <input type="hidden" th:name="existingThumbnails" th:value="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 3 ? item.thumbnailPaths[3] : ''}"/>
-                    </div>
-                    <input type="file" id="thumbnailInput4" name="thumbnails[3]" accept="image/*">
+                    <!-- 썸네일 부족 시 빈 자리 채우기 -->
+                    <th:block th:if="${item.thumbnailPaths == null or item.thumbnailPaths.size() < 4}">
+                        <th:block th:each="i : ${#numbers.sequence(item.thumbnailPaths != null ? item.thumbnailPaths.size() + 1 : 1, 4)}">
+                            <div class="thumbnail-preview" th:id="'thumb' + ${i}" draggable="true">
+                                <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
+                                     th:alt="'썸네일 ' + ${i}" />
+                                <!-- 썸네일 파일 업로드 -->
+                                <input type="file" th:id="'thumbnailInput' + ${i}"
+                                       class="file-input" th:name="'thumbnails[' + (${i - 1}) + ']'" accept="image/*">
+                            </div>
+                        </th:block>
+                    </th:block>
                 </div>
-            </div>
 
+                <!-- 썸네일 업로드 버튼 -->
+                <button id="thumbnailUploadButton" type="button">썸네일 업로드</button>
+            </div>
 
             <!-- 수정 버튼 -->
             <button class="btn-lg" type="submit"

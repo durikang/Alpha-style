@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const setupImageUpload = (inputId, previewId, placeholder) => {
+    const MAX_THUMBNAILS = 4;
+
+    // 공통 이미지 업로드 함수
+    const setupImageUpload = (inputId, previewId) => {
         const input = document.getElementById(inputId);
         const preview = document.getElementById(previewId);
 
@@ -16,13 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         };
 
-        // File input change event
-        input.addEventListener('change', function () {
-            const file = this.files[0];
+        // 파일 선택 이벤트
+        input.addEventListener('change', () => {
+            const file = input.files[0];
             if (file) setImage(file);
         });
 
-        // Drag-and-drop events
+        // 드래그 앤 드롭 이벤트
         preview.addEventListener('dragover', (e) => {
             e.preventDefault();
             preview.classList.add('dragover');
@@ -39,88 +42,50 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) {
                 setImage(file);
 
-                // Sync with input field
+                // 파일 입력 필드 업데이트
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 input.files = dataTransfer.files;
             }
         });
-
-        // Set placeholder image initially
-        const img = preview.querySelector('img');
-        if (img && placeholder) {
-            // 기존 src가 placeholder와 다르다면 그대로 둔다
-            // 또는 "비어있다면" placeholder로 설정
-            if (!img.src || img.src.includes('placeholder.com')) {
-                img.src = placeholder;
-            }
-        }
     };
 
-    // Main image setup
-    setupImageUpload(
-        'mainImageInput',
-        'mainImagePreview',
-        'https://via.placeholder.com/400x500.png?text=Main+Image'
-    );
+    // 메인 이미지 설정
+    setupImageUpload('mainImageInput', 'mainImagePreview');
 
-    // Thumbnail image setup
-    ['1', '2', '3', '4'].forEach((num) => {
-        setupImageUpload(
-            `thumbnailInput${num}`,
-            `thumb${num}Preview`,
-            `https://via.placeholder.com/80x100.png?text=Thumbnail+${num}`
-        );
-    });
+    // 썸네일 설정
+    for (let i = 1; i <= MAX_THUMBNAILS; i++) {
+        setupImageUpload(`thumbnailInput${i}`, `thumb${i}`);
+    }
 
-    // Add thumbnail upload button
-    const createUploadButton = () => {
-        const uploadButton = document.createElement('button');
-        uploadButton.textContent = '썸네일 업로드';
-        uploadButton.className = 'upload-btn';
+    // 썸네일 업로드 버튼
+    const uploadButton = document.getElementById('thumbnailUploadButton');
+    uploadButton.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
 
-        // 버튼 타입을 명시적으로 "button"으로 설정
-        uploadButton.type = 'button';
+        input.addEventListener('change', () => {
+            const files = Array.from(input.files).slice(0, MAX_THUMBNAILS);
+            files.forEach((file, index) => {
+                const preview = document.getElementById(`thumb${index + 1}`);
+                const thumbnailInput = document.getElementById(`thumbnailInput${index + 1}`);
 
-        uploadButton.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
+                if (file && preview && thumbnailInput) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        preview.querySelector('img').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
 
-            input.addEventListener('change', () => {
-                const files = Array.from(input.files).slice(0, 4); // Limit to 4 files
-                files.forEach((file, i) => {
-                    const inputField = document.getElementById(`thumbnailInput${i + 1}`);
-                    const preview = document.getElementById(`thumb${i + 1}Preview`);
-
-                    if (file && inputField && preview) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            preview.querySelector('img').src = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
-
-                        // Sync with hidden file input
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        inputField.files = dataTransfer.files;
-                    }
-                });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    thumbnailInput.files = dataTransfer.files;
+                }
             });
-
-            input.click();
         });
 
-        return uploadButton;
-    };
-
-
-    // Append upload button near gallery
-    const gallery = document.querySelector('.thumbnail-gallery');
-    const submitButton = document.querySelector('.btn-lg');
-    if (gallery && submitButton) {
-        const uploadButton = createUploadButton();
-        submitButton.parentElement.insertBefore(uploadButton, submitButton); // Add button above submit
-    }
+        input.click();
+    });
 });
