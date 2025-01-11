@@ -127,71 +127,87 @@
                       th:text="${#fields.errors('deliveryCode')}"></span>
             </div>
 
-            <!-- 상품 종류, 배송방식, 이미지 업로드 등도 그대로 복제 -->
-            <!-- 메인 이미지 -->
-            <div class="form-group">
-                <label>메인 이미지</label>
-                <div class="image-preview" id="mainImagePreview"
-                     onclick="document.getElementById('mainImageInput').click();">
-                    <!-- 등록 모드: item.mainImagePath가 없으므로 Placeholder -->
-                    <img th:src="${item.mainImagePath != null
-                                ? @environment.getProperty('file.dir') + item.mainImagePath
-                                : 'https://via.placeholder.com/400x500.png?text=Main+Image'}"
-                         alt="메인 이미지"/>
+            <!-- ===================== -->
+            <!-- 1) 이미지 섹션       -->
+            <!-- ===================== -->
+            <div class="image-section">
+                <!-- 메인 이미지 -->
+                <div class="main-image-wrapper" id="mainImagePreview" draggable="true">
+                    <img th:if="${item.mainImagePath != null}"
+                         th:src="@{'/files/' + ${item.mainImagePath}}"
+                         alt="상품 메인 이미지" />
+                    <img th:unless="${item.mainImagePath != null}"
+                         src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                         alt="기본 이미지" />
+                    <!-- 메인 이미지 파일 업로드 -->
+                    <input type="file"
+                           id="mainImageInput"
+                           class="file-input"
+                           name="mainImage"
+                           accept="image/*">
                 </div>
-                <input type="file" id="mainImageInput" name="mainImage" accept="image/*">
-            </div>
 
-            <!-- 썸네일 이미지 4개 -->
-            <div class="form-group">
-                <label>썸네일 이미지</label>
+                <!-- 썸네일 갤러리 -->
                 <div class="thumbnail-gallery">
-                    <!-- 썸네일 1 -->
-                    <div class="thumbnail-preview" id="thumb1Preview"
-                         onclick="document.getElementById('thumbnailInput1').click();">
-                        <img th:src="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 0
-                                   ? @environment.getProperty('file.dir') + item.thumbnailPaths[0]
-                                   : 'https://via.placeholder.com/80x100.png?text=Thumbnail+1'}"
-                             alt="썸네일 1"/>
-                    </div>
-                    <input type="file" id="thumbnailInput1" name="thumbnails[0]" accept="image/*">
+                    <!-- 이미 업로드된 썸네일이 있는 경우 -->
+                    <th:block th:if="${item.thumbnailPaths != null}">
+                        <th:block th:each="thumbnailPath, iter : ${item.thumbnailPaths}">
+                            <div class="thumbnail-preview"
+                                 th:id="'thumb' + ${iter.index + 1}"
+                                 draggable="true">
+                                <img th:src="@{'/files/' + ${thumbnailPath}}"
+                                     th:alt="'썸네일 ' + ${iter.index + 1}" />
+                                <!-- 썸네일 파일 업로드 -->
+                                <input type="file"
+                                       th:id="'thumbnailInput' + ${iter.index + 1}"
+                                       class="file-input"
+                                       th:name="'thumbnails[' + ${iter.index} + ']'"
+                                       accept="image/*">
+                            </div>
+                        </th:block>
 
-                    <!-- 썸네일 2 -->
-                    <div class="thumbnail-preview" id="thumb2Preview"
-                         onclick="document.getElementById('thumbnailInput2').click();">
-                        <img th:src="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 1
-                                   ? @environment.getProperty('file.dir') + item.thumbnailPaths[1]
-                                   : 'https://via.placeholder.com/80x100.png?text=Thumbnail+2'}"
-                             alt="썸네일 2"/>
-                    </div>
-                    <input type="file" id="thumbnailInput2" name="thumbnails[1]" accept="image/*">
+                        <!-- 썸네일 갯수가 4개 미만인 경우 나머지 자리 채우기 -->
+                        <th:block th:if="${item.thumbnailPaths.size() < 4}">
+                            <th:block th:each="i : ${#numbers.sequence(item.thumbnailPaths.size() + 1, 4)}">
+                                <div class="thumbnail-preview"
+                                     th:id="'thumb' + ${i}"
+                                     draggable="true">
+                                    <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
+                                         th:alt="'썸네일 ' + ${i}" />
+                                    <input type="file"
+                                           th:id="'thumbnailInput' + ${i}"
+                                           class="file-input"
+                                           th:name="'thumbnails[' + (${i - 1}) + ']'"
+                                           accept="image/*">
+                                </div>
+                            </th:block>
+                        </th:block>
+                    </th:block>
 
-                    <!-- 썸네일 3 -->
-                    <div class="thumbnail-preview" id="thumb3Preview"
-                         onclick="document.getElementById('thumbnailInput3').click();">
-                        <img th:src="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 2
-                                   ? @environment.getProperty('file.dir') + item.thumbnailPaths[2]
-                                   : 'https://via.placeholder.com/80x100.png?text=Thumbnail+3'}"
-                             alt="썸네일 3"/>
-                    </div>
-                    <input type="file" id="thumbnailInput3" name="thumbnails[2]" accept="image/*">
-
-                    <!-- 썸네일 4 -->
-                    <div class="thumbnail-preview" id="thumb4Preview"
-                         onclick="document.getElementById('thumbnailInput4').click();">
-                        <img th:src="${item.thumbnailPaths != null and item.thumbnailPaths.size() > 3
-                                   ? @environment.getProperty('file.dir') + item.thumbnailPaths[3]
-                                   : 'https://via.placeholder.com/80x100.png?text=Thumbnail+4'}"
-                             alt="썸네일 4"/>
-                    </div>
-                    <input type="file" id="thumbnailInput4" name="thumbnails[3]" accept="image/*">
+                    <!-- 썸네일이 전혀 없을 때 (item.thumbnailPaths == null) -->
+                    <th:block th:if="${item.thumbnailPaths == null}">
+                        <th:block th:each="i : ${#numbers.sequence(1, 4)}">
+                            <div class="thumbnail-preview"
+                                 th:id="'thumb' + ${i}"
+                                 draggable="true">
+                                <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
+                                     th:alt="'썸네일 ' + ${i}" />
+                                <input type="file"
+                                       th:id="'thumbnailInput' + ${i}"
+                                       class="file-input"
+                                       th:name="'thumbnails[' + (${i - 1}) + ']'"
+                                       accept="image/*">
+                            </div>
+                        </th:block>
+                    </th:block>
                 </div>
+                <button id="thumbnailUploadButton" type="button">썸네일 업로드</button>
             </div>
 
-            <!-- 등록 버튼 -->
-            <button class="btn-lg" type="submit"
-                    th:text="'상품 등록'">
-            </button>
+            <!-- ===================== -->
+            <!-- 3) 제출 버튼         -->
+            <!-- ===================== -->
+            <button class="btn-lg" type="submit" th:text="'상품 등록'"></button>
         </form>
     </div>
 

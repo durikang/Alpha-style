@@ -25,7 +25,7 @@ public class Review {
     private Member member;
 
     @Column(nullable = false)
-    private Integer rating;
+    private Double rating;
 
     @Column(name = "review_comment", nullable = false)
     private String reviewComment;

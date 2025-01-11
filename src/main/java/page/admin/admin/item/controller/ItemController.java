@@ -223,6 +223,11 @@ public class ItemController {
         }
     }
 
+
+
+
+
+
     /**
      * 상품 수정 처리
      */
@@ -278,19 +283,19 @@ public class ItemController {
      */
     @GetMapping("/subcategories/{mainCategoryId}")
     @ResponseBody
-    public List<SubCategoryDTO> getSubCategories(@PathVariable("mainCategoryId") Long mainCategoryId) {
-        log.info("Fetching subcategories for mainCategoryId={}", mainCategoryId);
-
-        List<SubCategory> subCategories = subCategoryService.getSubCategoriesByMainCategory(mainCategoryId);
-        log.info("Found subcategories: {}", subCategories);
-
-        // DTO 변환
-        return subCategories.stream()
-                .map(subCategory -> new SubCategoryDTO(subCategory.getId(), subCategory.getSubCategoryName()))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<SubCategoryDTO>> getSubCategories(@PathVariable("mainCategoryId") Long mainCategoryId) {
+        try {
+            log.debug("Fetching subcategories for mainCategoryId: {}", mainCategoryId);
+            List<SubCategory> subCategories = subCategoryService.getSubCategoriesByMainCategory(mainCategoryId);
+            List<SubCategoryDTO> subCategoryDTOs = subCategories.stream()
+                    .map(sc -> new SubCategoryDTO(sc.getId(), sc.getSubCategoryName()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(subCategoryDTOs);
+        } catch (Exception e) {
+            log.error("Error fetching subcategories for mainCategoryId {}: {}", mainCategoryId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
-
 
     /**
      * 폼에서 필요한 공통 모델 데이터 세팅
@@ -311,7 +316,5 @@ public class ItemController {
             log.debug("Main Category ID is null, skipping subCategories.");
         }
     }
-
-
 
 }

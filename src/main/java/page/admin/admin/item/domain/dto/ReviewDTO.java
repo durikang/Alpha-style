@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class ReviewDTO {
     private Long reviewId;
     private String username;
-    private Integer rating;
+    private Double rating;
     private String comment;
     private LocalDateTime createdDate;
 }

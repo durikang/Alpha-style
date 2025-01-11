@@ -117,6 +117,34 @@
             border-color: #007bff;
             pointer-events: none;
         }
+
+        #review-section .review-star-rating {
+            display: flex;
+            gap: 5px;
+            cursor: default;  /* 읽기 전용이면 pointer 아니어도 됨 */
+        }
+
+        #review-section .review-star-rating .star {
+            width: 30px;
+            height: 30px;
+            background: #ddd; /* 기본 배경색 */
+
+            /* ⭐ 여기 꼭 실제 인코딩된 SVG를 써야 함! */
+            mask: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%2017.27L18.18%2021l-1.64-7.03L22%209.24l-7.19-.61L12%202%209.19%208.63%202%209.24l5.46%204.73L5.82%2021z%22/%3E%3C/svg%3E") no-repeat center / contain;
+            -webkit-mask: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%2017.27L18.18%2021l-1.64-7.03L22%209.24l-7.19-.61L12%202%209.19%208.63%202%209.24l5.46%204.73L5.82%2021z%22/%3E%3C/svg%3E") no-repeat center / contain;
+
+            transition: background 0.3s;
+        }
+
+        /* 반만 채워진 별 */
+        #review-section .review-star-rating .star.filled-left {
+            background: linear-gradient(to right, #FFD700 50%, #ddd 50%);
+        }
+
+        /* 전부 채워진 별 */
+        #review-section .review-star-rating .star.filled-right {
+            background: #FFD700;
+        }
     </style>
 
 </head>
@@ -131,11 +159,15 @@
             <div class="review-header">
                 <span class="review-username" th:text="${review.username}">Username</span>
                 <span class="review-rating">
-                    <span th:each="i : ${#numbers.sequence(1,5)}">
-                        <span th:if="${i <= review.rating}" style="color: #ffc107;">&#9733;</span>
-                        <span th:unless="${i <= review.rating}" style="color: #ddd;">&#9733;</span>
-                    </span>
-                </span>
+            <!-- 별점 표시 -->
+            <span class="review-star-rating">
+                <span th:each="i : ${#numbers.sequence(1, 5)}"
+                      th:classappend="
+                          ${review.rating >= i} ? 'filled-right' :
+                          (${review.rating >= (i - 0.5)} ? 'filled-left' : '')"
+                      class="star"></span>
+            </span>
+        </span>
             </div>
             <div class="review-comment" th:text="${review.comment}">리뷰 내용</div>
             <div class="review-date" th:text="${#temporals.format(review.createdDate, 'yyyy-MM-dd HH:mm')}">2025-01-08 12:34</div>

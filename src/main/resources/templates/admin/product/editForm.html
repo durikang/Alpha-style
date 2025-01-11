@@ -9,6 +9,10 @@
     <title>상품 수정</title>
     <link rel="stylesheet" th:href="@{/admin/css/item/form.css}">
     <script th:src="@{/admin/js/item/itemForm.js}" th:inline="none" defer></script>
+    <!-- 글로벌 변수 설정 -->
+    <script>
+        window.SUBCATEGORIES_URL = /*[[@{/admin/product/items/subcategories/}]]*/ '/admin/product/items/subcategories/';
+    </script>
     <script th:src="@{/admin/js/item/categories.js}" defer></script>
 </head>
 <body>

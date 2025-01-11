@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const MAX_THUMBNAILS = 4;
 
-    // 공통 이미지 업로드 함수
     const setupImageUpload = (inputId, previewId) => {
         const input = document.getElementById(inputId);
         const preview = document.getElementById(previewId);
@@ -25,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) setImage(file);
         });
 
+        // 이미지 클릭 시 파일 업로드 트리거
+        preview.addEventListener('click', () => {
+            input.click();
+        });
+
         // 드래그 앤 드롭 이벤트
         preview.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -42,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) {
                 setImage(file);
 
-                // 파일 입력 필드 업데이트
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 input.files = dataTransfer.files;

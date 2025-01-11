@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mainCategoryElement = document.querySelector("#mainCategory");
+    const baseUrl = window.SUBCATEGORIES_URL; // 글로벌 변수 사용
 
     if (mainCategoryElement) {
         mainCategoryElement.addEventListener('change', function () {
             const mainCategoryId = this.value;
             if (!mainCategoryId) return;
 
-            fetch(`/product/items/subcategories/${mainCategoryId}`)
+            const url = `${baseUrl}${mainCategoryId}`; // URL 생성
+
+            fetch(url)
                 .then(response => {
                     if (!response.ok) throw new Error('Failed to load subcategories');
                     return response.json();

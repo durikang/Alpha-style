@@ -227,7 +227,23 @@ input[type="file"] {
     flex-direction: column;
     gap: 20px;
 }
-
+.main-image-wrapper, .thumbnail-preview {
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+}
+.main-image, .thumbnail-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.main-image:hover, .thumbnail-preview:hover img {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
 /* 메인 이미지 스타일 */
 .main-image-wrapper {
     position: relative;

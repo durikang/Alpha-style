@@ -19,6 +19,7 @@ import page.admin.common.utils.Alert;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -44,9 +45,11 @@ public class ReviewController {
         response.put("reviews", reviewPage.getContent());
         response.put("currentPage", reviewPage.getNumber());
         response.put("totalPages", reviewPage.getTotalPages());
+        response.put("starRange", List.of(0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0)); // 소수점 포함 범위 추가
 
         return ResponseEntity.ok(response);
     }
+
 
     /**
      * 리뷰 작성 처리

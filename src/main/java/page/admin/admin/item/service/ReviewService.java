@@ -7,7 +7,7 @@ import page.admin.admin.item.domain.dto.ReviewDTO;
 
 public interface ReviewService {
     Page<ReviewDTO> getReviewsByItemId(Long itemId, Pageable pageable);
-    Review createReview(Long itemId, Long memberId, Integer rating, String comment);
+    Review createReview(Long itemId, Long memberId, Double rating, String comment);
     void deleteReview(Long reviewId);
     Review getReviewById(Long reviewId);
     Double getAverageRating(Long itemId); // 추가된 메서드

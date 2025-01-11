@@ -39,7 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Review createReview(Long itemId, Long memberId, Integer rating, String comment) {
+    public Review createReview(Long itemId, Long memberId, Double rating, String comment) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new DataNotFoundException("해당 아이템을 찾을 수 없습니다. ID: " + itemId));
 

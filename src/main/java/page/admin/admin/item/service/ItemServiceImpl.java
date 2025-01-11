@@ -20,10 +20,7 @@ import page.admin.common.utils.exception.DataNotFoundException;
 import page.admin.common.utils.file.FileStore;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -144,6 +141,11 @@ public class ItemServiceImpl implements ItemService {
     // ======================================
     @Override
     public void updateItem(Long id, ItemUpdateForm form) {
+        // 필수 필드 유효성 검증
+        if (form.getItemName() == null || form.getItemName().isBlank()) {
+            throw new IllegalArgumentException("필수 필드가 누락되었습니다.");
+        }
+
         // (1) 기존 아이템 조회
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템이 없습니다. ID: " + id));
@@ -157,14 +159,11 @@ public class ItemServiceImpl implements ItemService {
         // (4) 썸네일 교체
         handleThumbnailsUpdate(item, form);
 
-        // (5) 연관 엔티티 업데이트 (지역, 카테고리, 배송 등)
+        // (5) 기타 연관 관계 업데이트
         updateAssociations(item, form);
 
-        // (6) 판매량 업데이트
-        // 판매량은 OrderDetail을 통해 자동으로 업데이트되므로 별도의 로직은 필요하지 않습니다.
-
+        // (6) 저장
         itemRepository.save(item);
-        log.info("아이템 업데이트 완료: {}", item);
     }
 
     // ======================================
@@ -225,7 +224,7 @@ public class ItemServiceImpl implements ItemService {
             return 0.0;
         }
         return reviews.stream()
-                .mapToInt(ReviewDTO::getRating)
+                .mapToDouble(ReviewDTO::getRating)
                 .average()
                 .orElse(0.0);
     }
@@ -368,7 +367,6 @@ public class ItemServiceImpl implements ItemService {
 
         // (1) 지역
         if (item.getRegions() != null) {
-            // regionCodes가 Set<String> 이라면, Region::getCode를 매핑
             Set<String> regionCodes = item.getRegions().stream()
                     .map(Region::getCode)
                     .collect(Collectors.toSet());
@@ -437,29 +435,33 @@ public class ItemServiceImpl implements ItemService {
         List<MultipartFile> newThumbnailFiles = form.getThumbnails();
         if (newThumbnailFiles != null && !newThumbnailFiles.isEmpty()) {
             // 기존 썸네일 삭제
-            if (item.getThumbnails() != null && !item.getThumbnails().isEmpty()) {
-                for (UploadFile thumbnail : item.getThumbnails()) {
-                    boolean thumbnailDeleted = fileStore.deleteFile(thumbnail.getStoreFileName());
-                    if (!thumbnailDeleted) {
+            Set<UploadFile> currentThumbnails = item.getThumbnails();
+            if (currentThumbnails != null) {
+                Iterator<UploadFile> iterator = currentThumbnails.iterator();
+                while (iterator.hasNext()) {
+                    UploadFile thumbnail = iterator.next();
+                    boolean deleted = fileStore.deleteFile(thumbnail.getStoreFileName());
+                    if (!deleted) {
                         log.warn("썸네일 삭제 실패: {}", thumbnail.getStoreFileName());
                     }
+                    iterator.remove(); // Hibernate 추적을 위해 iterator 사용
                 }
-                item.getThumbnails().clear();
             }
 
-            // 새로운 썸네일 저장 (최대 4개)
-            Set<UploadFile> updatedThumbnails = newThumbnailFiles.stream()
-                    .filter(file -> file != null && !file.isEmpty())
-                    .limit(4)
-                    .map(file -> fileStore.storeFile(file))
-                    .collect(Collectors.toSet());
-
-            // Set the item in each UploadFile
-            updatedThumbnails.forEach(thumbnail -> thumbnail.setItem(item));
-
-            item.setThumbnails(updatedThumbnails);
+            // 새로운 썸네일 저장 및 연관관계 설정
+            for (MultipartFile file : newThumbnailFiles) {
+                if (file != null && !file.isEmpty()) {
+                    UploadFile newThumbnail = fileStore.storeFile(file);
+                    newThumbnail.setItem(item); // 연관관계 설정
+                    item.getThumbnails().add(newThumbnail); // 기존 컬렉션에 추가
+                }
+            }
         }
     }
+
+
+
+
 
 
 

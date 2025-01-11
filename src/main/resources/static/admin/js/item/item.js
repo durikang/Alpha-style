@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 0;
 
     function updateMainImage() {
+        if (thumbnails.length === 0) return; // 썸네일이 없는 경우 바로 종료
         thumbnails.forEach(thumbnail => thumbnail.classList.remove("active"));
         const currentThumbnail = thumbnails[currentIndex];
+        if (!currentThumbnail) return; // currentThumbnail이 undefined일 경우 종료
         mainImage.src = currentThumbnail.src;
         currentThumbnail.classList.add("active");
         currentIndex = (currentIndex + 1) % thumbnails.length;
