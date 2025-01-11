@@ -8,6 +8,10 @@
     <title>상품 등록</title>
     <link rel="stylesheet" th:href="@{/admin/css/item/form.css}">
     <script th:src="@{/admin/js/item/itemForm.js}" th:inline="none" defer></script>
+    <!-- 글로벌 변수 설정 -->
+    <script>
+        window.SUBCATEGORIES_URL = /*[[@{/admin/product/items/subcategories/}]]*/ '/admin/product/items/subcategories/';
+    </script>
     <script th:src="@{/admin/js/item/categories.js}" defer></script>
 </head>
 <body>
@@ -130,14 +134,12 @@
             <!-- ===================== -->
             <!-- 1) 이미지 섹션       -->
             <!-- ===================== -->
+            <!-- 이미지 섹션 -->
             <div class="image-section">
                 <!-- 메인 이미지 -->
                 <div class="main-image-wrapper" id="mainImagePreview" draggable="true">
-                    <img th:if="${item.mainImagePath != null}"
-                         th:src="@{'/files/' + ${item.mainImagePath}}"
-                         alt="상품 메인 이미지" />
-                    <img th:unless="${item.mainImagePath != null}"
-                         src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                    <!-- 등록 페이지이므로, 항상 Placeholder -->
+                    <img src="https://via.placeholder.com/400x500.png?text=Main+Image"
                          alt="기본 이미지" />
                     <!-- 메인 이미지 파일 업로드 -->
                     <input type="file"
@@ -147,60 +149,23 @@
                            accept="image/*">
                 </div>
 
-                <!-- 썸네일 갤러리 -->
+                <!-- 썸네일 갤러리 (항상 4개) -->
                 <div class="thumbnail-gallery">
-                    <!-- 이미 업로드된 썸네일이 있는 경우 -->
-                    <th:block th:if="${item.thumbnailPaths != null}">
-                        <th:block th:each="thumbnailPath, iter : ${item.thumbnailPaths}">
-                            <div class="thumbnail-preview"
-                                 th:id="'thumb' + ${iter.index + 1}"
-                                 draggable="true">
-                                <img th:src="@{'/files/' + ${thumbnailPath}}"
-                                     th:alt="'썸네일 ' + ${iter.index + 1}" />
-                                <!-- 썸네일 파일 업로드 -->
-                                <input type="file"
-                                       th:id="'thumbnailInput' + ${iter.index + 1}"
-                                       class="file-input"
-                                       th:name="'thumbnails[' + ${iter.index} + ']'"
-                                       accept="image/*">
-                            </div>
-                        </th:block>
-
-                        <!-- 썸네일 갯수가 4개 미만인 경우 나머지 자리 채우기 -->
-                        <th:block th:if="${item.thumbnailPaths.size() < 4}">
-                            <th:block th:each="i : ${#numbers.sequence(item.thumbnailPaths.size() + 1, 4)}">
-                                <div class="thumbnail-preview"
-                                     th:id="'thumb' + ${i}"
-                                     draggable="true">
-                                    <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
-                                         th:alt="'썸네일 ' + ${i}" />
-                                    <input type="file"
-                                           th:id="'thumbnailInput' + ${i}"
-                                           class="file-input"
-                                           th:name="'thumbnails[' + (${i - 1}) + ']'"
-                                           accept="image/*">
-                                </div>
-                            </th:block>
-                        </th:block>
-                    </th:block>
-
-                    <!-- 썸네일이 전혀 없을 때 (item.thumbnailPaths == null) -->
-                    <th:block th:if="${item.thumbnailPaths == null}">
-                        <th:block th:each="i : ${#numbers.sequence(1, 4)}">
-                            <div class="thumbnail-preview"
-                                 th:id="'thumb' + ${i}"
-                                 draggable="true">
-                                <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
-                                     th:alt="'썸네일 ' + ${i}" />
-                                <input type="file"
-                                       th:id="'thumbnailInput' + ${i}"
-                                       class="file-input"
-                                       th:name="'thumbnails[' + (${i - 1}) + ']'"
-                                       accept="image/*">
-                            </div>
-                        </th:block>
+                    <!-- th:each로 1부터 4까지 반복하여 썸네일 생성 -->
+                    <th:block th:each="i : ${#numbers.sequence(1, 4)}">
+                        <div class="thumbnail-preview" th:id="'thumb' + ${i}" draggable="true">
+                            <img th:src="'https://via.placeholder.com/80x100.png?text=Thumbnail+' + ${i}"
+                                 th:alt="'썸네일 ' + ${i}" />
+                            <input type="file"
+                                   th:id="'thumbnailInput' + ${i}"
+                                   class="file-input"
+                                   th:name="'thumbnails[' + (${i - 1}) + ']'"
+                                   accept="image/*">
+                        </div>
                     </th:block>
                 </div>
+
+                <!-- (선택) 썸네일 업로드 버튼 -->
                 <button id="thumbnailUploadButton" type="button">썸네일 업로드</button>
             </div>
 

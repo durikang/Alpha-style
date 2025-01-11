@@ -50,6 +50,11 @@ public class ItemServiceImpl implements ItemService {
         // (1) 메인 이미지
         UploadFile mainImage = fileStore.storeFile(form.getMainImage());
 
+        List<MultipartFile> thumbnailFiles = form.getThumbnails();
+        if (thumbnailFiles == null) {
+            thumbnailFiles = Collections.emptyList(); // null 이면 빈 리스트로 대체
+        }
+
         // (2) 썸네일 처리 (최대 4개)
         Set<UploadFile> thumbnails = form.getThumbnails().stream()
                 .limit(4)

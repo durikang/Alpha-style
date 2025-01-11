@@ -6,11 +6,198 @@
       layout:fragment="Content">
 <head>
     <meta charset="UTF-8">
-    <title>대쉬보드</title>
+    <title>관리자 대시보드</title>
+    <style>
+        /* 전체 레이아웃 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: "Noto Sans KR", sans-serif;
+        }
+
+        main.dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .dashboard-header .title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+        .dashboard-header .subtext {
+            font-size: 0.9rem;
+            color: #868e96;
+        }
+
+        /* 카드 섹션 */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        .card .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        .card .card-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #212529;
+        }
+        .card .card-description {
+            font-size: 0.9rem;
+            color: #868e96;
+            margin-top: 4px;
+        }
+
+        /* 차트, 최근 활동 섹션 */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* 좌: 차트, 우: 최근활동 */
+            gap: 20px;
+        }
+
+        .chart-section, .activity-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-section h3,
+        .activity-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 1.1rem;
+            color: #495057;
+        }
+
+        /* 가짜 차트 이미지 or 영역 */
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #e0e0e0 25%, #f2f2f2 25%, #f2f2f2 50%, #e0e0e0 50%, #e0e0e0 75%, #f2f2f2 75%, #f2f2f2 100%);
+            background-size: 40px 40px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-note {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* 최근 활동 리스트 */
+        .activity-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .activity-list li {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+        }
+        .activity-list li::before {
+            content: "•";
+            color: #7cb47c;
+            margin-right: 8px;
+        }
+        .activity-list li span.timestamp {
+            margin-left: auto;
+            color: #adb5bd;
+            font-size: 0.85rem;
+        }
+
+        /* 반응형 */
+        @media(max-width: 992px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-    <h1>해당 페이지는 admin의 메인 페이지 이면서 대쉬보드가 위치할 페이지 입니다.</h1>
+<main class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <div class="title">관리자 대시보드</div>
+            <div class="subtext">사이트 운영 현황을 한눈에 확인하세요</div>
+        </div>
+    </div>
+
+    <!-- 카드 섹션 (주요 통계) -->
+    <div class="cards">
+        <div class="card">
+            <div class="card-title">오늘 가입자 수</div>
+            <div class="card-value">23</div>
+            <div class="card-description">오늘 새로 가입한 유저 수입니다.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">주문 건수</div>
+            <div class="card-value">87</div>
+            <div class="card-description">금일 처리된 주문 총 건수</div>
+        </div>
+        <div class="card">
+            <div class="card-title">미처리 문의</div>
+            <div class="card-value">5</div>
+            <div class="card-description">아직 답변이 완료되지 않은 고객 문의</div>
+        </div>
+        <div class="card">
+            <div class="card-title">매출</div>
+            <div class="card-value">2,350,000원</div>
+            <div class="card-description">금일 발생한 총 매출액</div>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠: 차트 + 최근 활동 -->
+    <div class="dashboard-content">
+        <div class="chart-section">
+            <h3>주간 매출 추이</h3>
+            <div class="chart-placeholder">
+                <div class="chart-note">차트 라이브러리를 연결해 보세요</div>
+            </div>
+        </div>
+        <div class="activity-section">
+            <h3>최근 활동</h3>
+            <ul class="activity-list">
+                <li>주문 #202501 오픈<span class="timestamp">09:15</span></li>
+                <li>사용자 문의(#4532) 답변 완료<span class="timestamp">10:22</span></li>
+                <li>베스트 상품 업데이트<span class="timestamp">11:08</span></li>
+                <li>관리자 계정 생성(#duri123)<span class="timestamp">12:30</span></li>
+                <li>주문 #202502 배송중으로 변경<span class="timestamp">13:50</span></li>
+            </ul>
+        </div>
+    </div>
 </main>
 </body>
 </html>

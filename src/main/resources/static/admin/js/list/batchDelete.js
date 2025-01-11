@@ -22,9 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fetch(deleteUrl, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        // CSRF 토큰을 헤더에 추가
-                        "X-CSRF-TOKEN": getCsrfToken(),
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify(selectedIds),
                 })

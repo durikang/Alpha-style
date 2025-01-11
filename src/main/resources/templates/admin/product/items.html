@@ -9,86 +9,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 목록</title>
     <style>
-        .actions {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        /* 전체 레이아웃 */
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
         }
-        .btn-register {
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
+
+        main.container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        /* 헤더 타이틀 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #343a40;
+        }
+
+        /* 검색 바 */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        /* 상단 액션 버튼들 */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* 버튼: 좀 더 차분한 색상 */
+        .btn-register,
+        .btn-delete {
+            color: #fff;
+            padding: 10px 16px;
             text-decoration: none;
             border-radius: 4px;
             transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        /* 등록 버튼: 차분한 톤의 그린-그레이 */
+        .btn-register {
+            background-color: #6c7d6c; /* 원하는 차분한 색상 */
         }
         .btn-register:hover {
-            background-color: #218838;
+            background-color: #5d6d5d; /* hover 시 조금 더 어두운 톤 */
+        }
+
+        /* 삭제 버튼: 약간 어두운 톤의 회색 */
+        .btn-delete {
+            background-color: #5f6569;
+        }
+        .btn-delete:hover {
+            background-color: #4e5457;
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        thead {
+            background-color: #f1f3f5;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 8px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        tbody tr:hover {
+            background-color: #f6f6f6;
+        }
+
+        tbody td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dee2e6;
+            color: #495057;
+        }
+
+        /* 체크박스들 */
+        #selectAll {
+            cursor: pointer;
+        }
+        .select-checkbox {
+            cursor: pointer;
+        }
+
+        /* 정렬 링크 (테이블 헤더 내 a 태그) */
+        thead th a {
+            color: #343a40;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        thead th a:hover {
+            color: #007bff;
+            text-decoration: underline;
+        }
+
+        /* clickable-row: 마우스 포인터 */
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        /* 반응형 (간단 처리) */
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tbody tr {
+                margin-bottom: 15px;
+                background-color: #fff;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+            }
+            tbody td {
+                border: none;
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+            }
+            tbody td:before {
+                content: attr(data-th);
+                font-weight: 600;
+                color: #495057;
+            }
         }
     </style>
 </head>
 <body>
-<main>
-    <h2>상품 목록</h2>
-    <div class="container">
+<main class="container">
+    <!-- 헤더 영역 -->
+    <div class="page-header">
+        <h2>상품 목록</h2>
+    </div>
 
-        <!-- 검색 바 포함 -->
-        <div th:replace="~{common/admin/fragments/searchBar :: searchBar('/admin/product/items','상품 검색',${keyword},null)}"></div>
+    <!-- 검색 바 포함 (searchBar fragment) -->
+    <div class="search-bar" th:replace="~{common/admin/fragments/searchBar :: searchBar('/admin/product/items','상품 검색',${keyword},null)}"></div>
 
-        <!-- 상단 등록 버튼 -->
-        <div class="actions">
-            <a th:href="@{/admin/product/items/add}" class="btn-register">상품 등록</a>
-            <!-- 삭제 버튼에 data-delete-url 속성 추가 -->
-            <button id="deleteSelected" class="btn btn-delete" data-delete-url="/admin/product/items/batch-delete">상품 삭제</button>
-        </div>
+    <!-- 상단 등록 버튼들 -->
+    <div class="actions">
+        <a th:href="@{/admin/product/items/add}" class="btn-register">상품 등록</a>
+        <button id="deleteSelected" class="btn-delete" data-delete-url="/admin/product/items/batch-delete">상품 삭제</button>
+    </div>
 
-        <!-- 테이블 -->
-        <table>
-            <thead>
-            <tr>
-                <th><input type="checkbox" id="selectAll"></th>
-                <th><a th:href="@{/admin/product/items(sort='itemId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">ID</a></th>
-                <th><a th:href="@{/admin/product/items(sort='itemName', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">상품명</a></th>
-                <th><a th:href="@{/admin/product/items(sort='purchasePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">매입가</a></th>
-                <th><a th:href="@{/admin/product/items(sort='salePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">매출가</a></th>
-                <th><a th:href="@{/admin/product/items(sort='quantity', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">수량</a></th>
-                <th>메인 카테고리</th>
-                <th>서브 카테고리</th>
-                <th>판매자</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- 데이터가 없을 경우 메시지 표시 -->
-            <tr th:if="${#lists.isEmpty(items)}">
-                <td colspan="9" style="text-align: center;">상품이 등록되어 있지 않습니다.</td>
-            </tr>
+    <!-- 테이블 -->
+    <table>
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>
+                <a th:href="@{/admin/product/items(sort='itemId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+                    ID
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/admin/product/items(sort='itemName', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+                    상품명
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/admin/product/items(sort='purchasePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+                    매입가
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/admin/product/items(sort='salePrice', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+                    매출가
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/admin/product/items(sort='quantity', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+                    수량
+                </a>
+            </th>
+            <th>메인 카테고리</th>
+            <th>서브 카테고리</th>
+            <th>판매자</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 데이터가 없을 경우 메시지 표시 -->
+        <tr th:if="${#lists.isEmpty(items)}">
+            <td colspan="9" style="text-align: center;">상품이 등록되어 있지 않습니다.</td>
+        </tr>
 
-            <!-- 데이터가 있을 경우 테이블 행 렌더링 -->
-            <tr th:each="item : ${items}"
-                th:data-id="${item.itemId}"
-                th:data-details-url="@{/admin/product/items/{id}(id=${item.itemId})}"
-                class="clickable-row">
-                <td><input type="checkbox" class="select-checkbox" th:value="${item.itemId}"></td>
-                <td th:text="${item.itemId}"></td>
-                <td>
-                    <a th:href="@{/admin/product/items/{id}(id=${item.itemId})}" th:text="${item.itemName}">상품명</a>
-                </td>
-                <td th:text="${item.purchasePrice}"></td>
-                <td th:text="${item.salePrice}"></td>
-                <td th:text="${item.quantity}"></td>
-                <td th:text="${item.mainCategory != null ? item.mainCategory.mainCategoryName : '없음'}"></td>
-                <td th:text="${item.subCategory != null ? item.subCategory.subCategoryName : '없음'}"></td>
-                <td th:text="${item.seller.username}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <!-- 데이터가 있을 경우 테이블 행 렌더링 -->
+        <tr th:each="item : ${items}"
+            th:data-id="${item.itemId}"
+            th:data-details-url="@{/admin/product/items/{id}(id=${item.itemId})}"
+            class="clickable-row">
+            <td data-th="선택"><input type="checkbox" class="select-checkbox" th:value="${item.itemId}"></td>
+            <td data-th="ID" th:text="${item.itemId}"></td>
+            <td data-th="상품명">
+                <a th:href="@{/admin/product/items/{id}(id=${item.itemId})}" th:text="${item.itemName}">상품명</a>
+            </td>
+            <td data-th="매입가" th:text="${item.purchasePrice}"></td>
+            <td data-th="매출가" th:text="${item.salePrice}"></td>
+            <td data-th="수량" th:text="${item.quantity}"></td>
+            <td data-th="메인 카테고리" th:text="${item.mainCategory != null ? item.mainCategory.mainCategoryName : '없음'}"></td>
+            <td data-th="서브 카테고리" th:text="${item.subCategory != null ? item.subCategory.subCategoryName : '없음'}"></td>
+            <td data-th="판매자" th:text="${item.seller.username}"></td>
+        </tr>
+        </tbody>
+    </table>
 
-        <!-- 페이징 -->
-        <div th:replace="~{common/admin/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
-                         ${currentPage},'/admin/product/items',${keyword},${sortField},${sortDirection})}"></div>
-
+    <!-- 페이징 -->
+    <div th:replace="~{common/admin/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
+                     ${currentPage},'/admin/product/items',${keyword},${sortField},${sortDirection})}">
     </div>
 </main>
+
+<script>
+    // 예시: row 클릭 시 상세페이지 이동
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = document.querySelectorAll(".clickable-row");
+        rows.forEach(row => {
+            row.addEventListener("click", () => {
+                const detailsUrl = row.getAttribute("data-details-url");
+                if (detailsUrl) {
+                    window.location.href = detailsUrl;
+                }
+            });
+        });
+
+        // 전체 체크박스
+        const selectAll = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".select-checkbox");
+        if (selectAll) {
+            selectAll.addEventListener("change", () => {
+                checkboxes.forEach(chk => {
+                    chk.checked = selectAll.checked;
+                });
+            });
+        }
+    });
+</script>
 </body>
 </html>
