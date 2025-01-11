@@ -19,6 +19,7 @@ import page.admin.admin.order.domain.OrderDetail;
 import page.admin.admin.order.domain.QOrder;
 import page.admin.admin.order.domain.QOrderDetail;
 import page.admin.admin.order.domain.dto.*;
+import page.admin.admin.order.repository.OrderDetailRepository;
 import page.admin.admin.order.repository.OrderRepository;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final JPAQueryFactory queryFactory;
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository; // ItemRepository 주입
+    private final OrderDetailRepository orderDetailRepository;
 
     @Override
     public Order getOrderById(Long id) {
@@ -238,6 +240,41 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.save(order);
     }
+
+    @Override
+    public Page<ItemOrderDetailDTO> getItemOrderDetails(Long itemId, Pageable pageable) {
+        QOrderDetail od = QOrderDetail.orderDetail;
+        QOrder o = QOrder.order;
+        QItem i = QItem.item;
+
+        // 원하는 정렬 기준(orderDate)도 여기서 수동으로 지정
+        var query = queryFactory
+                .select(new QItemOrderDetailDTO(
+                        o.orderNo,
+                        o.orderDate,
+                        i.itemId,
+                        i.itemName,
+                        od.quantity,
+                        od.subtotal,
+                        od.vat,
+                        o.deliveryStatus
+                ))
+                .from(od)
+                .join(od.order, o)
+                .join(od.item, i)
+                .where(i.itemId.eq(itemId))
+                .orderBy(o.orderDate.desc()); // <-- 여기서 정렬
+
+        long total = query.fetchCount();
+        List<ItemOrderDetailDTO> content = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+
 
 
 }

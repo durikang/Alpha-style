@@ -3,6 +3,7 @@ package page.admin.admin.order.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import page.admin.admin.order.domain.Order;
+import page.admin.admin.order.domain.dto.ItemOrderDetailDTO;
 import page.admin.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryChartDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
@@ -55,5 +56,8 @@ public interface OrderService {
      */
     Order createOrder(Order order);
 
-
+    /**
+     * 상품별 주문 상세 목록
+     */
+    Page<ItemOrderDetailDTO> getItemOrderDetails(Long itemId, Pageable pageable);
 }

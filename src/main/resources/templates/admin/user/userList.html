@@ -6,42 +6,55 @@
       layout:fragment="Content">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 리스트 조회</title>
+  <!-- 기존 JS/CSS를 포함 (예: listDelete.js, userList.css) -->
   <script th:src="@{/admin/js/member/listDelete.js}" th:inline="none"></script>
   <link rel="stylesheet" th:href="@{/admin/css/user/userList.css}"/>
-  <style>
-    .actions {
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-  </style>
+
+
 </head>
 <body>
-<main>
-  <h2>회원 리스트 조회</h2>
-  <div class="container">
-
-    <!-- 검색 및 정렬 -->
-    <div th:replace="~{common/admin/fragments/searchBar :: searchBar(
-    '/user/users','검색어 입력',${keyword},null)}"></div>
-
-    <!-- 상단 등록 버튼 -->
-  <div class="actions">
-      <a href="/admin/user/users/add" class="btn btn-register">회원 등록</a>
-    <button id="deleteSelected" data-delete-url="/admin/user/users/batch-delete">회원 삭제</button>
+<main class="container">
+  <!-- 상단 헤더 -->
+  <div class="page-header">
+    <h2>회원 리스트 조회</h2>
   </div>
-    <!-- 테이블 -->
+
+  <!-- 검색 및 정렬 -->
+  <div class="search-bar" th:replace="~{common/admin/fragments/searchBar :: searchBar('/user/users','검색어 입력',${keyword},null)}"></div>
+
+  <!-- 상단 등록 버튼 -->
+  <div class="actions">
+    <a href="/admin/user/users/add" class="btn-register">회원 등록</a>
+    <button id="deleteSelected" class="btn-delete"
+            data-delete-url="/admin/user/users/batch-delete">회원 삭제</button>
+  </div>
+
+  <!-- 테이블 -->
   <table>
     <thead>
     <tr>
       <th><input type="checkbox" id="selectAll"></th>
-      <th><a th:href="@{/admin/user/users(sort='userNo', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">회원 번호</a></th>
-      <th><a th:href="@{/admin/user/users(sort='userId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">아이디</a></th>
-      <th><a th:href="@{/admin/user/users(sort='username', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">이름</a></th>
-      <th><a th:href="@{/admin/user/users(sort='email', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">이메일</a></th>
+      <th>
+        <a th:href="@{/admin/user/users(sort='userNo', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+          회원 번호
+        </a>
+      </th>
+      <th>
+        <a th:href="@{/admin/user/users(sort='userId', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+          아이디
+        </a>
+      </th>
+      <th>
+        <a th:href="@{/admin/user/users(sort='username', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+          이름
+        </a>
+      </th>
+      <th>
+        <a th:href="@{/admin/user/users(sort='email', direction=${sortDirection == 'ASC' ? 'DESC' : 'ASC'})}">
+          이메일
+        </a>
+      </th>
       <th>전화번호</th>
       <th>역할</th>
     </tr>
@@ -51,21 +64,46 @@
         th:data-details-url="@{/admin/user/users/{userNo}(userNo=${member.userNo}, page=${currentPage}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
         th:data-id="${member.userNo}"
         class="clickable-row">
-      <td><input type="checkbox" th:value="${member.userNo}" class="select-checkbox"></td>
-      <td th:text="${member.userNo}"></td>
-      <td th:text="${member.userId}"></td>
-      <td th:text="${member.username}"></td>
-      <td th:text="${member.email}"></td>
-      <td th:text="${member.mobilePhone}"></td>
-      <td th:text="${member.role}"></td>
+      <td data-th="선택"><input type="checkbox" th:value="${member.userNo}" class="select-checkbox"></td>
+      <td data-th="회원 번호" th:text="${member.userNo}"></td>
+      <td data-th="아이디" th:text="${member.userId}"></td>
+      <td data-th="이름" th:text="${member.username}"></td>
+      <td data-th="이메일" th:text="${member.email}"></td>
+      <td data-th="전화번호" th:text="${member.mobilePhone}"></td>
+      <td data-th="역할" th:text="${member.role}"></td>
     </tr>
     </tbody>
   </table>
 
-    <div th:replace="~{common/admin/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
+  <!-- 페이징 -->
+  <div th:replace="~{common/admin/fragments/pagination :: pagination(${startPage},${endPage},${totalPages},
         ${currentPage},'/user/users',${keyword},${sortField},${sortDirection})}"></div>
-
-  </div>
 </main>
+
+<script>
+  // 예시: row 클릭 시 상세페이지 이동
+  document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll(".clickable-row");
+    rows.forEach(row => {
+      row.addEventListener("click", () => {
+        const detailsUrl = row.getAttribute("data-details-url");
+        if (detailsUrl) {
+          window.location.href = detailsUrl;
+        }
+      });
+    });
+
+    // 전체 체크박스
+    const selectAll = document.getElementById("selectAll");
+    const checkboxes = document.querySelectorAll(".select-checkbox");
+    if (selectAll) {
+      selectAll.addEventListener("change", () => {
+        checkboxes.forEach(chk => {
+          chk.checked = selectAll.checked;
+        });
+      });
+    }
+  });
+</script>
 </body>
 </html>

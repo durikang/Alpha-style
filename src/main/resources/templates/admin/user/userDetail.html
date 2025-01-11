@@ -6,25 +6,16 @@
       layout:fragment="Content">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 상세보기</title>
-  <style>
-    /* 페이지 고유 스타일 */
-    body {
-      padding: 20px;
-      background-color: #f4f4f9;
-    }
-
-    h2 {
-      color: #333;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/admin/css/user/userDetail.css}"/>
 </head>
 <body>
-<main>
-  <h2>회원 상세 정보</h2>
+<main class="detail-container">
+  <div class="page-header">
+    <h2>회원 상세 정보</h2>
+  </div>
 
-  <table>
+  <table class="info-table">
     <tr>
       <th>회원 번호</th>
       <td th:text="${member.userNo}">1</td>
@@ -74,13 +65,20 @@
   </table>
 
   <div class="btn-container">
-    <a th:href="@{/admin/user/users/{userNo}/edit(userNo=${member.userNo})}" class="btn">수정</a>
-    <a th:href="@{/admin/user/users(page=${page - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}" class="btn btn-back">목록으로</a>
-    <form th:action="@{/admin/user/users/{userNo}/delete(userNo=${member.userNo})}" method="post" style="display:inline;">
+    <!-- 수정 버튼 -->
+    <a th:href="@{/admin/user/users/{userNo}/edit(userNo=${member.userNo})}"
+       class="btn btn-edit">수정</a>
+
+    <!-- 목록으로 버튼 -->
+    <a th:href="@{/admin/user/users(page=${page - 1}, keyword=${keyword}, sort=${sortField}, direction=${sortDirection})}"
+       class="btn btn-back">목록으로</a>
+
+    <!-- 삭제 버튼 (form) -->
+    <form th:action="@{/admin/user/users/{userNo}/delete(userNo=${member.userNo})}"
+          method="post" style="display:inline;">
       <button type="submit" class="btn btn-delete">삭제</button>
     </form>
   </div>
-
 </main>
 </body>
 </html>

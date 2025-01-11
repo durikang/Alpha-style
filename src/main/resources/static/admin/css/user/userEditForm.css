@@ -1,0 +1,144 @@
+/* 전체 레이아웃 배경 / 폰트 */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+main.form-page {
+    max-width: 850px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 상단 제목 */
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.page-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #343a40;
+}
+
+/* 폼 컨테이너 */
+.form-container {
+    margin: 0 auto;
+}
+
+/* 폼 그룹 (라벨 + 입력) */
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #555;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    max-width: 500px; /* 입력창 너비 제한 (원한다면 조정) */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* 주소 검색 버튼 */
+.search-btn {
+    margin-left: 10px;
+    padding: 9px 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+.search-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 오류 메시지 */
+.error-message {
+    margin-top: 5px;
+    color: #d35d5d; /* 빨간계열 색상 */
+    font-size: 0.85rem;
+}
+
+/* 폼 액션 영역 */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* 버튼들 */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    border: none;
+    transition: background-color 0.3s;
+    min-width: 100px;
+}
+.btn-save {
+    background-color: #28a745;
+}
+.btn-save:hover {
+    background-color: #218838;
+}
+.btn-cancel {
+    background-color: #6c757d;
+}
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+/* 반응형 처리 */
+@media (max-width: 600px) {
+    main.form-page {
+        margin: 20px auto;
+        padding: 16px;
+    }
+    .form-group {
+        margin-bottom: 16px;
+    }
+    .form-group input,
+    .form-group select {
+        max-width: 100%;
+    }
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .search-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+    }
+}

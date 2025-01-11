@@ -59,7 +59,9 @@
             <td th:text="${summary.sellerName}">판매자</td>
             <td th:text="${#dates.format(summary.createdDate, 'yyyy-MM-dd')}">등록일</td>
             <td>
-                <a th:href="@{/orders/details/{itemId}(itemId=${summary.itemId})}" class="btn btn-info">상세 보기</a>
+                <a th:href="@{/admin/orders/itemDetails/{itemId}(itemId=${summary.itemId})}" class="btn btn-info">
+                    상세 보기
+                </a>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(orderSummaries)}">

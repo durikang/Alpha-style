@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import page.admin.admin.item.domain.Item;
+import page.admin.admin.order.domain.dto.ItemOrderDetailDTO;
+import page.admin.admin.item.repository.ItemRepository;
 import page.admin.admin.item.service.DeliveryCodeService;
 import page.admin.admin.member.domain.Member;
 import page.admin.admin.order.domain.Order;
@@ -24,9 +27,7 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -36,7 +37,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final DeliveryCodeService deliveryCodeService;
-
+    private final ItemRepository itemRepository;
     /**
      * 구매자별 구매 현황 페이지
      */
@@ -296,8 +297,69 @@ public class OrderController {
         return "redirect:/admin/orders/details/" + orderNo;
     }
 
+    /**
+     * 상품별 주문 상세 (itemId 기준)
+     */
+    @GetMapping("/itemDetails/{itemId}")
+    public String getItemOrderDetails(@PathVariable Long itemId,
+                                      @RequestParam(name = "page", defaultValue = "0") int page,
+                                      @RequestParam(name = "size", defaultValue = "10") int size,
+                                      Model model) {
 
+        // 1) itemId 유효성 확인
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. itemId=" + itemId));
 
+        // 2) 페이징 객체 생성
+        Pageable pageable = PageableUtils.createPageRequest(page, size, "orderDate", "desc");
+
+        // 3) 해당 상품에 대한 주문 상세 목록 조회 (페이징)
+        Page<ItemOrderDetailDTO> itemOrderDetails = orderService.getItemOrderDetails(itemId, pageable);
+
+        // 4) 페이징 정보 계산(화면에서 사용하는 startPage, endPage 등)
+        int totalPages = itemOrderDetails.getTotalPages();
+        int currentPage = page + 1;
+        int startPage = Math.max(1, currentPage - 2);
+        int endPage = Math.min(totalPages, currentPage + 2);
+
+        // 5) Model에 담아서 뷰로 전달
+        model.addAttribute("item", item);
+        model.addAttribute("itemOrderDetails", itemOrderDetails.getContent());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        return "admin/order/itemOrderDetails";  // 뷰 템플릿 이름
+    }
+
+    // 차트 분석 Ajax용
+    @GetMapping("/itemDetails/analyze")
+    @ResponseBody
+    public Map<String, Object> analyzeItemDetails(
+            @RequestParam("itemId") Long itemId,
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr,
+            @RequestParam(value = "chartType", required = false) String chartType
+    ) {
+        // 1) 입력 파라미터(기간, 차트 유형) 등으로 DB 조회
+        //   예: service.analyzeItemSales(itemId, startDate, endDate)
+        //   이 예시에선 임의로 "labels/values"를 생성한다고 가정
+
+        // 여기에 날짜 파싱 로직이나 DB 쿼리 추가
+        // ...
+        // 간단히 하드코딩 예시:
+        List<String> labels = List.of("2025-01-01", "2025-01-02", "2025-01-03");
+        List<Integer> values = List.of(5, 10, 7);
+
+        // 2) 결과를 JSON으로 반환하기 위해 Map or DTO 사용
+        Map<String, Object> result = new HashMap<>();
+        result.put("labels", labels);
+        result.put("values", values);
+        result.put("title", "Item " + itemId + " 분석 결과");
+
+        return result; // JSON 직렬화
+    }
 
 
 }
