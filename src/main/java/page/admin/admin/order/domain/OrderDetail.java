@@ -13,6 +13,7 @@ import java.util.Locale;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "order_detail")
 public class OrderDetail {
 
     @Id
@@ -110,4 +111,8 @@ public class OrderDetail {
     public String getFormattedTotalAmount() {
         return formatCurrency(getTotalAmount());
     }
+
+
+
+
 }

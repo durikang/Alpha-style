@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용자 페이지 로고 관리</title>
+  <link rel="stylesheet" th:href="@{/admin/css/manager/logo-management.css}">
+  <!-- Google Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<main class="container">
+  <h1>사용자 페이지 로고 관리</h1>
+
+  <!-- 로고 업로드 -->
+  <form th:action="@{/admin/user/logo/upload}" method="post" enctype="multipart/form-data">
+    <div>
+      <label for="logoName">로고 이름:</label>
+      <input type="text" id="logoName" name="logoName" placeholder="예: 메인 로고" required>
+    </div>
+    <div>
+      <label for="logoFile">로고 파일:</label>
+      <input type="file" id="logoFile" name="logoFile" accept="image/*" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit">업로드</button>
+    </div>
+  </form>
+
+  <!-- 로고 목록 -->
+  <h2>등록된 로고</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>번호</th>
+      <th>로고 이미지</th>
+      <th>로고 이름</th>
+      <th>등록일</th>
+      <th>수정일</th>
+      <th>삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="logo : ${logos}">
+      <td th:text="${logo.id}"></td>
+      <td>
+        <img th:src="${logo.logoUrl}" alt="로고 이미지">
+      </td>
+      <td th:text="${logo.logoName}"></td>
+      <td th:text="${logo.createdDate}"></td>
+      <td th:text="${logo.modifiedDate}"></td>
+      <td>
+        <form th:action="@{/admin/user/logo/delete/{id}(id=${logo.id})}" method="post">
+          <button type="submit">삭제</button>
+        </form>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(logos)}">
+      <td colspan="6" style="text-align: center;">등록된 로고가 없습니다.</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

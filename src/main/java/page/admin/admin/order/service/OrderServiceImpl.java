@@ -1,7 +1,9 @@
 package page.admin.admin.order.service;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -64,57 +66,52 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public Page<Order> getOrdersWithFilters(String keyword, Date startDate, Date endDate, Pageable pageable, String sortField, String sortDirection) {
+    public Page<Order> getOrdersWithFilters(String keyword, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable, String sortField, String sortDirection) {
         QOrder order = QOrder.order;
         QMember user = QMember.member;
+        QOrderDetail orderDetail = QOrderDetail.orderDetail;
+        QItem item = QItem.item;
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (keyword != null && !keyword.isEmpty()) {
-            builder.and(
-                    user.username.containsIgnoreCase(keyword)
-                            .or(user.userId.containsIgnoreCase(keyword))
-            );
+        // 키워드 필터링
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(user.username.containsIgnoreCase(keyword)
+                    .or(user.userId.containsIgnoreCase(keyword)));
         }
 
-        if (startDate != null) {
-            builder.and(order.orderDate.goe(startDate));
-        }
+        // 날짜 필터링
+        if (startDate != null) builder.and(order.orderDate.goe(startDate));
+        if (endDate != null) builder.and(order.orderDate.loe(endDate));
 
-        if (endDate != null) {
-            builder.and(order.orderDate.loe(endDate));
-        }
+        // Item이 존재하지 않는 OrderDetail 제외
+        builder.and(orderDetail.item.isNotNull());
 
-        // 정렬 필드와 방향을 기반으로 OrderSpecifier 생성
         OrderSpecifier<?> orderSpecifier = getOrderSpecifier(sortField, sortDirection);
 
-        // QueryDSL 쿼리 작성
+        // QueryDSL로 데이터 조회
         var query = queryFactory
                 .selectFrom(order)
-                .join(order.user, user)
-                .fetchJoin()
+                .join(order.user, user).fetchJoin()
+                .join(order.orderDetails, orderDetail).fetchJoin()
+                .join(orderDetail.item, item).fetchJoin() // Item과 연관 데이터도 조인
                 .where(builder)
                 .orderBy(orderSpecifier);
 
+        // 페이징 처리
         if (pageable.isPaged()) {
-            // 페이징이 활성화된 경우
             List<Order> results = query
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetch();
-
-            long total = query.fetchCount();
-
-            return new PageImpl<>(results, pageable, total);
-        } else {
-            // 페이징이 비활성화된 경우 (모든 데이터 조회)
-            List<Order> results = query.fetch();
-
-            long total = results.size();
-
-            return new PageImpl<>(results, pageable, total);
+            return new PageImpl<>(results, pageable, query.fetchCount());
         }
+
+        // 모든 데이터 조회 (페이징 비활성화 시)
+        List<Order> results = query.fetch();
+        return new PageImpl<>(results, pageable, results.size());
     }
+
 
     /**
      * 정렬 필드와 방향에 따라 OrderSpecifier를 반환합니다.
@@ -247,9 +244,8 @@ public class OrderServiceImpl implements OrderService {
         QOrder o = QOrder.order;
         QItem i = QItem.item;
 
-        // 원하는 정렬 기준(orderDate)도 여기서 수동으로 지정
         var query = queryFactory
-                .select(new QItemOrderDetailDTO(
+                .select(Projections.constructor(ItemOrderDetailDTO.class,
                         o.orderNo,
                         o.orderDate,
                         i.itemId,
@@ -263,7 +259,7 @@ public class OrderServiceImpl implements OrderService {
                 .join(od.order, o)
                 .join(od.item, i)
                 .where(i.itemId.eq(itemId))
-                .orderBy(o.orderDate.desc()); // <-- 여기서 정렬
+                .orderBy(o.orderDate.desc());
 
         long total = query.fetchCount();
         List<ItemOrderDetailDTO> content = query
@@ -274,7 +270,44 @@ public class OrderServiceImpl implements OrderService {
         return new PageImpl<>(content, pageable, total);
     }
 
+    @Override
+    public List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder o = QOrder.order;
+        QOrderDetail od = QOrderDetail.orderDetail;
 
+        // 1) 동적 where 조건
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(od.item.itemId.eq(itemId));
+        if (startDate != null) {
+            builder.and(o.orderDate.goe(startDate));
+        }
+        if (endDate != null) {
+            builder.and(o.orderDate.loe(endDate));
+        }
+
+        // 2) 날짜를 yyyy-MM-dd 로 포맷 (MySQL 기준)
+        var dateExpr = Expressions.stringTemplate(
+                "TO_CHAR({0}, 'YYYY-MM-DD')",
+                o.orderDate
+        );
+
+        // 3) 쿼리 실행: (날짜별) quantity 합계
+        // select dateExpr, sum(od.quantity)
+        //   from Order o
+        //  join o.orderDetails od
+        //  where itemId = ?
+        //    and orderDate between startDate/endDate
+        // group by dateExpr
+        // order by dateExpr asc
+        return queryFactory
+                .select(dateExpr, od.quantity.sum())
+                .from(o)
+                .join(o.orderDetails, od)
+                .where(builder)
+                .groupBy(dateExpr)
+                .orderBy(dateExpr.asc())
+                .fetch();
+    }
 
 
 }

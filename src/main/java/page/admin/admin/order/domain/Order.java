@@ -7,6 +7,8 @@ import lombok.Setter;
 import page.admin.common.BaseEntity;
 import page.admin.admin.member.domain.Member;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +29,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "user_no", nullable = false)
     private Member user;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date orderDate;
+    private LocalDateTime orderDate;
 
     private Double totalAmount;
 
@@ -41,4 +42,15 @@ public class Order extends BaseEntity {
         detail.setOrder(this);
         this.orderDetails.add(detail);
     }
+
+    // 날짜 포맷팅 메서드 추가
+    public String getFormattedOrderDate(String pattern) {
+        if (this.orderDate == null) {
+            return "N/A";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return this.orderDate.format(formatter);
+    }
+
+
 }

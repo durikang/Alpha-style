@@ -271,14 +271,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByMainCategoryIdAndOpenTrue(mainCategoryId, pageable).getContent();
     }
 
-    // ======================================
-    // 13) 리뷰 관련 메서드 추가
-    // ======================================
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Review> getReviewsByItemId(Long itemId, Pageable pageable) {
-        return reviewRepository.findByItemItemId(itemId, pageable);
-    }
+
 
     // ---------------------------------------
     // 삭제 시 첨부 파일 제거

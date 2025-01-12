@@ -1,5 +1,6 @@
 package page.admin.admin.order.service;
 
+import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import page.admin.admin.order.domain.Order;
@@ -8,6 +9,7 @@ import page.admin.admin.order.domain.dto.OrderDetailDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryChartDTO;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public interface OrderService {
      * @param sortDirection 정렬 방향
      * @return 필터링된 주문 페이지
      */
-    Page<Order> getOrdersWithFilters(String keyword, Date startDate, Date endDate, Pageable pageable, String sortField, String sortDirection);
+    Page<Order> getOrdersWithFilters(String keyword, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable, String sortField, String sortDirection);
 
     /**
      * 제품별 주문 현황 조회
@@ -60,4 +62,8 @@ public interface OrderService {
      * 상품별 주문 상세 목록
      */
     Page<ItemOrderDetailDTO> getItemOrderDetails(Long itemId, Pageable pageable);
+
+    // 추가 메서드: (itemId, 기간)에 대한 판매수량 집계
+    List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate);
+
 }

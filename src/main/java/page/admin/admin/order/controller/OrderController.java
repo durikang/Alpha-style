@@ -1,5 +1,6 @@
 package page.admin.admin.order.controller;
 
+import com.querydsl.core.Tuple;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import page.admin.admin.order.domain.OrderDetail;
 import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.admin.order.service.OrderService;
 import page.admin.common.utils.Alert;
+import page.admin.common.utils.DateUtils;
 import page.admin.common.utils.PageableUtils;
 
 import java.io.IOException;
@@ -27,6 +29,10 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Slf4j
@@ -39,7 +45,7 @@ public class OrderController {
     private final DeliveryCodeService deliveryCodeService;
     private final ItemRepository itemRepository;
     /**
-     * 구매자별 구매 현황 페이지
+     * 구매자별 상품 구매 현황 페이지
      */
     @GetMapping("/list")
     public String getBuyerPurchaseList(
@@ -53,26 +59,20 @@ public class OrderController {
             Model model,
             HttpServletResponse response) {
 
-        // 날짜 문자열을 Date로 변환
-        Date startDate = null;
-        Date endDate = null;
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
 
+        // 날짜 문자열을 LocalDateTime으로 변환
         try {
             if (startDateStr != null && !startDateStr.isEmpty()) {
-                startDate = formatter.parse(startDateStr);
+                startDate = DateUtils.parseLocalDateTime(startDateStr);
             }
             if (endDateStr != null && !endDateStr.isEmpty()) {
-                endDate = formatter.parse(endDateStr);
+                endDate = DateUtils.parseLocalDateTime(endDateStr);
                 // 종료 시간을 하루의 마지막으로 설정
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(endDate);
-                cal.set(Calendar.HOUR_OF_DAY, 23);
-                cal.set(Calendar.MINUTE, 59);
-                cal.set(Calendar.SECOND, 59);
-                endDate = cal.getTime();
+                endDate = endDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             log.error("날짜 형식 변환 오류: startDateStr={}, endDateStr={}", startDateStr, endDateStr, e);
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 날짜 형식입니다.");
@@ -85,10 +85,17 @@ public class OrderController {
         // Pageable 객체 생성
         Pageable pageable = PageableUtils.createPageRequest(page, size, sortField, sortDirection);
 
-        // 필터링된 주문 데이터 조회 (정렬 파라미터 추가)
-        Page<Order> orders = orderService.getOrdersWithFilters(keyword, startDate, endDate, pageable, sortField, sortDirection);
+        // 필터링된 주문 데이터 조회
+        Page<Order> orders;
+        try {
+            orders = orderService.getOrdersWithFilters(keyword, startDate, endDate, pageable, sortField, sortDirection);
+        } catch (Exception e) {
+            log.error("주문 데이터 조회 중 오류 발생", e);
+            model.addAttribute("error", "주문 데이터를 불러오는 중 오류가 발생했습니다.");
+            return "admin/order/buyerPurchaseList"; // 오류 메시지를 포함한 템플릿 반환
+        }
 
-        // 페이징 속성 추가 (새로운 메서드 사용)
+        // 페이징 속성 추가
         PageableUtils.addPaginationAttributes(model, orders, keyword, sortField, sortDirection, startDateStr, endDateStr);
 
         // 모델에 데이터 추가
@@ -96,8 +103,9 @@ public class OrderController {
         model.addAttribute("startDate", startDateStr);
         model.addAttribute("endDate", endDateStr);
 
-        return "admin/order/buyerPurchaseList"; // 템플릿 경로에 맞게 수정
+        return "admin/order/buyerPurchaseList"; // 템플릿 경로
     }
+
 
     // 기존 downloadCSV 메서드 및 기타 메서드들...
 
@@ -116,26 +124,20 @@ public class OrderController {
         log.info("CSV 다운로드 요청 - keyword: {}, startDate: {}, endDate: {}, sortField: {}, sortDirection: {}",
                 keyword, startDateStr, endDateStr, sortField, sortDirection);
 
-        // 날짜 문자열을 Date로 변환
-        Date startDate = null;
-        Date endDate = null;
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        // 날짜 문자열을 LocalDateTime으로 변환
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
 
         try {
             if (startDateStr != null && !startDateStr.isEmpty()) {
-                startDate = formatter.parse(startDateStr);
+                startDate = DateUtils.parseLocalDateTime(startDateStr);
             }
             if (endDateStr != null && !endDateStr.isEmpty()) {
-                endDate = formatter.parse(endDateStr);
+                endDate = DateUtils.parseLocalDateTime(endDateStr);
                 // 종료 시간을 하루의 마지막으로 설정
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(endDate);
-                cal.set(Calendar.HOUR_OF_DAY, 23);
-                cal.set(Calendar.MINUTE, 59);
-                cal.set(Calendar.SECOND, 59);
-                endDate = cal.getTime();
+                endDate = endDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             log.error("날짜 형식 변환 오류: startDateStr={}, endDateStr={}", startDateStr, endDateStr, e);
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 날짜 형식입니다.");
@@ -174,11 +176,11 @@ public class OrderController {
 
             writer.println("주문 번호,회원 이름,주문 날짜,총 금액,배송 상태");
 
-            // SimpleDateFormat 사용
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            // DateTimeFormatter 사용
+            DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
             for (Order order : orders) {
-                String formattedDate = (order.getOrderDate() != null) ? sdf.format(order.getOrderDate()) : "";
+                String formattedDate = (order.getOrderDate() != null) ? order.getOrderDate().format(sdf) : "";
                 // CSV 형식에 맞게 데이터를 이스케이프 처리 (콤마 포함 시 따옴표로 감싸기)
                 String userName = escapeCsv(order.getUser().getUsername());
                 String deliveryStatus = escapeCsv(order.getDeliveryStatus());
@@ -204,6 +206,7 @@ public class OrderController {
             }
         }
     }
+
 
     /**
      * CSV 필드 이스케이프 처리
@@ -279,6 +282,7 @@ public class OrderController {
         return "admin/order/orderDetails";
     }
 
+
     @PostMapping("/update")
     public String updateOrderStatus(
             @RequestParam("orderNo") Long orderNo,
@@ -333,7 +337,9 @@ public class OrderController {
         return "admin/order/itemOrderDetails";  // 뷰 템플릿 이름
     }
 
-    // 차트 분석 Ajax용
+    /**
+     * 차트 분석 Ajax용
+     */
     @GetMapping("/itemDetails/analyze")
     @ResponseBody
     public Map<String, Object> analyzeItemDetails(
@@ -342,24 +348,50 @@ public class OrderController {
             @RequestParam(value = "endDate", required = false) String endDateStr,
             @RequestParam(value = "chartType", required = false) String chartType
     ) {
-        // 1) 입력 파라미터(기간, 차트 유형) 등으로 DB 조회
-        //   예: service.analyzeItemSales(itemId, startDate, endDate)
-        //   이 예시에선 임의로 "labels/values"를 생성한다고 가정
+        // 1) 날짜 파싱 (yyyy-MM-dd)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
 
-        // 여기에 날짜 파싱 로직이나 DB 쿼리 추가
-        // ...
-        // 간단히 하드코딩 예시:
-        List<String> labels = List.of("2025-01-01", "2025-01-02", "2025-01-03");
-        List<Integer> values = List.of(5, 10, 7);
+        try {
+            if (startDateStr != null && !startDateStr.isEmpty()) {
+                LocalDate startLocalDate = LocalDate.parse(startDateStr, formatter);
+                startDate = startLocalDate.atStartOfDay();
+            }
+            if (endDateStr != null && !endDateStr.isEmpty()) {
+                LocalDate endLocalDate = LocalDate.parse(endDateStr, formatter);
+                endDate = endLocalDate.atTime(23, 59, 59, 999999999);
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd", e);
+        }
 
-        // 2) 결과를 JSON으로 반환하기 위해 Map or DTO 사용
+        // 2) Service 호출 -> (날짜, 수량 합계) 튜플 목록
+        List<Tuple> rows = orderService.analyzeItemSales(itemId, startDate, endDate);
+
+        // 3) 결과를 라벨/값 리스트로 변환
+        List<String> labels = new ArrayList<>();
+        List<Integer> values = new ArrayList<>();
+
+        for (Tuple tuple : rows) {
+            String dateStr = tuple.get(0, String.class);
+            Number sumValue = tuple.get(1, Number.class);
+            int totalQty = sumValue != null ? sumValue.intValue() : 0;
+
+            labels.add(dateStr);
+            values.add(totalQty);
+        }
+
+        // 4) JSON 응답을 위한 맵 생성
         Map<String, Object> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);
-        result.put("title", "Item " + itemId + " 분석 결과");
+        result.put("title", "Item " + itemId + " 분석 결과 (" + startDateStr + "~" + endDateStr + ")");
+        result.put("chartType", chartType); // 필요하다면
 
-        return result; // JSON 직렬화
+        return result; // -> JSON
     }
+
 
 
 }

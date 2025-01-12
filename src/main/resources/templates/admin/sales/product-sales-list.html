@@ -1,0 +1,142 @@
+<!-- templates/admin/sales/product-sales-list.html -->
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <title>제품별 판매 기록 조회</title>
+    <link rel="stylesheet" th:href="@{/admin/css/sales/product-sales-list.css}">
+    <!--<script th:src="@{/admin/js/item/itemForm.js}" th:inline="none" defer></script>-->
+</head>
+<body>
+<div class="container">
+    <h1>제품별 판매 기록 조회</h1>
+
+    <!-- 검색 폼 시작 -->
+    <form id="searchForm" th:action="@{/admin/pd-manager/product-sales/search}" method="post" th:object="${searchRequest}" class="search-form">
+        <div>
+            <label for="startDate">시작일
+                <input type="date" th:field="*{startDate}" id="startDate"/>
+            </label>
+        </div>
+        <div>
+            <label for="endDate">종료일
+                <input type="date" th:field="*{endDate}" id="endDate"/>
+            </label>
+        </div>
+        <div>
+            <label for="itemName">상품명
+                <input type="text" th:field="*{itemName}" th:value="*{itemName}" id="itemName" placeholder="예: 스마트폰" />
+            </label>
+        </div>
+        <div>
+            <label for="sellerId">판매자ID
+                <input type="text" th:field="*{sellerId}" id="sellerId" placeholder="예: seller123"/>
+            </label>
+        </div>
+        <div>
+            <label for="deliveryStatus">배송상태
+                <select th:field="*{deliveryStatus}" id="deliveryStatus">
+                    <option value="">전체</option>
+                    <option value="배송중">배송중</option>
+                    <option value="배송완료">배송완료</option>
+                    <option value="취소">취소</option>
+                </select>
+            </label>
+        </div>
+        <div>
+            <button type="submit">검색</button>
+        </div>
+    </form>
+    <!-- 검색 폼 끝 -->
+
+    <!-- 결과 테이블 -->
+    <div>
+        <table class="sales-table">
+            <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>주문일</th>
+                <th>상품명</th>
+                <th>판매자</th>
+                <th>수량</th>
+                <th>판매가(단가)</th>
+                <th>부가세</th>
+                <th>합계</th>
+                <th>배송상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="od : ${salesList}">
+                <td th:text="${od.orderNo}">1</td>
+                <td th:text="${od.formattedOrderDate}"></td>
+                <td th:text="${od.itemName}">상품명</td>
+                <td th:text="${od.sellerId}">판매자ID</td>
+                <td th:text="${od.quantity}">1</td>
+                <td th:text="${od.formattedSalePrice != null ? od.formattedSalePrice : 'N/A'}"></td>
+                <td th:text="${od.formattedVAT != null ? od.formattedVAT : 'N/A'}"></td>
+                <td th:text="${od.formattedTotalAmount != null ? od.formattedTotalAmount : 'N/A'}"></td>
+                <td th:text="${od.deliveryStatus}">배송중</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(salesList)}">
+                <td colspan="9" class="no-results">검색 결과가 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- 테이블 끝 -->
+
+    <!-- 페이징 처리 -->
+    <div class="pagination">
+        <div class="page-info">
+            <span>현재 페이지: </span>
+            <strong th:text="${currentPage != null ? currentPage + 1 : 1}">1</strong> <!-- 0-based index -->
+            <span> / </span>
+            <strong th:text="${totalPages != null ? totalPages : 1}">1</strong>
+            <span> | 총 건수: </span>
+            <strong th:text="${totalElements != null ? totalElements : 0}">0</strong>
+        </div>
+        <div class="page-buttons">
+            <a th:if="${currentPage != null and currentPage > 0}"
+               th:href="@{/admin/pd-manager/product-sales/search(page=${currentPage - 1}, size=${10})}"
+               onclick="event.preventDefault(); document.getElementById('searchForm').submit();">
+                이전
+            </a>
+            <a th:if="${currentPage != null and currentPage < totalPages - 1}"
+               th:href="@{/admin/pd-manager/product-sales/search(page=${currentPage + 1}, size=${10})}"
+               onclick="event.preventDefault(); document.getElementById('searchForm').submit();">
+                다음
+            </a>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/admin/js/sales/product-sales-guide.js}" defer></script>
+
+<!-- Help 버튼 추가 -->
+<button class="help-button" id="helpButton">Help</button>
+
+<!-- 사용자 안내 모달 -->
+<div id="guideModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <div class="modal-header">제품별 판매 기록 조회 안내</div>
+        <div class="modal-body">
+            <p>환영합니다! 이 페이지는 제품별 판매 기록을 조회할 수 있는 기능을 제공합니다.</p>
+            <ul>
+                <li><strong>시작일/종료일:</strong> 조회할 판매 기록의 기간을 설정합니다.</li>
+                <li><strong>상품명:</strong> 특정 상품의 판매 기록을 검색할 수 있습니다.</li>
+                <li><strong>판매자ID:</strong> 특정 판매자의 판매 기록을 조회할 수 있습니다.</li>
+                <li><strong>배송상태:</strong> '배송중', '배송완료', '취소' 등 배송 상태에 따라 필터링할 수 있습니다.</li>
+            </ul>
+            <p>검색 버튼을 클릭하면 조건에 맞는 판매 기록이 아래의 테이블에 표시됩니다. 페이징을 통해 결과를 탐색할 수 있습니다.</p>
+        </div>
+        <div class="modal-footer">
+            <button id="closeButton">확인</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

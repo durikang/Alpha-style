@@ -1,0 +1,62 @@
+.container {
+    padding: 20px;
+    margin: auto;
+    background: #fff;
+    border-radius: 8px;
+}
+.product-info {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+}
+.product-info img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+.search-bar {
+    margin: 20px 0;
+}
+table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+table thead {
+    background-color: #f8f9fa;
+}
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+table th {
+    font-weight: 600;
+}
+
+/* =====================
+   독립 페이징 클래스
+ ===================== */
+.paging-container {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+.paging-link {
+    padding: 6px 10px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+}
+.paging-link:hover {
+    background-color: #0056b3;
+}
+.paging-active .paging-link {
+    background-color: #28a745 !important; /* 현재 페이지 강조 색상 */
+}

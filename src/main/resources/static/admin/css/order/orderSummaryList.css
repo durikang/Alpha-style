@@ -1,0 +1,11 @@
+.main-container { padding: 20px; }
+.search-bar-container { margin-bottom: 20px; }
+.order-summary-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+.order-summary-table th, .order-summary-table td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+.order-summary-table th { background-color: #f4f4f4; color: #555; font-weight: bold; }
+.order-summary-table tr:nth-child(even) { background-color: #f9f9f9; }
+.actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+.actions button { padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.actions button:hover { background-color: #218838; }
+.chart-container { margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+.chart-container canvas { max-width: 100%; }

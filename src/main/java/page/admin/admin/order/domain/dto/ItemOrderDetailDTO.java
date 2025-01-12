@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -12,7 +14,7 @@ import java.util.Locale;
 public class ItemOrderDetailDTO {
 
     private Long orderNo;           // 주문 번호
-    private Date orderDate;         // 주문 일자
+    private LocalDateTime orderDate;         // 주문 일자
     private Long itemId;            // 상품 번호
     private String itemName;        // 상품명
     private Integer quantity;       // 수량
@@ -23,7 +25,7 @@ public class ItemOrderDetailDTO {
     // QueryDSL에서 DTO 생성 시 사용되는 생성자
     @QueryProjection
     public ItemOrderDetailDTO(Long orderNo,
-                              Date orderDate,
+                              LocalDateTime orderDate, // LocalDateTime으로 수정
                               Long itemId,
                               String itemName,
                               Integer quantity,
@@ -31,7 +33,7 @@ public class ItemOrderDetailDTO {
                               Double vat,
                               String deliveryStatus) {
         this.orderNo = orderNo;
-        this.orderDate = orderDate;
+        this.orderDate = orderDate; // LocalDateTime으로 수정
         this.itemId = itemId;
         this.itemName = itemName;
         this.quantity = quantity;
@@ -58,8 +60,8 @@ public class ItemOrderDetailDTO {
         if (orderDate == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        return sdf.format(orderDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return orderDate.format(formatter);
     }
 
     /**

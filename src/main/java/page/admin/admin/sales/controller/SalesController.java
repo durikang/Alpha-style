@@ -14,6 +14,7 @@ import page.admin.admin.sales.domain.dto.SalesRecordDto;
 import page.admin.admin.sales.service.SalesService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/admin/sales")
@@ -29,8 +30,8 @@ public class SalesController {
             @RequestParam(name = "sortField", required = false, defaultValue = "orderDate") String sortField,
             @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime startDate,
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime endDate,
             Model model
     ) {
         // 페이지 요청 생성

@@ -1,14 +1,11 @@
 package page.admin.admin.item.service;
 
 import page.admin.admin.item.domain.Review;
+import page.admin.admin.item.domain.dto.*;
 import page.admin.admin.manager.domain.dto.CategoryWithItemsDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import page.admin.admin.item.domain.Item;
-import page.admin.admin.item.domain.dto.ItemEditForm;
-import page.admin.admin.item.domain.dto.ItemSaveForm;
-import page.admin.admin.item.domain.dto.ItemUpdateForm;
-import page.admin.admin.item.domain.dto.ItemViewForm;
 import page.admin.user.member.domain.dto.LoginSessionInfo;
 
 import java.util.List;
@@ -60,6 +57,5 @@ public interface ItemService {
     // 평균 평점 계산
     Double getAverageRating(Long itemId);
 
-    Page<Review> getReviewsByItemId(Long itemId, Pageable pageable);
 
 }

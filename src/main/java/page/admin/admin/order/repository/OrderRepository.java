@@ -10,6 +10,7 @@ import page.admin.admin.order.domain.dto.OrderSummaryDTO;
 import page.admin.admin.sales.domain.dto.SalesRecordDto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -69,6 +70,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND (:endDate IS NULL OR o.orderDate <= :endDate)")
     Page<SalesRecordDto> findSalesRecordsWithPaging(Pageable pageable,
                                                     @Param("keyword") String keyword,
-                                                    @Param("startDate") LocalDate startDate,
-                                                    @Param("endDate") LocalDate endDate);
+                                                    @Param("startDate") LocalDateTime startDate,
+                                                    @Param("endDate") LocalDateTime endDate);
 }

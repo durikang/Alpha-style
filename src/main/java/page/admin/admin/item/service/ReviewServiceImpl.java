@@ -29,6 +29,12 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewDTO> getReviewsByItemId(Long itemId, Pageable pageable) {
         Page<Review> reviewPage = reviewRepository.findByItemItemId(itemId, pageable);
+
+        // 리뷰가 없으면 빈 페이지 반환
+        if (reviewPage == null || reviewPage.isEmpty()) {
+            return Page.empty();
+        }
+
         return reviewPage.map(review -> new ReviewDTO(
                 review.getReviewId(),
                 review.getMember().getUsername(),

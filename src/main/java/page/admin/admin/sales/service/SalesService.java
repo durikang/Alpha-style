@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import page.admin.admin.sales.domain.dto.SalesRecordDto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface SalesService {
 
@@ -17,6 +18,6 @@ public interface SalesService {
      * @param endDate    조회 종료 날짜
      * @return 판매 기록 페이지
      */
-    Page<SalesRecordDto> getSalesRecords(Pageable pageable, String keyword, LocalDate startDate, LocalDate endDate);
+    Page<SalesRecordDto> getSalesRecords(Pageable pageable, String keyword, LocalDateTime startDate, LocalDateTime endDate);
 
 }

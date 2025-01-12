@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 @Getter
 @Setter
@@ -11,7 +12,7 @@ import java.util.Date;
 public class SalesRecordDto {
 
     private Long orderNo;
-    private Date orderDate; // Date 타입으로 변경
+    private LocalDateTime orderDate; // Date에서 LocalDateTime으로 변경
     private String username;
     private String itemName;
     private Integer quantity;
@@ -19,7 +20,7 @@ public class SalesRecordDto {
     private Long totalAmount;
     private String deliveryStatus;
 
-    public SalesRecordDto(Long orderNo, Date orderDate, String username, String itemName,
+    public SalesRecordDto(Long orderNo, LocalDateTime orderDate, String username, String itemName,
                           Integer quantity, Integer salePrice, Long totalAmount, String deliveryStatus) {
         this.orderNo = orderNo;
         this.orderDate = orderDate;

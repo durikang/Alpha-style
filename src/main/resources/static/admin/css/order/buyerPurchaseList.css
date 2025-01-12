@@ -1,0 +1,136 @@
+/* 기존 스타일 유지 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+table th {
+    background-color: #f4f4f4;
+    color: #555;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-section, .date-filter-section {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-section input[type="text"] {
+    width: 200px;
+}
+
+.date-filter-section label {
+    margin-right: 5px;
+}
+
+.date-filter-section input[type="date"],
+.date-filter-section select {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-section button, .date-filter-section button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.search-section button:hover, .date-filter-section button:hover {
+    background-color: #0056b3;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.pagination a {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+    pointer-events: none;
+}
+
+.pagination a.disabled {
+    pointer-events: none;
+    color: #ccc;
+}
+
+/* 검색 섹션 스타일 */
+.search-section input[type="text"] {
+    width: 200px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.search-section input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.search-section button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-section button:hover {
+    background-color: #0056b3;
+}
+
+/* 정렬 링크 스타일 */
+th a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+th a span {
+    margin-left: 5px;
+    font-size: 0.8em;
+}
