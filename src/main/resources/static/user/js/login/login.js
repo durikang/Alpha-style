@@ -20,13 +20,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // 로딩 스피너 표시 및 페이드아웃
+    // 로딩 스피너 표시
     window.showLoadingSpinner = function () {
         const spinner = document.getElementById('loadingSpinner');
         spinner.style.display = 'block';
         setTimeout(() => {
             spinner.style.display = 'none';
-        }, 2000); // 2초 후 페이드아웃
+        }, 2000); // 2초 후 숨김
     };
 
     // 아이디 저장 로직
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // 저장된 아이디 불러오기
     const savedUserId = localStorage.getItem('savedUserId');
     if (savedUserId) {
         document.getElementById('userId').value = savedUserId;
