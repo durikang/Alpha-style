@@ -15,25 +15,28 @@
     <script th:src="@{/user/js/login/login.js}" th:inline="none"></script>
 </div>
 
-<div layout:fragment="content">
+<div layout:fragment="content" style="margin-top: 80px;">
     <link rel="stylesheet" th:href="@{/user/css/login/login.css}"/>
-    <div class="login-container">
+    <div class="login-container fade-in">
         <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
-        <h1>로그인</h1>
         <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()">
-            <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>
-            <span id="userIdError" style="color: red; font-size: 12px;"></span>
+            <div class="input-group">
+                <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>
+                <span id="userIdError" class="error-message" style="color: red; font-size: 12px;"></span>
+            </div>
 
-            <input type="password" id="password" name="password" th:field="*{password}" placeholder="비밀번호" required>
-            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">비밀번호 오류</span>
-            <button type="button" onclick="togglePassword()">👁</button>
+            <div class="input-group">
+                <input type="password" id="password" name="password" th:field="*{password}" placeholder="비밀번호" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+            </div>
 
             <div class="save-id-container">
                 <label for="save-id">아이디 저장</label>
                 <input type="checkbox" id="save-id" name="save-id">
             </div>
+
             <button type="submit" class="btn btn-login">로그인</button>
-            <div id="loadingSpinner">🔄 로그인 중...</div>
+            <div id="loadingSpinner" class="loading-spinner">🔄 로그인 중...</div>
         </form>
 
         <form th:action="@{/signup}" method="get">
@@ -42,16 +45,13 @@
 
         <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
         <div class="options">
-            <a th:href="@{/user/member/find-id}">아이디찾기</a> | <a th:href="@{/user/member/find/pwd}">비밀번호찾기</a>
+            <a th:href="@{/user/member/find-id}">아이디 찾기</a> | <a th:href="@{/user/member/find/pwd}">비밀번호 찾기</a>
         </div>
-
-        <hr>
-        <button class="btn btn-social btn-kakao">카카오 로그인</button>
-        <button class="btn btn-social btn-google">구글 로그인</button>
-        <button class="btn btn-social btn-naver">네이버 로그인</button>
     </div>
 </div>
 
-
+<div layout:fragment="pageScripts">
+    <script th:src="@{/user/js/login/login.js}" th:inline="none"></script>
+</div>
 </body>
 </html>

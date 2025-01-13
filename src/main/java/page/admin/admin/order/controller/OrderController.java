@@ -305,7 +305,7 @@ public class OrderController {
      * 상품별 주문 상세 (itemId 기준)
      */
     @GetMapping("/itemDetails/{itemId}")
-    public String getItemOrderDetails(@PathVariable Long itemId,
+    public String getItemOrderDetails(@PathVariable("itemId") Long itemId,
                                       @RequestParam(name = "page", defaultValue = "0") int page,
                                       @RequestParam(name = "size", defaultValue = "10") int size,
                                       Model model) {
@@ -391,7 +391,4 @@ public class OrderController {
 
         return result; // -> JSON
     }
-
-
-
 }
