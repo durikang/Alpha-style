@@ -4,10 +4,7 @@ import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import page.admin.admin.order.domain.Order;
-import page.admin.admin.order.domain.dto.ItemOrderDetailDTO;
-import page.admin.admin.order.domain.dto.OrderDetailDTO;
-import page.admin.admin.order.domain.dto.OrderSummaryChartDTO;
-import page.admin.admin.order.domain.dto.OrderSummaryDTO;
+import page.admin.admin.order.domain.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -61,9 +58,28 @@ public interface OrderService {
     /**
      * 상품별 주문 상세 목록
      */
-    Page<ItemOrderDetailDTO> getItemOrderDetails(Long itemId, Pageable pageable);
+    Page<ItemOrderDetailDTO> getItemOrderDetails(Long itemId, Pageable pageable, LocalDateTime startDate, LocalDateTime endDate);
 
     // 추가 메서드: (itemId, 기간)에 대한 판매수량 집계
     List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate);
 
+    Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(String keyword, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    List<Tuple> analyzeBuyerPurchases(LocalDateTime startDate, LocalDateTime endDate);
+
+    Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(
+            String keyword,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable,
+            String sortField,
+            String sortDirection);
+
+    /**
+     * 매출 요약 데이터 분석
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @return 일별 매출 요약 튜플
+     */
+    List<Tuple> analyzeSalesSummary(LocalDateTime startDate, LocalDateTime endDate);
 }

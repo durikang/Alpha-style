@@ -39,6 +39,12 @@ public class OrderDetail {
     private Double vat;
 
     /**
+     * 매입/매출 여부 (1: 매출, 2: 매입)
+     */
+    @Column(nullable = false)
+    private Integer transactionType;
+
+    /**
      * Subtotal 및 VAT 계산
      */
     @PrePersist

@@ -5,12 +5,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import page.admin.admin.item.domain.Item;
+import page.admin.admin.order.domain.dto.CustomerPurchaseSummaryDTO;
 import page.admin.admin.order.domain.dto.ItemOrderDetailDTO;
 import page.admin.admin.item.repository.ItemRepository;
 import page.admin.admin.item.service.DeliveryCodeService;
@@ -44,67 +46,104 @@ public class OrderController {
     private final OrderService orderService;
     private final DeliveryCodeService deliveryCodeService;
     private final ItemRepository itemRepository;
-    /**
-     * 구매자별 상품 구매 현황 페이지
-     */
+
     @GetMapping("/list")
     public String getBuyerPurchaseList(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sortField", defaultValue = "orderDate") String sortField,
-            @RequestParam(value = "sortDirection", defaultValue = "desc") String sortDirection,
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "startDate", required = false) String startDateStr,
             @RequestParam(value = "endDate", required = false) String endDateStr,
-            Model model,
-            HttpServletResponse response) {
+            Model model) {
 
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
 
-        // 날짜 문자열을 LocalDateTime으로 변환
         try {
-            if (startDateStr != null && !startDateStr.isEmpty()) {
-                startDate = DateUtils.parseLocalDateTime(startDateStr);
+            if (startDateStr != null && !startDateStr.isBlank()) {
+                startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
             }
-            if (endDateStr != null && !endDateStr.isEmpty()) {
-                endDate = DateUtils.parseLocalDateTime(endDateStr);
-                // 종료 시간을 하루의 마지막으로 설정
-                endDate = endDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+            if (endDateStr != null && !endDateStr.isBlank()) {
+                endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
             }
-        } catch (Exception e) {
-            log.error("날짜 형식 변환 오류: startDateStr={}, endDateStr={}", startDateStr, endDateStr, e);
-            try {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 날짜 형식입니다.");
-            } catch (IOException ioException) {
-                log.error("오류 메시지 전송 실패", ioException);
-            }
-            return "redirect:/admin/orders/list?error=invalid_date_format";
+        } catch (DateTimeParseException e) {
+            model.addAttribute("error", "날짜 형식이 잘못되었습니다.");
+            return "admin/order/buyerPurchaseList";
         }
 
-        // Pageable 객체 생성
-        Pageable pageable = PageableUtils.createPageRequest(page, size, sortField, sortDirection);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CustomerPurchaseSummaryDTO> summaries = orderService.getBuyerOrderSummaries(keyword, startDate, endDate, pageable);
 
-        // 필터링된 주문 데이터 조회
-        Page<Order> orders;
-        try {
-            orders = orderService.getOrdersWithFilters(keyword, startDate, endDate, pageable, sortField, sortDirection);
-        } catch (Exception e) {
-            log.error("주문 데이터 조회 중 오류 발생", e);
-            model.addAttribute("error", "주문 데이터를 불러오는 중 오류가 발생했습니다.");
-            return "admin/order/buyerPurchaseList"; // 오류 메시지를 포함한 템플릿 반환
-        }
-
-        // 페이징 속성 추가
-        PageableUtils.addPaginationAttributes(model, orders, keyword, sortField, sortDirection, startDateStr, endDateStr);
+        int totalPages = summaries.getTotalPages();
+        int currentPage = summaries.getNumber() + 1; // 페이지는 0부터 시작하므로 +1
+        int groupSize = 10; // 한 그룹에 표시할 페이지 수
+        int currentGroup = (currentPage - 1) / groupSize + 1; // 현재 페이지 그룹
+        int startPage = (currentGroup - 1) * groupSize + 1; // 그룹 시작 페이지
+        int endPage = Math.min(startPage + groupSize - 1, totalPages); // 그룹 종료 페이지
 
         // 모델에 데이터 추가
-        model.addAttribute("orders", orders.getContent());
+        model.addAttribute("customerSummaries", summaries);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("startDate", startDateStr);
         model.addAttribute("endDate", endDateStr);
+        model.addAttribute("currentGroup", currentGroup);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("totalPages", totalPages);
 
-        return "admin/order/buyerPurchaseList"; // 템플릿 경로
+        return "admin/order/buyerPurchaseList";
     }
+
+    @GetMapping("/customerSummary")
+    public String getCustomerSummary(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr,
+            @RequestParam(value = "sortField", defaultValue = "totalAmount") String sortField,
+            @RequestParam(value = "sortDirection", defaultValue = "desc") String sortDirection,
+            Model model) {
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+
+        try {
+            if (startDateStr != null && !startDateStr.isBlank()) {
+                startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+            }
+            if (endDateStr != null && !endDateStr.isBlank()) {
+                endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+            }
+        } catch (DateTimeParseException e) {
+            model.addAttribute("error", "날짜 형식이 잘못되었습니다.");
+            return "admin/order/buyerPurchaseList";
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CustomerPurchaseSummaryDTO> summaries = orderService.getBuyerOrderSummaries(keyword, startDate, endDate, pageable);
+
+        int totalPages = summaries.getTotalPages();
+        int currentPage = summaries.getNumber() + 1;
+        int groupSize = 10;
+        int currentGroup = (currentPage - 1) / groupSize + 1;
+        int startPage = (currentGroup - 1) * groupSize + 1;
+        int endPage = Math.min(startPage + groupSize - 1, totalPages);
+
+        model.addAttribute("customerSummaries", summaries != null ? summaries : Page.empty());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("startDate", startDateStr);
+        model.addAttribute("endDate", endDateStr);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("currentGroup", currentGroup);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("totalPages", totalPages);
+
+        return "admin/order/buyerPurchaseList";
+    }
+
 
 
     // 기존 downloadCSV 메서드 및 기타 메서드들...
@@ -308,34 +347,50 @@ public class OrderController {
     public String getItemOrderDetails(@PathVariable("itemId") Long itemId,
                                       @RequestParam(name = "page", defaultValue = "0") int page,
                                       @RequestParam(name = "size", defaultValue = "10") int size,
+                                      @RequestParam(name = "startDate", required = false) String startDateStr,
+                                      @RequestParam(name = "endDate", required = false) String endDateStr,
                                       Model model) {
 
-        // 1) itemId 유효성 확인
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다. itemId=" + itemId));
 
-        // 2) 페이징 객체 생성
         Pageable pageable = PageableUtils.createPageRequest(page, size, "orderDate", "desc");
 
-        // 3) 해당 상품에 대한 주문 상세 목록 조회 (페이징)
-        Page<ItemOrderDetailDTO> itemOrderDetails = orderService.getItemOrderDetails(itemId, pageable);
+        // 날짜 필터링
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // 4) 페이징 정보 계산(화면에서 사용하는 startPage, endPage 등)
+        try {
+            if (startDateStr != null && !startDateStr.isEmpty()) {
+                startDate = LocalDate.parse(startDateStr, formatter).atStartOfDay();
+            }
+            if (endDateStr != null && !endDateStr.isEmpty()) {
+                endDate = LocalDate.parse(endDateStr, formatter).atTime(23, 59, 59, 999999999);
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다.", e);
+        }
+
+        Page<ItemOrderDetailDTO> itemOrderDetails = orderService.getItemOrderDetails(itemId, pageable, startDate, endDate);
+
         int totalPages = itemOrderDetails.getTotalPages();
         int currentPage = page + 1;
         int startPage = Math.max(1, currentPage - 2);
         int endPage = Math.min(totalPages, currentPage + 2);
 
-        // 5) Model에 담아서 뷰로 전달
         model.addAttribute("item", item);
         model.addAttribute("itemOrderDetails", itemOrderDetails.getContent());
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        model.addAttribute("startDate", startDateStr);
+        model.addAttribute("endDate", endDateStr);
 
-        return "admin/order/itemOrderDetails";  // 뷰 템플릿 이름
+        return "admin/order/itemOrderDetails";
     }
+
 
     /**
      * 차트 분석 Ajax용
@@ -391,4 +446,80 @@ public class OrderController {
 
         return result; // -> JSON
     }
+
+
+    @GetMapping("/analyze")
+    @ResponseBody
+    public Map<String, Object> analyzePurchases(
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr) {
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+
+        try {
+            if (startDateStr != null && !startDateStr.isBlank()) {
+                startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+            }
+            if (endDateStr != null && !endDateStr.isBlank()) {
+                endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("날짜 형식이 잘못되었습니다.");
+        }
+
+        List<Tuple> data = orderService.analyzeBuyerPurchases(startDate, endDate);
+
+        // 데이터 포맷 변환 (ECharts에 적합한 형식)
+        List<String> labels = new ArrayList<>();
+        List<Long> values = new ArrayList<>();
+
+        for (Tuple tuple : data) {
+            labels.add(tuple.get(0, String.class));  // 날짜
+            values.add(tuple.get(1, Long.class));  // 구매 수량
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("labels", labels);
+        result.put("values", values);
+        result.put("title", "구매 분석 결과 (" + startDateStr + " ~ " + endDateStr + ")");
+
+        return result;
+    }
+
+
+    @GetMapping("/analyzeSalesSummary")
+    @ResponseBody
+    public Map<String, Object> analyzeSalesSummary(
+            @RequestParam("startDate") String startDateStr,
+            @RequestParam("endDate") String endDateStr,
+            @RequestParam(value = "chartType", defaultValue = "line") String chartType) {
+
+        LocalDateTime startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+        LocalDateTime endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+
+        List<Tuple> results = orderService.analyzeSalesSummary(startDate, endDate);
+
+        List<String> labels = new ArrayList<>();
+        List<Long> values = new ArrayList<>();
+
+        for (Tuple result : results) {
+            labels.add(result.get(0, String.class)); // 날짜
+            values.add(result.get(1, Long.class)); // 매출 금액
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("labels", labels);
+        response.put("values", values);
+        response.put("title", "매출 분석 (" + startDateStr + " ~ " + endDateStr + ")");
+        response.put("chartType", chartType);
+
+        return response;
+    }
+
+
+
+
+
+
 }
