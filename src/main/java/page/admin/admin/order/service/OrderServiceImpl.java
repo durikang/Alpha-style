@@ -153,33 +153,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    @Override
-    public List<Tuple> analyzeBuyerPurchases(LocalDateTime startDate, LocalDateTime endDate) {
-        QOrder order = QOrder.order;
-        QOrderDetail detail = QOrderDetail.orderDetail;
 
-        BooleanBuilder builder = new BooleanBuilder();
-        if (startDate != null) {
-            builder.and(order.orderDate.goe(startDate));
-        }
-        if (endDate != null) {
-            builder.and(order.orderDate.loe(endDate));
-        }
-
-        return queryFactory
-                .select(
-                        Expressions.stringTemplate(
-                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate
-                        ),
-                        detail.quantity.sum()
-                )
-                .from(order)
-                .join(order.orderDetails, detail)
-                .where(builder)
-                .groupBy(order.orderDate)
-                .orderBy(order.orderDate.asc())
-                .fetch();
-    }
 
     @Override
     public Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(
@@ -475,8 +449,40 @@ public class OrderServiceImpl implements OrderService {
                 .fetch();
     }
 
+    @Override
+    public List<Tuple> analyzeCustomerPurchases(Long customerId, LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+        QItem item = QItem.item; // 상품 정보 추가
 
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(order.user.userNo.eq(customerId)); // 고객 ID로 필터링
 
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        return queryFactory
+                .select(
+                        Expressions.stringTemplate(
+                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate // 날짜 포맷
+                        ),
+                        Expressions.asNumber(detail.quantity.sum()).castToNum(Long.class).as("totalQuantity"), // 총 구매 수량을 Long으로 캐스팅
+                        Expressions.asNumber(detail.subtotal.sum().add(detail.vat.sum())).castToNum(Long.class).as("totalAmount"), // 총 구매 금액을 Long으로 캐스팅
+                        item.mainCategory.mainCategoryName.as("category"), // 상품 카테고리
+                        Expressions.asNumber(detail.subtotal.avg().add(detail.vat.avg())).castToNum(Double.class).as("averageAmount") // 평균 구매 금액을 Double로 캐스팅
+                )
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item) // 아이템 조인
+                .where(builder)
+                .groupBy(order.orderDate, item.mainCategory.mainCategoryName) // 날짜와 카테고리별로 그룹화
+                .orderBy(order.orderDate.asc())
+                .fetch();
+    }
 
 
 

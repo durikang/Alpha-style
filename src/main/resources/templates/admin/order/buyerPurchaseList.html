@@ -16,9 +16,8 @@
 <main class="container mt-4">
     <h1>고객별 구매 현황</h1>
 
-    <!-- 검색/필터 영역 -->
     <section class="filter-section mb-4">
-        <form th:action="@{/admin/orders/customerSummary}" method="get" class="row gx-3 gy-2 align-items-center">
+        <form id="searchForm" th:action="@{/admin/orders/customerSummary}" method="get" class="row gx-3 gy-2 align-items-center">
             <div class="col-auto">
                 <div class="filter-label"><label for="startDate" class="form-label">시작 날짜</label></div>
                 <input type="date" id="startDate" name="startDate" class="form-control" th:value="${startDate}">
@@ -46,12 +45,18 @@
             </div>
             <!-- 분석 버튼 추가 -->
             <div class="col-auto">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#chartModal">
-                    분석
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#customerChartModal">
+                    고객 분석
+                </button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#salesChartModal">
+                    매출 분석
                 </button>
             </div>
         </form>
     </section>
+
 
     <!-- 구매 현황 테이블 -->
     <section class="purchase-summary-section">
@@ -81,37 +86,41 @@
         </table>
     </section>
 
-    <!-- 모달 -->
-    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+    <!--
+        매출 분석 모달
+    -->
+    <div class="modal fade" id="salesChartModal" tabindex="-1" aria-labelledby="salesChartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="chartModalLabel">분석</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="salesChartModalLabel">매출 분석</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form class="row g-3 mb-3">
                         <div class="col-auto">
-                            <label for="modalStart" class="form-label">시작일</label>
-                            <input type="date" class="form-control" id="modalStart">
+                            <label for="salesModalStart" class="form-label">시작일</label>
+                            <input type="date" id="salesModalStart" class="form-control">
                         </div>
                         <div class="col-auto">
-                            <label for="modalEnd" class="form-label">종료일</label>
-                            <input type="date" class="form-control" id="modalEnd">
+                            <label for="salesModalEnd" class="form-label">종료일</label>
+                            <input type="date" id="salesModalEnd" class="form-control">
                         </div>
                         <div class="col-auto">
-                            <label for="chartType" class="form-label">차트 종류</label>
-                            <select class="form-select" id="chartType">
-                                <option value="bar">막대 그래프</option>
+                            <label for="salesChartType" class="form-label">차트 종류</label>
+                            <select id="salesChartType" class="form-select">
                                 <option value="line">선 그래프</option>
+                                <option value="bar">막대 그래프</option>
                                 <option value="pie">파이 차트</option>
                             </select>
                         </div>
-                        <div class="col-auto" style="margin-top: 32px;">
-                            <button type="button" class="btn btn-primary" id="analyzeButton">분석하기</button>
+                        <div class="col-auto">
+                            <button type="button" id="salesAnalyzeButton" class="btn btn-primary" style="margin-top: 32px;">
+                                분석하기
+                            </button>
                         </div>
                     </form>
-                    <div id="chartContainer" style="width: 100%; height: 400px;"></div>
+                    <div id="salesChartContainer" style="width: 100%; height: 400px;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -119,6 +128,55 @@
             </div>
         </div>
     </div>
+
+
+    <!--고객분석 모달 -->
+    <div class="modal fade" id="customerChartModal" tabindex="-1" aria-labelledby="customerChartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customerChartModalLabel">고객 분석</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label for="customerSelect" class="form-label">고객 선택</label>
+                            <select id="customerSelect" class="form-select">
+                                <option value="">고객을 선택하세요</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="customerModalStart" class="form-label">시작일</label>
+                            <input type="date" id="customerModalStart" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <label for="customerModalEnd" class="form-label">종료일</label>
+                            <input type="date" id="customerModalEnd" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <label for="customerChartType" class="form-label">차트 종류</label>
+                            <select id="customerChartType" class="form-select">
+                                <option value="bar">막대 그래프</option>
+                                <option value="line">선 그래프</option>
+                                <option value="pie">파이 차트</option>
+                            </select>
+                        </div>
+                        <div class="col-auto" style="margin-top: 32px;">
+                            <button type="button" id="customerAnalyzeButton" class="btn btn-primary">분석하기</button>
+                        </div>
+                    </form>
+                    <div id="customerChartContainer" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
 
@@ -153,5 +211,6 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
 <script th:src="@{/admin/js/order/customerPurchaseList.js}"></script>
 <script th:src="@{/admin/js/order/salesSummary.js}"></script>
+<script th:src="@{/admin/js/order/customerSelect.js}"></script>
 </body>
 </html>

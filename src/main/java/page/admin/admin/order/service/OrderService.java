@@ -65,7 +65,7 @@ public interface OrderService {
 
     Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(String keyword, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
-    List<Tuple> analyzeBuyerPurchases(LocalDateTime startDate, LocalDateTime endDate);
+
 
     Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(
             String keyword,
@@ -82,4 +82,6 @@ public interface OrderService {
      * @return 일별 매출 요약 튜플
      */
     List<Tuple> analyzeSalesSummary(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Tuple> analyzeCustomerPurchases(Long customerId, LocalDateTime startDate, LocalDateTime endDate);
 }

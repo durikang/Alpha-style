@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -81,8 +84,19 @@ public class OrderController {
         int startPage = (currentGroup - 1) * groupSize + 1; // 그룹 시작 페이지
         int endPage = Math.min(startPage + groupSize - 1, totalPages); // 그룹 종료 페이지
 
+        // 고객 정보를 Map 리스트로 변환
+        List<Map<String, Object>> customers = summaries.getContent().stream()
+                .map(summary -> {
+                    Map<String, Object> customerMap = new HashMap<>();
+                    customerMap.put("id", summary.getCustomerId());
+                    customerMap.put("name", summary.getCustomerName());
+                    return customerMap;
+                })
+                .collect(Collectors.toList());
+
         // 모델에 데이터 추가
         model.addAttribute("customerSummaries", summaries);
+        model.addAttribute("customers", customers); // 고객 선택 드롭다운용 데이터 추가
         model.addAttribute("keyword", keyword);
         model.addAttribute("startDate", startDateStr);
         model.addAttribute("endDate", endDateStr);
@@ -93,6 +107,55 @@ public class OrderController {
 
         return "admin/order/buyerPurchaseList";
     }
+
+    // Ajax를 위한 새로운 엔드포인트
+    @GetMapping("/list/ajax")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getBuyerPurchaseListAjax(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr) {
+
+        log.info("Ajax 요청 - page: {}, size: {}, keyword: {}, startDate: {}, endDate: {}",
+                page, size, keyword, startDateStr, endDateStr);
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+
+        try {
+            if (startDateStr != null && !startDateStr.isBlank()) {
+                startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+            }
+            if (endDateStr != null && !endDateStr.isBlank()) {
+                endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+            }
+        } catch (DateTimeParseException e) {
+            log.error("400 에러 - 잘못된 날짜 형식", e);
+            return ResponseEntity.badRequest().body(Map.of("error", "날짜 형식이 잘못되었습니다."));
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CustomerPurchaseSummaryDTO> summaries = orderService.getBuyerOrderSummaries(keyword, startDate, endDate, pageable);
+
+        if (summaries.isEmpty()) {
+            log.warn("검색 결과가 없습니다.");
+        }
+
+        List<Map<String, Object>> customers = summaries.getContent().stream()
+                .map(summary -> {
+                    Map<String, Object> customerMap = new HashMap<>();
+                    customerMap.put("id", summary.getCustomerId());
+                    customerMap.put("name", summary.getCustomerName());
+                    return customerMap;
+                })
+                .collect(Collectors.toList());
+
+        log.info("Ajax 응답 - 고객 수: {}", customers.size());
+        return ResponseEntity.ok(Map.of("customers", customers));
+    }
+
 
     @GetMapping("/customerSummary")
     public String getCustomerSummary(
@@ -447,45 +510,73 @@ public class OrderController {
         return result; // -> JSON
     }
 
-
+    /**
+     * 고객 분석
+     * @param customerId
+     * @param startDateStr
+     * @param endDateStr
+     * @return
+     */
     @GetMapping("/analyze")
     @ResponseBody
-    public Map<String, Object> analyzePurchases(
+    public ResponseEntity<Map<String, Object>> analyzeCustomerPurchases(
+            @RequestParam("customerId") Long customerId,
             @RequestParam(value = "startDate", required = false) String startDateStr,
             @RequestParam(value = "endDate", required = false) String endDateStr) {
 
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = null;
+        log.info("analyzeCustomerPurchases 요청: customerId={}, startDate={}, endDate={}", customerId, startDateStr, endDateStr);
+        Map<String, Object> result = new HashMap<>();
 
         try {
-            if (startDateStr != null && !startDateStr.isBlank()) {
+            if (customerId == null) {
+                log.error("customerId가 누락되었습니다.");
+                result.put("error", "고객 ID는 필수입니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+
+            LocalDateTime startDate = null;
+            LocalDateTime endDate = null;
+
+            if (startDateStr != null) {
                 startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
             }
-            if (endDateStr != null && !endDateStr.isBlank()) {
+            if (endDateStr != null) {
                 endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
             }
+
+            List<Tuple> data = orderService.analyzeCustomerPurchases(customerId, startDate, endDate);
+            if (data == null || data.isEmpty()) {
+                log.error("데이터가 존재하지 않습니다. customerId={}, startDate={}, endDate={}", customerId, startDate, endDate);
+                result.put("error", "분석 결과가 없습니다.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+
+            // 데이터 처리
+            List<String> labels = new ArrayList<>();
+            List<Long> values = new ArrayList<>();
+            for (Tuple tuple : data) {
+                labels.add(tuple.get(0, String.class));
+                values.add(tuple.get(1, Long.class));
+            }
+
+            result.put("labels", labels);
+            result.put("values", values);
+            result.put("title", "고객 ID " + customerId + "의 구매 분석 결과 (" + startDateStr + " ~ " + endDateStr + ")");
+            return ResponseEntity.ok(result);
+
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("날짜 형식이 잘못되었습니다.");
+            log.error("날짜 형식 오류: startDateStr={}, endDateStr={}", startDateStr, endDateStr, e);
+            result.put("error", "날짜 형식이 잘못되었습니다.");
+            return ResponseEntity.badRequest().body(result);
+        } catch (Exception e) {
+            log.error("분석 중 예외 발생: customerId={}, startDate={}, endDate={}", customerId, startDateStr, endDateStr, e);
+            result.put("error", "분석 중 문제가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
-
-        List<Tuple> data = orderService.analyzeBuyerPurchases(startDate, endDate);
-
-        // 데이터 포맷 변환 (ECharts에 적합한 형식)
-        List<String> labels = new ArrayList<>();
-        List<Long> values = new ArrayList<>();
-
-        for (Tuple tuple : data) {
-            labels.add(tuple.get(0, String.class));  // 날짜
-            values.add(tuple.get(1, Long.class));  // 구매 수량
-        }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("labels", labels);
-        result.put("values", values);
-        result.put("title", "구매 분석 결과 (" + startDateStr + " ~ " + endDateStr + ")");
-
-        return result;
     }
+
+
+
 
 
     @GetMapping("/analyzeSalesSummary")
