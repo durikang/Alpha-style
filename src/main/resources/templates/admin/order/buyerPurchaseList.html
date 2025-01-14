@@ -75,8 +75,8 @@
                 <td th:text="${summary.purchaseCount}">구매 횟수</td>
                 <td th:text="${summary.getFormattedTotalAmount}">총 금액</td>
                 <td>
-                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#chartModal"
-                            th:data-customer-id="${summary.customerId}" onclick="openChart(this)">분석</button>
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#individualCustomerChartModal"
+                            th:data-customer-id="${summary.customerId}">분석</button>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(customerSummaries)}">
@@ -87,7 +87,7 @@
     </section>
 
     <!--
-        매출 분석 모달
+    매출 분석 모달
     -->
     <div class="modal fade" id="salesChartModal" tabindex="-1" aria-labelledby="salesChartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -114,6 +114,11 @@
                                 <option value="pie">파이 차트</option>
                             </select>
                         </div>
+                        <div class="col-12">
+                            <p id="chartTypeDescription" class="text-muted" style="font-size: 0.9rem;">
+                                파이 차트를 선택하면 카테고리별 매출 분석 결과를 표시합니다.
+                            </p>
+                        </div>
                         <div class="col-auto">
                             <button type="button" id="salesAnalyzeButton" class="btn btn-primary" style="margin-top: 32px;">
                                 분석하기
@@ -121,6 +126,7 @@
                         </div>
                     </form>
                     <div id="salesChartContainer" style="width: 100%; height: 400px;"></div>
+                    <div id="subCategoryChartContainer" style="width: 100%; height: 400px; margin-top: 20px; display: none;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -128,6 +134,7 @@
             </div>
         </div>
     </div>
+
 
 
     <!--고객분석 모달 -->
@@ -167,6 +174,7 @@
                         </div>
                     </form>
                     <div id="customerChartContainer" style="width: 100%; height: 400px;"></div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
@@ -175,9 +183,44 @@
         </div>
     </div>
 
-
-
-
+    <!-- 개인 고객 분석 모달 -->
+    <div class="modal fade" id="individualCustomerChartModal" tabindex="-1" aria-labelledby="individualCustomerChartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="individualCustomerChartModalLabel">개인 고객 분석</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3 mb-3">
+                        <div class="col-auto">
+                            <label for="individualCustomerStartDate" class="form-label">시작일</label>
+                            <input type="date" id="individualCustomerStartDate" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <label for="individualCustomerEndDate" class="form-label">종료일</label>
+                            <input type="date" id="individualCustomerEndDate" class="form-control">
+                        </div>
+                        <div class="col-auto">
+                            <label for="individualCustomerChartType" class="form-label">차트 종류</label>
+                            <select id="individualCustomerChartType" class="form-select">
+                                <option value="bar">막대 그래프</option>
+                                <option value="line">선 그래프</option>
+                                <option value="pie">파이 차트</option>
+                            </select>
+                        </div>
+                        <div class="col-auto" style="margin-top: 32px;">
+                            <button type="button" id="individualCustomerAnalyzeButton" class="btn btn-primary">분석하기</button>
+                        </div>
+                    </form>
+                    <div id="individualCustomerChartContainer" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- 페이지네이션 -->
@@ -207,10 +250,20 @@
 
 </main>
 
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
-<script th:src="@{/admin/js/order/customerPurchaseList.js}"></script>
-<script th:src="@{/admin/js/order/salesSummary.js}"></script>
+
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/modalHandlers.js}"></script>
 <script th:src="@{/admin/js/order/customerSelect.js}"></script>
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerAjax.js}"></script>
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerChartManager.js}"></script>
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerModalHandlers.js}"></script>
+
+
+<script th:src="@{/admin/js/order/salesChartManager.js}"></script>
 </body>
 </html>

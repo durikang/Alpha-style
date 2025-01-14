@@ -9,6 +9,7 @@ import page.admin.admin.order.domain.dto.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
 
@@ -82,6 +83,12 @@ public interface OrderService {
      * @return 일별 매출 요약 튜플
      */
     List<Tuple> analyzeSalesSummary(LocalDateTime startDate, LocalDateTime endDate);
+
+    /**
+     * 큰/서브 카테고리별 매출 분석
+     */
+    Map<String, Object> analyzeCategorySales(LocalDateTime startDate, LocalDateTime endDate);
+
 
     List<Tuple> analyzeCustomerPurchases(Long customerId, LocalDateTime startDate, LocalDateTime endDate);
 }
