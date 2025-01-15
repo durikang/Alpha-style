@@ -17,7 +17,7 @@
     <h1>고객별 구매 현황</h1>
 
     <section class="filter-section mb-4">
-        <form id="searchForm" th:action="@{/admin/orders/customerSummary}" method="get" class="row gx-3 gy-2 align-items-center">
+        <form id="searchForm" th:action="@{/admin/orders/customerSummary}" method="get" class="row gx-3 gy-2 align-items-center" data-modal-form>
             <div class="col-auto">
                 <div class="filter-label"><label for="startDate" class="form-label">시작 날짜</label></div>
                 <input type="date" id="startDate" name="startDate" class="form-control" th:value="${startDate}">
@@ -97,7 +97,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="row g-3 mb-3">
+                    <form data-modal-form class="row g-3 mb-3">
                         <div class="col-auto">
                             <label for="salesModalStart" class="form-label">시작일</label>
                             <input type="date" id="salesModalStart" class="form-control">
@@ -146,7 +146,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="modal-form row g-3 mb-3">
+                    <form data-modal-form class="row g-3 mb-3">
                         <div class="col-12">
                             <label for="customerSelect" class="form-label">고객 선택</label>
                             <select id="customerSelect" class="form-select">
