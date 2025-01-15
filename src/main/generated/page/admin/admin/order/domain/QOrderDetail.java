@@ -32,6 +32,8 @@ public class QOrderDetail extends EntityPathBase<OrderDetail> {
 
     public final NumberPath<Long> subtotal = createNumber("subtotal", Long.class);
 
+    public final NumberPath<Integer> transactionType = createNumber("transactionType", Integer.class);
+
     public final NumberPath<Double> vat = createNumber("vat", Double.class);
 
     public QOrderDetail(String variable) {

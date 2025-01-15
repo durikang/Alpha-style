@@ -328,6 +328,16 @@
         <input type="hidden" id="selected-year" name="year" value="all">
         <button type="submit">다운로드</button>
     </form>
+
+
+    <!-- 진행 표시줄 -->
+    <div id="progressContainer" style="display: none;">
+        <h3>업로드 진행:</h3>
+        <progress id="uploadProgress" value="0" max="100" style="width: 100%;"></progress>
+        <span id="progressText">0%</span>
+    </div>
+    <div id="result"></div>
+
     <div class="daterange_div">
     <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" />
     </div>
