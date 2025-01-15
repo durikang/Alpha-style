@@ -28,7 +28,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public final page.admin.admin.member.domain.QMember member;
 
-    public final NumberPath<Integer> rating = createNumber("rating", Integer.class);
+    public final NumberPath<Double> rating = createNumber("rating", Double.class);
 
     public final StringPath reviewComment = createString("reviewComment");
 
