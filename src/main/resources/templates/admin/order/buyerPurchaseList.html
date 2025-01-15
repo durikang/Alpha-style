@@ -170,7 +170,7 @@
                             </select>
                         </div>
                         <div class="col-auto" style="margin-top: 32px;">
-                            <button type="button" id="customerAnalyzeButton" class="btn btn-primary">분석하기</button>
+                            <button type="button" id="customerAnalyzeButton" class="btn btn-primary btn-customer-analyze">분석하기</button>
                         </div>
                     </form>
                     <div id="customerChartContainer" style="width: 100%; height: 400px;"></div>
@@ -192,7 +192,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="row g-3 mb-3">
+                    <form class="row g-3 mb-3" data-modal-form>
                         <div class="col-auto">
                             <label for="individualCustomerStartDate" class="form-label">시작일</label>
                             <input type="date" id="individualCustomerStartDate" class="form-control">
@@ -210,7 +210,7 @@
                             </select>
                         </div>
                         <div class="col-auto" style="margin-top: 32px;">
-                            <button type="button" id="individualCustomerAnalyzeButton" class="btn btn-primary">분석하기</button>
+                            <button type="button" id="individualCustomerAnalyzeButton" class="btn btn-primary btn-individual-analyze">분석하기</button>
                         </div>
                     </form>
                     <div id="individualCustomerChartContainer" style="width: 100%; height: 400px;"></div>
