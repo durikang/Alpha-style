@@ -19,7 +19,7 @@
     <link rel="stylesheet" th:href="@{/user/css/login/login.css}"/>
     <div class="login-container fade-in">
         <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
-        <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()">
+        <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()" data-login-form>
             <div class="input-group">
                 <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>
                 <span id="userIdError" class="error-message" style="color: red; font-size: 12px;"></span>

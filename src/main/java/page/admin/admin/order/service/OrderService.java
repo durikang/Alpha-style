@@ -90,5 +90,5 @@ public interface OrderService {
     Map<String, Object> analyzeCategorySales(LocalDateTime startDate, LocalDateTime endDate);
 
 
-    List<Tuple> analyzeCustomerPurchases(Long customerId, LocalDateTime startDate, LocalDateTime endDate);
+    List<Tuple> analyzeCustomerPurchases(Long customerId, java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
 }

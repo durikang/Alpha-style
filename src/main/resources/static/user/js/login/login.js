@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.showLoadingSpinner = function () {
         const spinner = document.getElementById('loadingSpinner');
         spinner.style.display = 'block';
+
+        // 로딩 스피너는 비동기 작업과 별도로 동작
         setTimeout(() => {
             spinner.style.display = 'none';
         }, 2000); // 2초 후 숨김
