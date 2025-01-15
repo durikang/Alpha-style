@@ -146,7 +146,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="row g-3 mb-3">
+                    <form class="modal-form row g-3 mb-3">
                         <div class="col-12">
                             <label for="customerSelect" class="form-label">고객 선택</label>
                             <select id="customerSelect" class="form-select">
@@ -256,13 +256,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
-
-<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/modalHandlers.js}"></script>
 <script th:src="@{/admin/js/order/customerSelect.js}"></script>
+
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/customerModalHandlers.js}"></script>
 <script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerAjax.js}"></script>
 <script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerChartManager.js}"></script>
-<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/individualCustomerModalHandlers.js}"></script>
-
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/chartManager.js}"></script>
+<script type="module" th:src="@{/admin/js/order/buyerPurchaseList/dropdownManager.js}"></script>
 
 <script th:src="@{/admin/js/order/salesChartManager.js}"></script>
 </body>

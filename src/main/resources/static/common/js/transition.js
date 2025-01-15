@@ -30,6 +30,11 @@ function handlePageTransition(event, body) {
     const isForm = target.tagName === 'FORM';
     const isAnchor = target.tagName === 'A' && target.href;
 
+    // 로그인 폼 및 모달 내부 이벤트 제외
+    if (target.closest('[data-login-form]') || target.closest('.modal')) {
+        return;
+    }
+
     // 유효한 대상만 처리
     if (isForm || isAnchor) {
         event.preventDefault();
