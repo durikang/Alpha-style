@@ -6,76 +6,61 @@
       layout:fragment="Content">
 <head>
     <title>재무 데이터 관리</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .actions {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/admin/css/financial/financialList.css}">
+    <script th:src="@{/admin/js/financial/financialList.js}" th:inline="none" defer></script>
 </head>
 <body>
 <main>
     <div class="container">
         <h1>재무 데이터 관리</h1>
 
-
-
-        <!-- 검색 바 -->
-        <div th:replace="~{common/admin/fragments/searchBar :: searchBar(
-        ${actionUrl}, '검색어를 입력하세요', ${keyword}, ${filters})}"></div>
-
-        <!-- 상단 등록 버튼 -->
+        <!-- 필터 영역 -->
         <div class="actions">
-            <a href="/admin/user/users/add" class="btn btn-register">엑셀 다운로드</a>
-
-            <!--<button id="deleteSelected" data-delete-url="/batch-delete">회원 삭제</button>-->
+            <div class="filters">
+                <input type="date" id="startDate" placeholder="시작 날짜" value="" th:value="${param.startDate}">
+                <input type="date" id="endDate" placeholder="종료 날짜" value="" th:value="${param.endDate}">
+                <input type="text" id="keyword" placeholder="검색어 입력" value="" th:value="${keyword}">
+                <button id="filterButton">조회</button>
+            </div>
+            <a th:href="@{/admin/financial/financials/download}" class="btn btn-success">엑셀 다운로드</a>
         </div>
+
         <!-- 데이터 테이블 -->
         <table>
             <thead>
             <tr>
-                <th>거래일</th>
-                <th>거래 유형</th>
+                <th>
+                    거래일
+                    <button onclick="sortTable('transactionDate', 'asc')">▲</button>
+                    <button onclick="sortTable('transactionDate', 'desc')">▼</button>
+                </th>
+                <th>
+                    거래 유형
+                    <button onclick="sortTable('transactionType', 'asc')">▲</button>
+                    <button onclick="sortTable('transactionType', 'desc')">▼</button>
+                </th>
                 <th>제품명</th>
                 <th>수량</th>
                 <th>단가</th>
                 <th>공급 금액</th>
                 <th>VAT</th>
-                <th>총 금액</th>
-                <th>관리</th>
+                <th>
+                    총 금액
+                    <button onclick="sortTable('totalAmount', 'asc')">▲</button>
+                    <button onclick="sortTable('totalAmount', 'desc')">▼</button>
+                </th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="record : ${financialRecords}">
-                <td th:text="${record.year + '-' + record.month + '-' + record.day}"></td>
-                <td th:text="${record.transactionType == 1 ? '구매' : '판매'}"></td>
+                <td th:text="${record.transactionDate}"></td>
+                <td th:text="${record.transactionType}"></td>
                 <td th:text="${record.productName}"></td>
                 <td th:text="${record.quantity}"></td>
                 <td th:text="${record.unitPrice}"></td>
                 <td th:text="${record.supplyAmount}"></td>
                 <td th:text="${record.vat}"></td>
-                <td th:text="${record.supplyAmount + record.vat}"></td>
-                <td class="actions">
-                    <a th:href="@{/admin/financial-data/edit/{id}(id=${record.recordNo})}">수정</a> |
-                    <a th:href="@{/admin/financial-data/delete/{id}(id=${record.recordNo})}">삭제</a>
-                </td>
+                <td th:text="${record.totalAmount}"></td>
             </tr>
             </tbody>
         </table>
@@ -92,5 +77,6 @@
         ${sortDirection})}"></div>
     </div>
 </main>
+
 </body>
 </html>

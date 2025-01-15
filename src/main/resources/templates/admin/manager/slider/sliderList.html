@@ -13,7 +13,7 @@
 <main>
     <div class="slider-management">
         <h1>슬라이더 목록</h1>
-        <a th:href="@{/admin/user/slider/add}" class="btn btn-primary">슬라이더 추가</a>
+        <a th:href="@{/admin/user/slider/add}" class="btn">슬라이더 추가</a>
         <table class="table">
             <thead>
             <tr>
@@ -32,12 +32,12 @@
                     <!-- 슬라이더 이미지가 있는 경우 -->
                     <img th:if="${slider.imageUrl != null}"
                          th:src="@{/files/{filename}(filename=${slider.imageUrl.substring('/files/'.length())})}"
-                         alt="슬라이더 이미지" width="100"/>
+                         alt="슬라이더 이미지"/>
 
                     <!-- 슬라이더 이미지가 없는 경우 기본 이미지 표시 -->
                     <img th:unless="${slider.imageUrl != null}"
                          src="https://via.placeholder.com/100x100.png?text=No+Image"
-                         alt="기본 슬라이더 이미지" width="100"/>
+                         alt="기본 슬라이더 이미지"/>
                 </td>
                 <td th:text="${slider.description}">슬라이더 설명</td>
                 <td th:text="${slider.orderIndex}">1</td>

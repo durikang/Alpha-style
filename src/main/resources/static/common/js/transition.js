@@ -4,9 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 페이지 로드 시 페이드인 효과
     body.classList.add('fade-in');
 
-
     // 페이지 전환 처리 (로그인 폼, 모달 폼 제외)
-    document.querySelectorAll('a[href]:not([data-bs-toggle]), form:not([data-login-form]):not([data-modal-form])').forEach(element => {
+    document.querySelectorAll('a[href]:not([data-bs-toggle="modal"]), form:not([data-login-form]):not([data-modal-form])').forEach(element => {
         element.addEventListener('click', (event) => handlePageTransition(event, body));
     });
 });
@@ -32,7 +31,7 @@ function handlePageTransition(event, body) {
     const isAnchor = target.tagName === 'A' && target.href;
 
     // 로그인 폼, 모달 폼 및 모달 내부 이벤트 제외
-    if (target.closest('[data-login-form]') || target.closest('.modal-form')) {
+    if (target.closest('[data-login-form]') || target.closest('[data-modal-form]') || target.dataset.bsToggle === 'modal') {
         return;
     }
 

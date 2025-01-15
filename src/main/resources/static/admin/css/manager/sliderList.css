@@ -1,32 +1,127 @@
+/* 전체 레이아웃 스타일 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .slider-management {
     padding: 20px;
 }
 
 .slider-management h1 {
     margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #444;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
 }
 
+/* 버튼 스타일 */
 .slider-management .btn {
-    margin-bottom: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
+.slider-management .btn:hover {
+    background-color: #0056b3;
+}
+
+.slider-management .btn-secondary {
+    background-color: #6c757d;
+}
+
+.slider-management .btn-secondary:hover {
+    background-color: #565e64;
+}
+
+.slider-management .btn-danger {
+    background-color: #dc3545;
+}
+
+.slider-management .btn-danger:hover {
+    background-color: #b52a37;
+}
+
+/* 테이블 스타일 */
 .slider-management .table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
 .slider-management .table th,
 .slider-management .table td {
+    padding: 15px;
+    text-align: left;
     border: 1px solid #ddd;
-    padding: 8px;
 }
 
 .slider-management .table th {
-    background-color: #f2f2f2;
-    text-align: left;
+    background-color: #f4f4f4;
+    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
+.slider-management .table tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+.slider-management .table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 이미지 스타일 */
 .slider-management img {
-    max-width: 100px;
+    display: block;
+    width: 100px;
     height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 폼 및 버튼 정렬 */
+.slider-management form {
+    display: inline;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .slider-management h1 {
+        font-size: 1.5em;
+    }
+
+    .slider-management .table th,
+    .slider-management .table td {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .slider-management .btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
 }
