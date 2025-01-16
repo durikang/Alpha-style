@@ -59,12 +59,26 @@ body, html {
 .input-group .toggle-password {
     position: absolute;
     right: 30px;
-    top: 42%;
+    top: 41%;
     transform: translateY(-50%);
     border: none;
     background: none;
     font-size: 14px;
     cursor: pointer;
+}
+
+
+.input-group input:focus,
+.input-group input:active {
+    outline: none; /* 기본 포커스 스타일 제거 */
+    border: 1px solid #3b3dcd;
+    background-color: #fff; /* 포커스 시 배경색 변경 (선택사항) */
+}
+
+/* 크롬 자동완성 스타일 제거 */
+input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px white inset !important; /* 기본 스타일 제거 */
+    -webkit-text-fill-color: #000 !important; /* 텍스트 색상 설정 */
 }
 
 .btn {
