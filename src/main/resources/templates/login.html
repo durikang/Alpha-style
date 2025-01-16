@@ -19,7 +19,7 @@
     <link rel="stylesheet" th:href="@{/user/css/login/login.css}"/>
     <div class="login-container fade-in">
         <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
-        <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()">
+        <form th:action="@{/login}" th:object="${loginMember}" method="post" onsubmit="showLoadingSpinner()" data-login-form>
             <div class="input-group">
                 <input type="text" id="userId" name="userId" th:field="*{userId}" placeholder="아이디" required>
                 <span id="userIdError" class="error-message" style="color: red; font-size: 12px;"></span>
@@ -29,7 +29,6 @@
                 <input type="password" id="password" name="password" th:field="*{password}" placeholder="비밀번호" required>
                 <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
             </div>
-
             <div class="save-id-container">
                 <label for="save-id">아이디 저장</label>
                 <input type="checkbox" id="save-id" name="save-id">
@@ -43,7 +42,9 @@
             <button type="submit" class="btn btn-signup">회원가입</button>
         </form>
 
+
         <div th:if="${errorMessage}" th:text="${errorMessage}" class="errorMessage"></div>
+
         <div class="options">
             <a th:href="@{/user/member/find-id}">아이디 찾기</a> | <a th:href="@{/user/member/find/pwd}">비밀번호 찾기</a>
         </div>

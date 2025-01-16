@@ -25,9 +25,7 @@ import page.admin.admin.order.repository.OrderDetailRepository;
 import page.admin.admin.order.repository.OrderRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,37 +148,6 @@ public class OrderServiceImpl implements OrderService {
         return new PageImpl<>(results, pageable, total);
     }
 
-
-
-
-    @Override
-    public List<Tuple> analyzeBuyerPurchases(LocalDateTime startDate, LocalDateTime endDate) {
-        QOrder order = QOrder.order;
-        QOrderDetail detail = QOrderDetail.orderDetail;
-
-        BooleanBuilder builder = new BooleanBuilder();
-        if (startDate != null) {
-            builder.and(order.orderDate.goe(startDate));
-        }
-        if (endDate != null) {
-            builder.and(order.orderDate.loe(endDate));
-        }
-
-        return queryFactory
-                .select(
-                        Expressions.stringTemplate(
-                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate
-                        ),
-                        detail.quantity.sum()
-                )
-                .from(order)
-                .join(order.orderDetails, detail)
-                .where(builder)
-                .groupBy(order.orderDate)
-                .orderBy(order.orderDate.asc())
-                .fetch();
-    }
-
     @Override
     public Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(
             String keyword,
@@ -208,21 +175,33 @@ public class OrderServiceImpl implements OrderService {
             builder.and(order.orderDate.loe(endDate));
         }
 
-        OrderSpecifier<?> orderSpecifier = getOrderSpecifier(sortField, sortDirection);
+        // 집계 컬럼 정의
+        var totalAmount = detail.subtotal.sum().add(detail.vat.sum());
+        var purchaseCount = detail.countDistinct();
+
+        // 동적 정렬 기준 생성
+        OrderSpecifier<?> orderSpecifier;
+        if ("totalAmount".equals(sortField)) {
+            orderSpecifier = sortDirection.equalsIgnoreCase("asc") ? totalAmount.asc() : totalAmount.desc();
+        } else if ("purchaseCount".equals(sortField)) {
+            orderSpecifier = sortDirection.equalsIgnoreCase("asc") ? purchaseCount.asc() : purchaseCount.desc();
+        } else {
+            orderSpecifier = order.orderDate.desc(); // 기본 정렬
+        }
 
         var query = queryFactory
                 .select(Projections.constructor(
                         CustomerPurchaseSummaryDTO.class,
                         user.userId,
                         user.username,
-                        detail.countDistinct(),  // 구매 횟수
-                        detail.subtotal.sum().add(detail.vat.sum()) // 총 구매 금액
+                        purchaseCount.as("purchaseCount"), // 구매 횟수
+                        totalAmount.as("totalAmount") // 총 금액
                 ))
                 .from(order)
                 .join(order.user, user)
                 .join(order.orderDetails, detail)
                 .where(builder.and(detail.transactionType.eq(1))) // 매출만 포함
-                .groupBy(user.userId, user.username)
+                .groupBy(user.userId, user.username) // 그룹화
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -238,7 +217,6 @@ public class OrderServiceImpl implements OrderService {
 
         return new PageImpl<>(results, pageable, total);
     }
-
 
 
     /**
@@ -410,49 +388,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
-        QOrder o = QOrder.order;
-        QOrderDetail od = QOrderDetail.orderDetail;
-
-        // 1) 동적 where 조건
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(od.item.itemId.eq(itemId));
-        if (startDate != null) {
-            builder.and(o.orderDate.goe(startDate));
-        }
-        if (endDate != null) {
-            builder.and(o.orderDate.loe(endDate));
-        }
-
-        // 2) 날짜를 yyyy-MM-dd 로 포맷 (MySQL 기준)
-        var dateExpr = Expressions.stringTemplate(
-                "TO_CHAR({0}, 'YYYY-MM-DD')",
-                o.orderDate
-        );
-
-        // 3) 쿼리 실행: (날짜별) quantity 합계
-        // select dateExpr, sum(od.quantity)
-        //   from Order o
-        //  join o.orderDetails od
-        //  where itemId = ?
-        //    and orderDate between startDate/endDate
-        // group by dateExpr
-        // order by dateExpr asc
-        return queryFactory
-                .select(dateExpr, od.quantity.sum())
-                .from(o)
-                .join(o.orderDetails, od)
-                .where(builder)
-                .groupBy(dateExpr)
-                .orderBy(dateExpr.asc())
-                .fetch();
-    }
-
-    @Override
-    public List<Tuple> analyzeSalesSummary(LocalDateTime startDate, LocalDateTime endDate) {
         QOrder order = QOrder.order;
         QOrderDetail detail = QOrderDetail.orderDetail;
+        QMember member = QMember.member;
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        // 날짜 조건 필터링
         if (startDate != null) {
             builder.and(order.orderDate.goe(startDate));
         }
@@ -463,9 +405,107 @@ public class OrderServiceImpl implements OrderService {
         return queryFactory
                 .select(
                         Expressions.stringTemplate(
-                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate
-                        ),
-                        detail.subtotal.sum().add(detail.vat.sum()) // 매출 합계
+                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate // 일별로 그룹화
+                        ).as("formattedDate"),
+                        member.userId.as("userId"), // 회원 ID
+                        member.username.as("username"), // 회원 이름
+                        detail.subtotal.sum().add(detail.vat.sum()).as("totalSales"), // 총 매출 금액
+                        detail.subtotal.avg().add(detail.vat.avg()).as("averageSales") // 평균 매출 금액
+                )
+                .from(order)
+                .join(order.orderDetails, detail) // 주문-세부사항 조인
+                .join(order.user, member) // 주문-회원 조인
+                .where(builder) // 필터 적용
+                .groupBy(order.orderDate, member.userId, member.username) // 날짜와 회원별 그룹화
+                .orderBy(order.orderDate.asc()) // 날짜순 정렬
+                .fetch();
+    }
+
+
+
+    @Override
+    public Map<String, Object> analyzeCategorySales(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+        QItem item = QItem.item;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(order.orderDate.goe(startDate));
+        builder.and(order.orderDate.loe(endDate));
+        builder.and(detail.transactionType.eq(1)); // 매출만 포함
+
+        // 큰 카테고리별 매출
+        List<Tuple> mainCategoryResults = queryFactory
+                .select(
+                        item.mainCategory.mainCategoryName,
+                        detail.subtotal.sum().add(detail.vat.sum())
+                )
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item)
+                .where(builder)
+                .groupBy(item.mainCategory.mainCategoryName)
+                .fetch();
+
+        // 서브 카테고리별 매출
+        List<Tuple> subCategoryResults = queryFactory
+                .select(
+                        item.subCategory.subCategoryName,
+                        detail.subtotal.sum().add(detail.vat.sum())
+                )
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item)
+                .where(builder)
+                .groupBy(item.subCategory.subCategoryName)
+                .fetch();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("mainCategories", mainCategoryResults.stream()
+                .map(result -> Map.of(
+                        "name", result.get(0, String.class),
+                        "value", result.get(1, Long.class)
+                ))
+                .toList());
+        response.put("subCategories", subCategoryResults.stream()
+                .map(result -> Map.of(
+                        "name", result.get(0, String.class),
+                        "value", result.get(1, Long.class)
+                ))
+                .toList());
+
+        response.put("title", "카테고리별 매출 분석");
+        return response;
+    }
+
+
+
+    @Override
+    public List<Tuple> analyzeSalesSummary(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 날짜 필터 조건
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        // 매출만 포함 (transactionType = 1)
+        builder.and(detail.transactionType.eq(1));
+
+        // 쿼리 실행
+        return queryFactory
+                .select(
+                        Expressions.stringTemplate(
+                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate // 날짜 포맷
+                        ).as("formattedDate"),
+                        detail.subtotal.sum().add(detail.vat.sum()).as("totalSales"), // 총 매출
+                        detail.subtotal.avg().add(detail.vat.avg()).as("averageSales") // 평균 매출
                 )
                 .from(order)
                 .join(order.orderDetails, detail)
@@ -475,6 +515,48 @@ public class OrderServiceImpl implements OrderService {
                 .fetch();
     }
 
+
+
+    @Override
+    public List<Tuple> analyzeCustomerPurchases(Long customerId, LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+        QItem item = QItem.item; // 상품 정보
+        QMember member = QMember.member; // 회원 정보
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 회원 필터
+        builder.and(order.user.userNo.eq(customerId));
+
+        // 날짜 필터
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        // 쿼리 실행
+        return queryFactory
+                .select(
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate).as("formattedDate"), // 날짜 (String)
+                        detail.quantity.sum().castToNum(Long.class).as("totalQuantity"), // 총 구매 수량 (Long)
+                        detail.subtotal.sum().add(detail.vat.sum()).castToNum(Long.class).as("totalAmount"), // 총 구매 금액 (Long)
+                        item.mainCategory.mainCategoryName.as("mainCategory"), // 상품 대분류 (String)
+                        item.subCategory.subCategoryName.as("subCategory"), // 상품 소분류 (String)
+                        detail.subtotal.avg().add(detail.vat.avg()).castToNum(Double.class).as("averageAmount"), // 평균 구매 금액 (Double)
+                        member.username.as("username") // 회원 이름 (String)
+                )
+                .from(order)
+                .join(order.orderDetails, detail)
+                .join(detail.item, item) // 아이템 조인
+                .join(order.user, member) // 회원 조인
+                .where(builder)
+                .groupBy(order.orderDate, item.mainCategory.mainCategoryName, item.subCategory.subCategoryName, member.username) // 그룹화
+                .orderBy(order.orderDate.asc())
+                .fetch();
+    }
 
 
 
