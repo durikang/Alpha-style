@@ -43,7 +43,7 @@
             <button type="submit" class="btn btn-signup">회원가입</button>
         </form>
 
-        <div th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div th:if="${errorMessage}" th:text="${errorMessage}" class="errorMessage"></div>
         <div class="options">
             <a th:href="@{/user/member/find-id}">아이디 찾기</a> | <a th:href="@{/user/member/find/pwd}">비밀번호 찾기</a>
         </div>
