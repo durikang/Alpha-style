@@ -29,7 +29,7 @@ public class FinancialRecord {
     @Column(name = "fin_day") // 예약어 문제를 피하기 위해 "fin_day"로 변경
     private Integer day;
 
-    private Integer transactionType; // 1: 구매, 2: 판매
+    private Integer transactionType; // 1: 매출, 2: 매입
     private Double quantity;
     private Double unitPrice;
     private Double supplyAmount;

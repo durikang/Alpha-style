@@ -6,8 +6,11 @@
       layout:fragment="Content">
 <head>
     <title>재무 데이터 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <link rel="stylesheet" th:href="@{/admin/css/financial/financialList.css}">
     <script th:src="@{/admin/js/financial/financialList.js}" th:inline="none" defer></script>
+    <script th:src="@{/admin/js/financial/financialDownloadHandler.js}" th:inline="none" defer></script>
 </head>
 <body>
 <main>
@@ -16,16 +19,22 @@
 
         <div class="filters">
             <form id="filterForm" method="get">
-                <input type="date" name="startDate" th:value="${startDate != null ? startDate : ''}">
-                <input type="date" name="endDate" th:value="${endDate != null ? endDate : ''}">
+                <input id="startDate" type="date" name="startDate" th:value="${startDate != null ? startDate : ''}">
+                <input id="endDate" type="date" name="endDate" th:value="${endDate != null ? endDate : ''}">
                 <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}">
-                <select name="transactionType">
+                <select id="transactionType" name="transactionType">
                     <option value="" th:selected="${transactionType == null}">모든 유형</option>
-                    <option value="구매" th:selected="${transactionType == '구매'}">구매</option>
-                    <option value="판매" th:selected="${transactionType == '판매'}">판매</option>
+                    <option value="매출" th:selected="${transactionType == '매출'}">매출</option>
+                    <option value="매입" th:selected="${transactionType == '매입'}">매입</option>
                 </select>
                 <button type="submit">조회</button>
             </form>
+            <button id="downloadExcel"
+                    class="btn btn-primary"
+                    style="float: right;"
+                    th:attr="data-start-date=${startDate}, data-end-date=${endDate}, data-transaction-type=${transactionType}">
+                엑셀 다운로드
+            </button>
         </div>
 
 
@@ -68,6 +77,27 @@
             </tr>
             </tbody>
         </table>
+
+        <!-- Bootstrap 진행바 모달 -->
+        <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="progressModalLabel">엑셀 다운로드 중...</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="cancelTaskButton">작업 취소</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 페이징 -->
         <div th:if="${totalPages > 0}" th:replace="~{common/admin/fragments/pagination :: pagination(
