@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/admin/layouts/defaultLayout}"
+      layout:fragment="Content">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트페이지</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <!--    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <style>
+        /* 전체 컨테이너 */
+        .container {
+            font-family: Arial, sans-serif;
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 1200px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        /* 제목 */
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* 탭 네비게이션 버튼 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tabs button:hover {
+            background-color: #0056b3;
+        }
+
+        .tabs button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* 다운로드 버튼 */
+        form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #218838;
+        }
+
+        form button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+        }
+
+        .tab-content_map {
+            margin-top: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 600px;
+            overflow: hidden; /* 스크롤 바 제거 */
+        }
+
+        /* 로딩 메시지 스타일 */
+        .loading {
+            text-align: center;
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .tab-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; /* 차트와 테이블 간격 */
+            margin-top: 20px;
+        }
+
+        .tab-content {
+            flex: 1; /* 각 콘텐츠를 동일한 비율로 배치 */
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            height: 600px; /* 고정 높이 */
+            overflow: hidden; /* 스크롤 제거 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+        /* 테이블 가로 배치 */
+        #tab-content-additional3 {
+            display: flex; /* Flexbox 적용 */
+            gap: 20px; /* 테이블 간 간격 */
+        }
+
+        #tab-content-additional3 table {
+            flex: 1; /* 각 테이블이 동일한 너비를 차지하도록 설정 */
+            margin: 0; /* 테이블 외 여백 제거 */
+        }
+        /* 폼 및 버튼 스타일 */
+        form {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        form button {
+            background-color: #007bff; /* 버튼 배경색 */
+            color: #fff; /* 버튼 텍스트 색상 */
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3; /* 버튼 호버 색상 */
+        }
+        .daterange_div{
+            justify-self: center
+        }
+        input[name="daterange"] {
+
+            width: 400px;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        input[name="daterange"]:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        /* Date Range Picker 팝업 스타일 */
+        .daterangepicker {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        /* 달력 테이블 스타일 */
+        .daterangepicker .calendar-table {
+            border-collapse: separate;
+            margin: 12px;
+            width: 600px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* 날짜 셀 기본 스타일 */
+        .daterangepicker td {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* 사용 가능한 날짜에 호버 효과 */
+        .daterangepicker td.available:hover {
+            background-color: #e6f7ff;
+            color: #0056b3;
+        }
+
+
+        /* 비활성화된 날짜 스타일 */
+        .daterangepicker td.off {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .daterangepicker td.off:hover {
+            background-color: transparent;
+            color: #ccc;
+        }
+
+        /* 드롭다운 버튼 스타일 */
+        .daterangepicker .drp-buttons {
+            display: flex;
+            justify-content: flex-end;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+
+        /* 취소 버튼 스타일 */
+        .daterangepicker .drp-buttons .cancelBtn {
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .daterangepicker .drp-buttons .cancelBtn:hover {
+            background-color: #c82333;
+        }
+
+        /* 적용 버튼 스타일 */
+        .daterangepicker .drp-buttons .applyBtn {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .daterangepicker .drp-buttons .applyBtn:hover {
+            background-color: #218838;
+        }
+
+        /* 월 및 요일 헤더 스타일 */
+        .daterangepicker .calendar-table th {
+            text-align: center;
+            padding: 8px 0;
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* 네비게이션 버튼 스타일 */
+        .daterangepicker .prev, .daterangepicker .next {
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .daterangepicker .prev:hover, .daterangepicker .next:hover {
+            color: #0056b3;
+        }
+
+        /* 선택된 달력의 월 이름 스타일 */
+        .daterangepicker .month {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 선택된 요일 스타일 */
+        .daterangepicker .day-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .daterangepicker .drp-calendar {
+            display: none;
+            max-width: none;
+        }
+
+    </style>
+
+    </style>
+</head>
+<body>
+<main class="container">
+    <h1>연도별 데이터 그래프</h1>
+
+    <!-- 탭 네비게이션 -->
+    <div class="tabs">
+        <button type="button" onclick="setYearAndLoadGraph('2020')">2020</button>
+        <button type="button" onclick="setYearAndLoadGraph('2021')">2021</button>
+        <button type="button" onclick="setYearAndLoadGraph('2022')">2022</button>
+        <button type="button" onclick="setYearAndLoadGraph('2023')">2023</button>
+        <button type="button" onclick="setYearAndLoadGraph('2024')">2024</button>
+        <button type="button" onclick="setYearAndLoadGraph('all')">전체</button>
+    </div>
+
+    <!-- 다운로드 버튼 -->
+    <form action="http://localhost:5000/download" method="post">
+        <input type="hidden" id="selected-year" name="year" value="all">
+        <button type="submit">다운로드</button>
+    </form>
+
+
+    <!-- 진행 표시줄 -->
+    <div id="progressContainer" style="display: none;">
+        <h3>업로드 진행:</h3>
+        <progress id="uploadProgress" value="0" max="100" style="width: 100%;"></progress>
+        <span id="progressText">0%</span>
+    </div>
+    <div id="result"></div>
+
+    <div class="daterange_div">
+    <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" />
+    </div>
+    <script>
+        $(function() {
+            // Date Range Picker 초기화
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'center', // 팝업이 중앙에 열림
+                locale: {
+                    format: 'YYYY-MM-DD', // 한국어 형식 (예: 2020-01-01)
+                    separator: ' - ', // 시작 날짜와 종료 날짜 사이의 구분자
+                    applyLabel: '적용',
+                    cancelLabel: '취소',
+                    daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],
+                    monthNames: [
+                        '1월', '2월', '3월', '4월', '5월', '6월',
+                        '7월', '8월', '9월', '10월', '11월', '12월'
+                    ],
+                    firstDay: 0 // 일요일을 시작 요일로 설정
+                },
+                startDate: moment('2020-01-01', 'YYYY-MM-DD'), // 초기 시작 날짜 설정
+                endDate: moment('2020-12-31', 'YYYY-MM-DD') // 초기 종료 날짜 설정 (원하는 날짜로 변경 가능)
+
+            }, function(start, end, label) {
+                console.log("새로운 날짜 선택: " +
+                    start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+            });
+        });
+    </script>
+    <!-- 탭 콘텐츠 -->
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content-additional">
+            <table id="data-table">
+                <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>매출</td>
+                    <td id="sales-value">N/A</td>
+                </tr>
+                <tr>
+                    <td>판관비</td>
+                    <td id="admin-cost-value">N/A</td>
+                </tr>
+                <tr>
+                    <td>당기순이익</td>
+                    <td id="net-income-value">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td1" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content1"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content1-additional">
+            <table id="data-table2">
+                <thead>
+                <tr>
+                    <th>카테고리</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>상의</td>
+                    <td id="top_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>하의</td>
+                    <td id="bottom_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>운동화</td>
+                    <td id="running_shoes_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>단화</td>
+                    <td id="loafers_value">N/A</td>
+                </tr>
+                <tr>
+                    <td>슬리퍼</td>
+                    <td id="slippers_value">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table2" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td2" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content2"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content2-additional">
+            <table id="data-table3">
+                <thead>
+                <tr>
+                    <th>나이</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>10대</td>
+                    <td id="10age">N/A</td>
+                </tr>
+                <tr>
+                    <td>20대</td>
+                    <td id="20age">N/A</td>
+                </tr>
+                <tr>
+                    <td>30대</td>
+                    <td id="30age">N/A</td>
+                </tr>
+                <tr>
+                    <td>40대</td>
+                    <td id="40age">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table3" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td3" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content3"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content3-additional">
+            <table id="data-table4">
+                <thead>
+                <tr>
+                    <th>성별</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>남자</td>
+                    <td id="male_data">N/A</td>
+                </tr>
+                <tr>
+                    <td>여자</td>
+                    <td id="female_data">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table4" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td4" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content4"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content4-additional">
+            <table id="data-table5">
+                <thead>
+                <tr>
+                    <th>상위 유저</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>10%</td>
+                    <td id="10percent">N/A</td>
+                </tr>
+                <tr>
+                    <td>20%</td>
+                    <td id="20percent">N/A</td>
+                </tr>
+                <tr>
+                    <td>30%</td>
+                    <td id="30percent">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table5" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td5" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-row">
+        <div class="tab-content" id="tab-content5"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
+        <div class="tab-content" id="tab-content5-additional">
+            <table id="data-table6">
+                <thead>
+                <tr>
+                    <th>상위 지역</th>
+                    <th>값</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="area_name1">지역명</td>
+                    <td id="area_value1">N/A</td>
+                </tr>
+                <tr>
+                    <td id="area_name2">지역명</td>
+                    <td id="area_value2">N/A</td>
+                </tr>
+                <tr>
+                    <td id="area_name3">지역명</td>
+                    <td id="area_value3">N/A</td>
+                </tr>
+                <tr>
+                    <td id="area_name4">지역명</td>
+                    <td id="area_value4">N/A</td>
+                </tr>
+                <tr>
+                    <td id="area_name5">지역명</td>
+                    <td id="area_value5">N/A</td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="analysis-table6" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>분석 결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="analysis-td6" style="padding: 10px;">
+                        이 테이블은 그래프를 어떻게 분석했는지 보여줄 예정입니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+<script>
+    function setYearAndLoadGraph(year) {
+        console.log('버튼에서 넘긴 year 값:', year); // year 값 확인
+        loadDataAndRender(year);
+        showAnalysisTableByYear1(year);
+        showAnalysisTableByYear2(year);
+        showAnalysisTableByYear3(year);
+        showAnalysisTableByYear4(year);
+        showAnalysisTableByYear5(year);
+        showAnalysisTableByYear6(year);
+    }
+
+    function executeScripts(container) {
+        const scripts = container.querySelectorAll('script');
+        scripts.forEach((oldScript) => {
+            const newScript = document.createElement('script');
+            [...oldScript.attributes].forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            if (oldScript.src) {
+                newScript.src = oldScript.src;
+            } else {
+                newScript.textContent = oldScript.textContent;
+            }
+            document.body.appendChild(newScript);
+            oldScript.remove();
+        });
+    }
+
+    async function loadDataAndRender(year) {
+        const contentIds = [
+            'tab-content',
+            'tab-content1',
+            'tab-content2',
+            'tab-content3',
+            'tab-content4',
+            'tab-content5'
+        ];
+
+        try {
+            // 로딩 메시지 표시
+            contentIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<p class="loading">Loading...</p>';
+                } else {
+                    console.warn(`Element with ID '${id}' not found. Skipping.`);
+                }
+            });
+
+            // 서버 요청
+            const response = await fetch('http://127.0.0.1:5000/graph', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ year })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+
+            // JSON 데이터 파싱
+            const result = await response.json();
+
+            // HTML 콘텐츠 렌더링
+            result.html_results.forEach((item, index) => {
+                const contentElement = document.getElementById(contentIds[index]);
+                if (contentElement) {
+                    contentElement.innerHTML = item.content || `<p>${item.path} 파일을 찾을 수 없습니다.</p>`;
+                    executeScripts(contentElement); // HTML 삽입 후 스크립트 실행
+                } else {
+                    console.warn(`Element with ID '${contentIds[index]}' not found.`);
+                }
+            });
+
+            // 테이블 데이터 렌더링
+            if (result.table_data) {
+                renderTableData(result.table_data);
+            }
+
+            console.log(`Data for year ${year} loaded successfully.`);
+        } catch (error) {
+            // 에러 처리
+            contentIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = `<p>Error: ${error.message}</p>`;
+                }
+            });
+            console.error("Error fetching graph data:", error);
+        }
+    }
+
+    // 테이블 데이터 렌더링 함수
+    function renderTableData(data) {
+        // 1. Summary 데이터 처리
+        if (data.summary && data.summary.length > 0) {
+            const overall = data.summary.find(item => item.년도 === '전체') || {};
+            const summary = data.summary[0]; // 첫 번째 데이터 기준
+
+            document.getElementById('sales-value').textContent = overall['매출']?.toLocaleString() || summary['매출']?.toLocaleString() || 'N/A';
+            document.getElementById('admin-cost-value').textContent = overall['판관비']?.toLocaleString() || summary['판관비']?.toLocaleString() || 'N/A';
+            document.getElementById('net-income-value').textContent = overall['당기순이익']?.toLocaleString() || summary['당기순이익']?.toLocaleString() || 'N/A';
+        }
+
+        // 2. Category Sales 데이터 처리
+        if (data.category_sales && data.category_sales.length > 0) {
+            const categoryIdMap = {
+                '상의': 'top_value',
+                '하의': 'bottom_value',
+                '운동화': 'running_shoes_value',
+                '단화': 'loafers_value',
+                '슬리퍼': 'slippers_value'
+            };
+            data.category_sales.forEach(item => {
+                const elementId = categoryIdMap[item['카테고리']];
+                if (elementId) {
+                    document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+
+        // 3. Age Group Sales 데이터 처리
+        if (data.age_group_sales && data.age_group_sales.length > 0) {
+            const ageGroupIdMap = {
+                '10대': '10age',
+                '20대': '20age',
+                '30대': '30age',
+                '40대': '40age'
+            };
+            data.age_group_sales.forEach(item => {
+                const elementId = ageGroupIdMap[item['나이대']];
+                if (elementId) {
+                    document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+
+        // 4. Gender Sales 데이터 처리
+        if (data.gender_sales && data.gender_sales.length > 0) {
+            const genderIdMap = {
+                '남': 'male_data',
+                '여': 'female_data'
+            };
+            data.gender_sales.forEach(item => {
+                const elementId = genderIdMap[item['성별']];
+                if (elementId) {
+                    document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+
+        // 5. VIP Sales 데이터 처리
+        if (data.vip_sales && data.vip_sales.length > 0) {
+            const vipIdMap = {
+                "상위 10%": "10percent",
+                "상위 20%": "20percent",
+                "상위 30%": "30percent"
+            };
+            data.vip_sales.forEach(item => {
+                const elementId = vipIdMap[item['비율']];
+                if (elementId) {
+                    document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+
+        // 6. Area Sales 데이터 처리
+        if (data.area_sales && data.area_sales.length > 0) {
+            console.log("Area Sales Data:", data.area_sales); // 데이터 확인용
+            data.area_sales.forEach((item, index) => {
+                if (index < 5) {
+                    const areaNameElement = document.getElementById(`area_name${index + 1}`);
+                    const areaValueElement = document.getElementById(`area_value${index + 1}`);
+
+                    if (areaNameElement) areaNameElement.textContent = item['지역'] || 'N/A';
+                    if (areaValueElement) areaValueElement.textContent = item['공급가액']?.toLocaleString() || 'N/A';
+                }
+            });
+        }
+    }
+
+    // 버튼 클릭 이벤트 등록
+    document.querySelectorAll('.tabs button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const year = event.target.dataset.year || event.target.textContent === '전체' ? 'all' : event.target.textContent;
+            setYearAndLoadGraph(year);
+        });
+    });
+
+    // 개별 연도 분석 테이블 업데이트 함수
+    function showAnalysisTableByYear1(year) {
+        console.log(`showAnalysisTableByYear1 called with year: ${year}`);
+    }
+
+    function showAnalysisTableByYear2(year) {
+        console.log(`showAnalysisTableByYear2 called with year: ${year}`);
+    }
+
+    function showAnalysisTableByYear3(year) {
+        console.log(`showAnalysisTableByYear3 called with year: ${year}`);
+    }
+
+    function showAnalysisTableByYear4(year) {
+        console.log(`showAnalysisTableByYear4 called with year: ${year}`);
+    }
+
+    function showAnalysisTableByYear5(year) {
+        console.log(`showAnalysisTableByYear5 called with year: ${year}`);
+    }
+
+    function showAnalysisTableByYear6(year) {
+        console.log(`showAnalysisTableByYear6 called with year: ${year}`);
+    }
+</script>
+
+
+</body>
+</html>
