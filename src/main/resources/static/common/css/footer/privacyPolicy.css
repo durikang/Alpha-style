@@ -1,0 +1,129 @@
+/* 기본 스타일 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+/* 페이지 헤더 스타일링 */
+.page-header {
+    background-color: #f0f0f0; /* 밝은 회색 배경 */
+    color: #0f0f0f;
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.page-header .header-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+/* 메인 컨텐츠 스타일링 */
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.container h3 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 0.5rem;
+    color: #333;
+}
+
+.container p, .container li {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+.container a {
+    color: #0f0f0f;
+    text-decoration: none;
+}
+
+.container a:hover {
+    text-decoration: underline;
+}
+
+/* 반응형 스타일링 */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    .page-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .page-header p {
+        font-size: 1rem;
+    }
+
+    .container h2 {
+        font-size: 1.5rem;
+    }
+
+    .container h3 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .container h2 {
+        font-size: 1.3rem;
+    }
+
+    .container h3 {
+        font-size: 1.1rem;
+    }
+}

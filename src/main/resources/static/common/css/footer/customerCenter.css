@@ -1,0 +1,56 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+.page-header {
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 2rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.header-content h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #0f0f0f;
+}
+
+.header-content p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+    color: #0f0f0f;
+}
+
+.faq {
+    margin-bottom: 1.5rem;
+}
+
+.faq h3 {
+    margin-bottom: 0.5rem;
+}
+
+a {
+    color: #0f0f0f;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

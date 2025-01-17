@@ -1,0 +1,115 @@
+/* Reset 및 기본 스타일링 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 메인 컨텐츠 스타일링 */
+.content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #555;
+}
+.page-header {
+    background-color: #f0f0f0; /* 밝은 회색 */
+    color: #333; /* 어두운 텍스트 색상 */
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-content h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 지도 스타일링 */
+#map {
+    width: 100%;
+    height: 500px;
+    margin: 0 auto 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 방향 안내 섹션 스타일링 */
+.directions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.direction-section {
+    background-color: #fff;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    width: 45%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.direction-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2f2f2f;
+}
+
+.direction-section p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .directions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .direction-section {
+        width: 90%;
+    }
+
+    #map {
+        height: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .direction-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .direction-section p {
+        font-size: 0.95rem;
+    }
+
+    #map {
+        height: 300px;
+    }
+}
