@@ -1,4 +1,6 @@
-/* Colors and spacing variables */
+/* ===================== */
+/* 기존 변수/기본 스타일 */
+/* ===================== */
 :root {
     --primary-color: #007bff;
     --secondary-color: #28a745;
@@ -9,7 +11,6 @@
     --border-radius: 8px;
 }
 
-/* Global container styling */
 .container {
     margin: var(--spacing) auto;
     padding: var(--spacing);
@@ -19,7 +20,9 @@
     border-radius: var(--border-radius);
 }
 
-/* Header section */
+/* ===================== */
+/* Header Section */
+/* ===================== */
 .header-section h1 {
     text-align: center;
     margin-bottom: var(--spacing);
@@ -46,43 +49,74 @@
     background-color: #0056b3;
 }
 
-/* Action section */
+/* ===================== */
+/* Action Section 개선 */
+/* ===================== */
 .action-section {
     text-align: center;
     margin-bottom: var(--spacing);
+    display: flex; /* 버튼을 가로로 배치 */
+    justify-content: center; /* 가운데 정렬 */
+    gap: var(--spacing); /* 버튼 간 간격 유지 */
 }
 
-.action-section form button {
+/* 버튼 크기와 스타일 통일 */
+.action-section form button,
+.action-section button {
     background-color: var(--secondary-color);
     color: white;
-    border: none;
     padding: 10px 20px;
+    border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
+    font-size: 16px;
+    width: 130px; /* 버튼 너비 */
+    height: 45px; /* 버튼 높이 */
     transition: background-color 0.3s ease;
 }
 
-.action-section form button:hover {
+/* 버튼 hover 효과 */
+.action-section form button:hover,
+.action-section button:hover {
     background-color: #218838;
 }
 
-/* Content section */
-.content-section .tab-row {
-    display: flex;
-    gap: var(--spacing);
-    margin-top: var(--spacing);
+/* ===================== */
+/* 결과 표시 섹션 스타일 */
+/* ===================== */
+.result-section {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.content-section .tab-content {
-    flex: 1;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    padding: var(--spacing);
-    height: 600px;
-    overflow: hidden;
+/* ===================== */
+/* 날짜 선택 섹션 스타일 */
+/* ===================== */
+.daterange-section {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
 }
+
+.daterange-input {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.daterange-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* ===================== */
 /* 진행 상태 섹션 스타일 */
+/* ===================== */
 .status-section {
     margin-top: 20px;
     text-align: center;
@@ -100,17 +134,16 @@
     border-radius: 8px;
     background-color: #e9ecef;
     appearance: none;
-    /* 커스터마이즈된 진행 바 스타일 */
 }
 
 .progress-bar::-webkit-progress-value {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     border-radius: 8px;
     transition: width 0.3s;
 }
 
 .progress-bar::-moz-progress-bar {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     border-radius: 8px;
     transition: width 0.3s;
 }
@@ -122,32 +155,65 @@
     color: #666;
 }
 
-/* 결과 표시 섹션 스타일 */
-.result-section {
-    margin-top: 20px;
-    text-align: center;
-}
-
-/* 날짜 선택 섹션 스타일 */
-.daterange-section {
-    margin-top: 20px;
+/* ===================== */
+/* Content Section */
+/* ===================== */
+.content-section .tab-row {
     display: flex;
-    justify-content: center;
+    gap: var(--spacing);
+    margin-top: var(--spacing);
 }
 
-.daterange-input {
-    width: 300px;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
+.content-section .tab-content {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    padding: var(--spacing);
+    height: 600px;
+    overflow: hidden;
+}
+
+/* ===================== */
+/* "카드" 스타일 (추가) */
+/* ===================== */
+.tab-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tab-content table thead tr {
+    background-color: #f2f2f2;
+}
+
+.tab-content table th,
+.tab-content table td {
+    padding: 8px;
+    border: 1px solid #ccc;
     text-align: center;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    color: #444;
 }
 
-.daterange-input:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-    outline: none;
-}
+/* ===================== */
+/* 반응형 개선 */
+/* ===================== */
+@media (max-width: 768px) {
+    .header-section .tabs {
+        flex-wrap: wrap;
+    }
 
+    .action-section {
+        flex-direction: column; /* 버튼 수직 정렬 */
+        gap: 10px; /* 버튼 간격 */
+    }
+
+    .content-section .tab-row {
+        flex-direction: column;
+        gap: calc(var(--spacing) / 2);
+    }
+
+    .tab-content {
+        height: auto;
+    }
+}
