@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import page.admin.admin.order.domain.dto.ProductSalesDTO;
+import page.admin.admin.order.domain.dto.SalesSearchRequest;
 import page.admin.admin.order.repository.ProductSalesRepository;
 
 import java.time.LocalDate;
@@ -15,17 +16,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductSalesServiceImpl implements ProductSalesService {
+
     private final ProductSalesRepository productSalesRepository;
 
-    /**
-     * 특정 기간 동안의 제품별 매출 집계 데이터를 페이징하여 조회합니다.
-     *
-     * @param startDate 조회 시작일
-     * @param endDate   조회 종료일
-     * @param pageable  페이징 정보
-     * @return Page<ProductSalesDTO> 객체
-     */
-    public Page<ProductSalesDTO> getProductSales(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return productSalesRepository.findProductSales(startDate, endDate, pageable);
+    @Override
+    public Page<ProductSalesDTO> getProductSales(SalesSearchRequest request, Pageable pageable) {
+        // LocalDate -> LocalDateTime 변환
+        LocalDate start = request.getStartDate();
+        LocalDate end = request.getEndDate();
+        if (start == null || end == null) {
+            LocalDate now = LocalDate.now();
+            if (start == null) start = now.minusMonths(1);
+            if (end == null) end = now;
+        }
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(23, 59, 59);
+
+        // 검색 요청 객체 확장
+        request.setStartDateTime(startDateTime);
+        request.setEndDateTime(endDateTime);
+
+        // QueryDSL 호출
+        return productSalesRepository.findProductSales(request, pageable);
     }
+
 }

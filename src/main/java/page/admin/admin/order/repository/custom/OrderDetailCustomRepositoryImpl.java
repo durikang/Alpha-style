@@ -31,22 +31,25 @@ public class OrderDetailCustomRepositoryImpl implements OrderDetailCustomReposit
         // 검색 조건을 Querydsl의 BooleanBuilder로 구성
         BooleanBuilder condition = new BooleanBuilder();
 
-        // 1) 기간 조건 (startDate와 endDate는 이미 LocalDateTime이므로 직접 사용)
+        // ...
+        // 1) 기간 조건 (startDate, endDate는 LocalDate)
         if (searchRequest.getStartDate() != null) {
-            condition.and(order.orderDate.goe(searchRequest.getStartDate()));
+            // "00:00:00" 시점으로 변환
+            condition.and(order.orderDate.goe(searchRequest.getStartDate().atStartOfDay()));
         }
         if (searchRequest.getEndDate() != null) {
-            condition.and(order.orderDate.loe(searchRequest.getEndDate()));
+            // "23:59:59" 시점으로 변환
+            condition.and(order.orderDate.loe(searchRequest.getEndDate().atTime(23, 59, 59)));
         }
 
-        // 2) 상품명 조건
-        if (searchRequest.getItemName() != null && !searchRequest.getItemName().isEmpty()) {
-            condition.and(item.itemName.containsIgnoreCase(searchRequest.getItemName()));
-        }
 
-        // 3) 판매자 아이디 조건
-        if (searchRequest.getSellerId() != null && !searchRequest.getSellerId().isEmpty()) {
-            condition.and(seller.userId.eq(searchRequest.getSellerId()));
+        // 2) keyword(= 상품명 or 판매자ID)
+        if (searchRequest.getKeyword() != null && !searchRequest.getKeyword().isBlank()) {
+            String kw = searchRequest.getKeyword();
+            condition.and(
+                    item.itemName.containsIgnoreCase(kw)
+                            .or(seller.userId.containsIgnoreCase(kw))
+            );
         }
 
         // 4) 배송 상태

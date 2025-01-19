@@ -1,5 +1,5 @@
 // 모달 요소 가져오기
-const modal = document.getElementById('guideModal');
+const modal = document.getElementById('guideModal');      // ← #guideModal (.help-modal)
 const closeModalSpan = document.getElementById('closeModal');
 const closeButton = document.getElementById('closeButton');
 const helpButton = document.getElementById('helpButton');

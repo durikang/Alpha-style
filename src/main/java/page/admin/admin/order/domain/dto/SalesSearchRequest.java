@@ -3,18 +3,22 @@ package page.admin.admin.order.domain.dto;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 public class SalesSearchRequest {
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private LocalDate startDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime startDate;
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private LocalDate endDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime endDate;
+    // 하나의 검색어만
+    private String keyword;
+    private String deliveryStatus;
 
-    private String itemName;
-    private String sellerId;
-    private String deliveryStatus;  // 예) "배송중", "배송완료" 등
+    // Querydsl 검색용 필드 (필수 아님)
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 }
