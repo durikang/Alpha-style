@@ -6,7 +6,7 @@
       <div class="modal-header">
         <h5 class="modal-title" id="optionModalLabel">작업 진행</h5>
         <!-- data-bs-dismiss="modal" 제거 & id="optionCloseButton"만 남김 -->
-        <button type="button" class="btn-close" id="optionCloseButton" aria-label="닫기">
+        <button type="button" class="btn-close" id="optionCloseButton" data-bs-dismiss="modal" aria-label="닫기">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -54,7 +54,7 @@
 
                 <!-- 취소 & 닫기 버튼 (id 구분) -->
                 <button id="optionCancelButton" class="btn btn-danger w-100">취소</button>
-                <button id="optionCloseButton2" class="btn btn-secondary w-100" style="margin-top: 10px;">
+                <button id="optionCloseButton2" class="btn btn-secondary w-100" data-bs-dismiss="modal" style="margin-top: 10px;">
                   닫기
                 </button>
               </div>
