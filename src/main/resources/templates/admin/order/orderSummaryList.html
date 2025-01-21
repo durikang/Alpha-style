@@ -62,15 +62,6 @@
     <!-- 페이징 -->
     <div th:replace="~{common/admin/fragments/pagination(startPage=${startPage}, endPage=${endPage}, totalPages=${totalPages}, currentPage=${currentPage}, url='/admin/orders/summaryList', keyword=${keyword}, sortField=${sortBy}, sortDirection=${sortDir})}"></div>
 
-    <!-- 그래프 -->
-    <div class="chart-container">
-        <canvas id="orderSummaryChart"></canvas>
-    </div>
-
-    <!-- 관리 기능 -->
-    <div class="actions">
-        <button onclick="downloadCSV()">CSV 다운로드</button>
-    </div>
 </main>
 
 </body>
