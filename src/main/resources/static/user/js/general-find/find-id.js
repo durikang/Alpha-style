@@ -12,39 +12,44 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval;
 
     /**
-     * 인증 코드 요청
+     * 인증 코드 요청 (아이디 찾기용)
      */
     sendCodeButton.addEventListener('click', () => {
         const email = emailField.value;
+        const emailNotFoundMessage = document.getElementById('emailNotFoundMessage');
 
         // 이메일 유효성 검사
         if (!email || !validateEmail(email)) {
-            emailMessage.textContent = '유효한 이메일을 입력하세요.';
-            emailMessage.style.color = 'red';
+            emailNotFoundMessage.textContent = '유효한 이메일을 입력하세요.';
+            emailNotFoundMessage.style.color = 'red';
+            console.log('Invalid email format');
             return;
         }
 
-        fetch(`/auth/send-code?email=${encodeURIComponent(email)}`, {
+        console.log(`Sending request to /auth/find-id/send-code with email: ${email}`);
+
+        fetch(`/auth/find-id/send-code?email=${encodeURIComponent(email)}`, {
             method: 'POST',
         })
-            .then((response) => response.json()
-                .then((data) => {
+            .then((response) => {
+                console.log(`Response status: ${response.status}`);
+                return response.json().then((data) => {
                     if (!response.ok) {
-                        // 에러 메시지 처리
-                        emailMessage.textContent = data.message || '오류가 발생했습니다.';
-                        emailMessage.style.color = 'red';
+                        emailNotFoundMessage.textContent = data.message || '등록되지 않은 이메일입니다.';
+                        emailNotFoundMessage.style.color = 'red';
+                        console.log('Error message to display:', emailNotFoundMessage.textContent);
                     } else {
-                        // 성공 메시지 처리
-                        emailMessage.textContent = data.message || '인증 코드가 발송되었습니다.';
-                        emailMessage.style.color = 'green';
+                        emailNotFoundMessage.textContent = '';
                         emailDiv.style.display = 'none';
                         verificationDiv.style.display = 'block';
-                        startTimer(300); // 5분 타이머 시작
+                        startTimer(300);
                     }
-                }))
-            .catch(() => {
-                emailMessage.textContent = '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.';
-                emailMessage.style.color = 'red';
+                });
+            })
+            .catch((error) => {
+                console.error('Fetch error:', error);
+                emailNotFoundMessage.textContent = '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.';
+                emailNotFoundMessage.style.color = 'red';
             });
     });
 

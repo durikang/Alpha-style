@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import page.admin.common.utils.Alert;
 import page.admin.user.member.service.AuthService;
 
 import java.util.HashMap;
@@ -37,16 +38,23 @@ public class AuthController {
     // 아이디 찾기용 이메일 인증 코드 발송
     @PostMapping("/find-id/send-code")
     public ResponseEntity<Map<String, String>> sendCodeForFindId(@RequestParam String email) {
+        System.out.println("Received email: " + email); // 디버깅 로그
         Map<String, String> response = new HashMap<>();
         try {
             authService.validateAndSendCodeForFindId(email);
             response.put("message", "아이디 찾기용 인증 코드가 이메일로 발송되었습니다!");
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            response.put("message", e.getMessage());
+            System.out.println("Validation failed: " + e.getMessage()); // 에러 로그
+            response.put("message", e.getMessage()); // 클라이언트로 반환
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+
+
+
+
 
     // 비밀번호 찾기용 이메일 인증 코드 발송
     @PostMapping("/reset-password/send-code")
