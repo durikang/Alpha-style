@@ -100,24 +100,50 @@ function renderTableData(data) {
         const overall = data.summary.find(item => item.년도 === '전체') || {};
         const summary = data.summary[0]; // 첫 번째 데이터 기준
 
-        document.getElementById('sales-value').textContent = overall['매출']?.toLocaleString() || summary['매출']?.toLocaleString() || 'N/A';
-        document.getElementById('admin-cost-value').textContent = overall['판관비']?.toLocaleString() || summary['판관비']?.toLocaleString() || 'N/A';
-        document.getElementById('net-income-value').textContent = overall['당기순이익']?.toLocaleString() || summary['당기순이익']?.toLocaleString() || 'N/A';
-    }
+        // 실제 데이터 표시
+        updateElementTextContent('sales-value', formatValue(overall['매출'], summary['매출']));
+        updateElementTextContent('admin-cost-value', formatValue(overall['판관비'], summary['판관비']));
+        updateElementTextContent('net-income-value', formatValue(overall['당기순이익'], summary['당기순이익']));
 
+        // 예측 데이터 표시 (ID에 'feature_' 접두사 추가)
+        updateElementTextContent('feature-sales-value', formatValue(overall['예측매출'], summary['예측매출']));
+        updateElementTextContent('feature-admin-cost-value', formatValue(overall['예측판관비'], summary['예측판관비']));
+        updateElementTextContent('feature-net-income-value', formatValue(overall['예측당기순이익'], summary['예측당기순이익']));
+    }
     // 2. Category Sales 데이터 처리
     if (data.category_sales && data.category_sales.length > 0) {
-        const categoryIdMap = {
-            '상의': 'top_value',
-            '하의': 'bottom_value',
-            '운동화': 'running_shoes_value',
-            '단화': 'loafers_value',
-            '슬리퍼': 'slippers_value'
-        };
-        data.category_sales.forEach(item => {
-            const elementId = categoryIdMap[item['카테고리']];
-            if (elementId) {
-                document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+        // 데이터를 '실제공급가액' 기준으로 내림차순 정렬
+        const sortedCategorySales = data.category_sales.sort((a, b) => b['실제공급가액'] - a['실제공급가액']);
+
+        // 정렬된 데이터를 기반으로 DOM에 반영
+        sortedCategorySales.forEach((item, index) => {
+            // 현재 인덱스를 기반으로 ID 생성 (category_value1, feature_category_value1, category_name1 등)
+            const actualId = `category_value${index + 1}`;
+            const predictedId = `feature_category_value${index + 1}`;
+            const categoryNameId = `category_name${index + 1}`;
+
+            // 1. 실제/예측 공급가액 업데이트
+            const actualElement = document.getElementById(actualId);
+            const predictedElement = document.getElementById(predictedId);
+
+            if (actualElement) {
+                actualElement.textContent = formatValue(item['실제공급가액'], null);
+            } else {
+                console.warn(`Element with ID '${actualId}' not found.`);
+            }
+
+            if (predictedElement) {
+                predictedElement.textContent = formatValue(item['예측공급가액'], null);
+            } else {
+                console.warn(`Element with ID '${predictedId}' not found.`);
+            }
+
+            // 2. 카테고리 이름 업데이트
+            const categoryNameElement = document.getElementById(categoryNameId);
+            if (categoryNameElement) {
+                categoryNameElement.textContent = item['카테고리'];
+            } else {
+                console.warn(`Element with ID '${categoryNameId}' not found.`);
             }
         });
     }
@@ -125,15 +151,18 @@ function renderTableData(data) {
     // 3. Age Group Sales 데이터 처리
     if (data.age_group_sales && data.age_group_sales.length > 0) {
         const ageGroupIdMap = {
-            '10대': '10age',
-            '20대': '20age',
-            '30대': '30age',
-            '40대': '40age'
+            '전체': { actual: 'age_overall', predicted: 'feature_age_overall' },
+            '10대': { actual: '10age', predicted: 'feature_10age' },
+            '20대': { actual: '20age', predicted: 'feature_20age' },
+            '30대': { actual: '30age', predicted: 'feature_30age' },
+            '40대': { actual: '40age', predicted: 'feature_40age' }
         };
         data.age_group_sales.forEach(item => {
-            const elementId = ageGroupIdMap[item['나이대']];
-            if (elementId) {
-                document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+            const ageGroup = item['나이대'];
+            const elementIds = ageGroupIdMap[ageGroup];
+            if (elementIds) {
+                document.getElementById(elementIds.actual).textContent = formatValue(item['실제공급가액'], null);
+                document.getElementById(elementIds.predicted).textContent = formatValue(item['예측공급가액'], null);
             }
         });
     }
@@ -141,13 +170,16 @@ function renderTableData(data) {
     // 4. Gender Sales 데이터 처리
     if (data.gender_sales && data.gender_sales.length > 0) {
         const genderIdMap = {
-            '남': 'male_data',
-            '여': 'female_data'
+            '전체': { actual: 'gender_overall', predicted: 'feature_gender_overall' },
+            '남': { actual: 'male_data', predicted: 'feature_male_data' },
+            '여': { actual: 'female_data', predicted: 'feature_female_data' }
         };
         data.gender_sales.forEach(item => {
-            const elementId = genderIdMap[item['성별']];
-            if (elementId) {
-                document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+            const gender = item['성별'];
+            const elementIds = genderIdMap[gender];
+            if (elementIds) {
+                document.getElementById(elementIds.actual).textContent = formatValue(item['실제공급가액'], null);
+                document.getElementById(elementIds.predicted).textContent = formatValue(item['예측공급가액'], null);
             }
         });
     }
@@ -155,30 +187,82 @@ function renderTableData(data) {
     // 5. VIP Sales 데이터 처리
     if (data.vip_sales && data.vip_sales.length > 0) {
         const vipIdMap = {
-            "상위 10%": "10percent",
-            "상위 20%": "20percent",
-            "상위 30%": "30percent"
+            "전체": { actual: "vip_overall", predicted: "feature_vip_overall" },
+            "10%": { actual: "10percent", predicted: "feature_10percent" },
+            "20%": { actual: "20percent", predicted: "feature_20percent" },
+            "30%": { actual: "30percent", predicted: "feature_30percent" }
         };
         data.vip_sales.forEach(item => {
-            const elementId = vipIdMap[item['비율']];
-            if (elementId) {
-                document.getElementById(elementId).textContent = item['공급가액']?.toLocaleString() || 'N/A';
+            const ratio = item['비율'];
+            const elementIds = vipIdMap[ratio];
+            if (elementIds) {
+                document.getElementById(elementIds.actual).textContent = formatValue(item['실제공급가액'], null);
+                document.getElementById(elementIds.predicted).textContent = formatValue(item['예측공급가액'], null);
             }
         });
     }
 
     // 6. Area Sales 데이터 처리
     if (data.area_sales && data.area_sales.length > 0) {
-        console.log("Area Sales Data:", data.area_sales); // 데이터 확인용
-        data.area_sales.forEach((item, index) => {
-            if (index < 5) {
-                const areaNameElement = document.getElementById(`area_name${index + 1}`);
-                const areaValueElement = document.getElementById(`area_value${index + 1}`);
+        // 데이터를 '실제공급가액' 기준으로 내림차순 정렬
+        const sortedAreaSales = data.area_sales.sort((a, b) => b['실제공급가액'] - a['실제공급가액']);
 
-                if (areaNameElement) areaNameElement.textContent = item['지역'] || 'N/A';
-                if (areaValueElement) areaValueElement.textContent = item['공급가액']?.toLocaleString() || 'N/A';
+        // 정렬된 데이터를 기반으로 DOM에 반영
+        sortedAreaSales.forEach((item, index) => {
+            // 현재 인덱스를 기반으로 ID 생성 (area_value1, feature_area_value1, area_name1 등)
+            const actualId = `area_value${index + 1}`;
+            const predictedId = `feature_area_value${index + 1}`;
+            const areaNameId = `area_name${index + 1}`;
+
+            // 1. 실제/예측 공급가액 업데이트
+            const actualElement = document.getElementById(actualId);
+            const predictedElement = document.getElementById(predictedId);
+
+            if (actualElement) {
+                actualElement.textContent = formatValue(item['실제공급가액'], null);
+            } else {
+                console.warn(`Element with ID '${actualId}' not found.`);
+            }
+
+            if (predictedElement) {
+                predictedElement.textContent = formatValue(item['예측공급가액'], null);
+            } else {
+                console.warn(`Element with ID '${predictedId}' not found.`);
+            }
+
+            // 2. 지역 이름 업데이트
+            const areaNameElement = document.getElementById(areaNameId);
+            if (areaNameElement) {
+                areaNameElement.textContent = item['지역'];
+            } else {
+                console.warn(`Element with ID '${areaNameId}' not found.`);
             }
         });
+    }
+
+
+    // 2. 기타 데이터 처리 (Category Sales, Age Group, Gender 등)...
+    // 여기에도 동일한 방식으로 처리
+}
+
+// 값 포맷팅 함수: 실제 공급가액과 예측 공급가액을 처리
+function formatValue(actual, summaryActual) {
+    if (actual === 'N/A' || actual === null || actual === undefined) {
+        return 'N/A';
+    } else if (typeof actual === 'number') {
+        return actual.toLocaleString();
+    } else {
+        return actual;
+    }
+}
+
+// 안전하게 요소에 텍스트 업데이트하는 함수
+function updateElementTextContent(id, text) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = text;
+    } else {
+        console.warn(`Element with ID '${id}' not found.`);
     }
 }
 

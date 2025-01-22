@@ -338,35 +338,36 @@
     </div>
     <div id="result"></div>
 
-    <div class="daterange_div">
-    <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" />
-    </div>
-    <script>
-        $(function() {
-            // Date Range Picker 초기화
-            $('input[name="daterange"]').daterangepicker({
-                opens: 'center', // 팝업이 중앙에 열림
-                locale: {
-                    format: 'YYYY-MM-DD', // 한국어 형식 (예: 2020-01-01)
-                    separator: ' - ', // 시작 날짜와 종료 날짜 사이의 구분자
-                    applyLabel: '적용',
-                    cancelLabel: '취소',
-                    daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],
-                    monthNames: [
-                        '1월', '2월', '3월', '4월', '5월', '6월',
-                        '7월', '8월', '9월', '10월', '11월', '12월'
-                    ],
-                    firstDay: 0 // 일요일을 시작 요일로 설정
-                },
-                startDate: moment('2020-01-01', 'YYYY-MM-DD'), // 초기 시작 날짜 설정
-                endDate: moment('2020-12-31', 'YYYY-MM-DD') // 초기 종료 날짜 설정 (원하는 날짜로 변경 가능)
+<!--    <div class="daterange_div">-->
+<!--    <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" />-->
+<!--    </div>-->
+<!--    <script>-->
+<!--        $(function() {-->
+<!--            // Date Range Picker 초기화-->
+<!--            $('input[name="daterange"]').daterangepicker({-->
+<!--                opens: 'center', // 팝업이 중앙에 열림-->
+<!--                locale: {-->
+<!--                    format: 'YYYY-MM-DD', // 한국어 형식 (예: 2020-01-01)-->
+<!--                    separator: ' - ', // 시작 날짜와 종료 날짜 사이의 구분자-->
+<!--                    applyLabel: '적용',-->
+<!--                    cancelLabel: '취소',-->
+<!--                    daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],-->
+<!--                    monthNames: [-->
+<!--                        '1월', '2월', '3월', '4월', '5월', '6월',-->
+<!--                        '7월', '8월', '9월', '10월', '11월', '12월'-->
+<!--                    ],-->
+<!--                    firstDay: 0 // 일요일을 시작 요일로 설정-->
+<!--                },-->
+<!--                startDate: moment('2020-01-01', 'YYYY-MM-DD'), // 초기 시작 날짜 설정-->
+<!--                endDate: moment('2020-12-31', 'YYYY-MM-DD') // 초기 종료 날짜 설정 (원하는 날짜로 변경 가능)-->
 
-            }, function(start, end, label) {
-                console.log("새로운 날짜 선택: " +
-                    start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
-            });
-        });
-    </script>
+<!--            }, function(start, end, label) {-->
+<!--                console.log("새로운 날짜 선택: " +-->
+<!--                    start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+<!--    -->
     <!-- 탭 콘텐츠 -->
     <div class="tab-row">
         <div class="tab-content" id="tab-content"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
@@ -376,6 +377,7 @@
                 <tr>
                     <th>항목</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -391,6 +393,14 @@
                     <td>당기순이익</td>
                     <td id="net-income-value">N/A</td>
                 </tr>
+                </tbody>
+                <tbody>
+                    <td>매출</td>
+                    <td id="feature-sales-value">N/A</td>
+                    <td>판관비</td>
+                    <td id="feature-admin-cost-value">N/A</td>
+                    <td>당기순이익</td>
+                    <td id="feature-net-income-value">N/A</td>
                 </tbody>
             </table>
             <table id="analysis-table1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
@@ -417,28 +427,51 @@
                 <tr>
                     <th>카테고리</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td>상의</td>
-                    <td id="top_value">N/A</td>
+                    <td id="category_value1">N/A</td>
                 </tr>
                 <tr>
                     <td>하의</td>
-                    <td id="bottom_value">N/A</td>
+                    <td id="category_value2">N/A</td>
                 </tr>
                 <tr>
                     <td>운동화</td>
-                    <td id="running_shoes_value">N/A</td>
+                    <td id="category_value3">N/A</td>
                 </tr>
                 <tr>
                     <td>단화</td>
-                    <td id="loafers_value">N/A</td>
+                    <td id="category_value4">N/A</td>
                 </tr>
                 <tr>
                     <td>슬리퍼</td>
-                    <td id="slippers_value">N/A</td>
+                    <td id="category_value5">N/A</td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td>카테고리 명</td>
+                    <td id="feature_category_value1">N/A</td>
+                </tr>
+                <tr>
+                    <td>카테고리 명</td>
+                    <td id="feature_category_value2">N/A</td>
+                </tr>
+                <tr>
+                    <td>카테고리 명</td>
+                    <td id="feature_category_value3">N/A</td>
+                </tr>
+                <tr>
+                    <td>카테고리 명</td>
+                    <td id="feature_category_value4">N/A</td>
+                </tr>
+                <tr>
+                    <td>카테고리 명</td>
+                    <td id="feature_category_value5">N/A</td>
                 </tr>
                 </tbody>
             </table>
@@ -466,6 +499,7 @@
                 <tr>
                     <th>나이</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -484,6 +518,24 @@
                 <tr>
                     <td>40대</td>
                     <td id="40age">N/A</td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td>10대</td>
+                    <td id="feature_10age">N/A</td>
+                </tr>
+                <tr>
+                    <td>20대</td>
+                    <td id="feature_20age">N/A</td>
+                </tr>
+                <tr>
+                    <td>30대</td>
+                    <td id="feature_30age">N/A</td>
+                </tr>
+                <tr>
+                    <td>40대</td>
+                    <td id="feature_40age">N/A</td>
                 </tr>
                 </tbody>
             </table>
@@ -512,6 +564,7 @@
                 <tr>
                     <th>성별</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -522,6 +575,16 @@
                 <tr>
                     <td>여자</td>
                     <td id="female_data">N/A</td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td>남자</td>
+                    <td id="feature_male_data">N/A</td>
+                </tr>
+                <tr>
+                    <td>여자</td>
+                    <td id="feature_female_data">N/A</td>
                 </tr>
                 </tbody>
             </table>
@@ -550,6 +613,7 @@
                 <tr>
                     <th>상위 유저</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -564,6 +628,20 @@
                 <tr>
                     <td>30%</td>
                     <td id="30percent">N/A</td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td>10%</td>
+                        <td id="feature_10percent">N/A</td>
+                </tr>
+                <tr>
+                    <td>20%</td>
+                    <td id="feature_20percent">N/A</td>
+                </tr>
+                <tr>
+                    <td>30%</td>
+                    <td id="feature_30percent">N/A</td>
                 </tr>
                 </tbody>
             </table>
@@ -591,6 +669,7 @@
                 <tr>
                     <th>상위 지역</th>
                     <th>값</th>
+                    <th>예측</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -613,6 +692,28 @@
                 <tr>
                     <td id="area_name5">지역명</td>
                     <td id="area_value5">N/A</td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td id="feature_area_name1">지역명</td>
+                    <td id="feature_area_value1">N/A</td>
+                </tr>
+                <tr>
+                    <td id="feature_area_name2">지역명</td>
+                    <td id="feature_area_value2">N/A</td>
+                </tr>
+                <tr>
+                    <td id="feature_area_name3">지역명</td>
+                    <td id="feature_area_value3">N/A</td>
+                </tr>
+                <tr>
+                    <td id="feature_area_name4">지역명</td>
+                    <td id="feature_area_value4">N/A</td>
+                </tr>
+                <tr>
+                    <td id="feature_area_name5">지역명</td>
+                    <td id="feature_area_value5">N/A</td>
                 </tr>
                 </tbody>
             </table>
@@ -740,11 +841,16 @@
         // 2. Category Sales 데이터 처리
         if (data.category_sales && data.category_sales.length > 0) {
             const categoryIdMap = {
-                '상의': 'top_value',
-                '하의': 'bottom_value',
-                '운동화': 'running_shoes_value',
-                '단화': 'loafers_value',
-                '슬리퍼': 'slippers_value'
+                '상의': 'category_value1',
+                '하의': 'category_value2',
+                '운동화': 'category_value3',
+                '단화': 'category_value4',
+                '슬리퍼': 'category_value5',
+                '상의': 'feature_category_value1',
+                '하의': 'feature_category_value2',
+                '운동화': 'feature_category_value3',
+                '단화': 'feature_category_value4',
+                '슬리퍼': 'feature_category_value5'
             };
             data.category_sales.forEach(item => {
                 const elementId = categoryIdMap[item['카테고리']];
@@ -760,7 +866,11 @@
                 '10대': '10age',
                 '20대': '20age',
                 '30대': '30age',
-                '40대': '40age'
+                '40대': '40age',
+                '10대': 'feature_10age',
+                '20대': 'feature_20age',
+                '30대': 'feature_30age',
+                '40대': 'feature_40age'
             };
             data.age_group_sales.forEach(item => {
                 const elementId = ageGroupIdMap[item['나이대']];
@@ -774,7 +884,9 @@
         if (data.gender_sales && data.gender_sales.length > 0) {
             const genderIdMap = {
                 '남': 'male_data',
-                '여': 'female_data'
+                '여': 'female_data',
+                '남': 'feature_male_data',
+                '여': 'feature_female_data'
             };
             data.gender_sales.forEach(item => {
                 const elementId = genderIdMap[item['성별']];
@@ -789,7 +901,10 @@
             const vipIdMap = {
                 "상위 10%": "10percent",
                 "상위 20%": "20percent",
-                "상위 30%": "30percent"
+                "상위 30%": "30percent",
+                "상위 10%": "feature_10percent",
+                "상위 20%": "feature_20percent",
+                "상위 30%": "feature_30percent"
             };
             data.vip_sales.forEach(item => {
                 const elementId = vipIdMap[item['비율']];

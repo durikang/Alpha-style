@@ -26,6 +26,8 @@
     <script th:src="@{/admin/js/financial/optionModal.js}" defer></script>
     <link rel="stylesheet" th:href="@{/admin/css/financial/uploadModal.css}" />
     <script th:src="@{/admin/js/financial/uploadModal.js}" defer></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
 <main class="container">
@@ -57,10 +59,10 @@
     </section>
 
 
-<!--    &lt;!&ndash; 날짜 선택 영역 &ndash;&gt;
-    <section id="daterange-section" class="daterange-section">
-        <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" class="daterange-input" />
-    </section>-->
+    <!--    &lt;!&ndash; 날짜 선택 영역 &ndash;&gt;
+        <section id="daterange-section" class="daterange-section">
+            <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" class="daterange-input" />
+        </section>-->
 
     <section class="content-section">
         <!-- 탭 콘텐츠 -->
@@ -72,20 +74,24 @@
                     <tr>
                         <th>항목</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td>매출</td>
                         <td id="sales-value">N/A</td>
+                        <td id="feature-sales-value">N/A</td>
                     </tr>
                     <tr>
                         <td>판관비</td>
                         <td id="admin-cost-value">N/A</td>
+                        <td id="feature-admin-cost-value">N/A</td>
                     </tr>
                     <tr>
                         <td>당기순이익</td>
                         <td id="net-income-value">N/A</td>
+                        <td id="feature-net-income-value">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -113,28 +119,44 @@
                     <tr>
                         <th>카테고리</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td>상의</td>
-                        <td id="top_value">N/A</td>
+                        <td id="category_name1">카테고리명</td>
+                        <td id="category_value1">N/A</td>
+                        <td id="feature_category_value1">N/A</td>
                     </tr>
                     <tr>
-                        <td>하의</td>
-                        <td id="bottom_value">N/A</td>
+                        <td id="category_name2">카테고리명</td>
+                        <td id="category_value2">N/A</td>
+                        <td id="feature_category_value2">N/A</td>
                     </tr>
                     <tr>
-                        <td>운동화</td>
-                        <td id="running_shoes_value">N/A</td>
+                        <td id="category_name3">카테고리명</td>
+                        <td id="category_value3">N/A</td>
+                        <td id="feature_category_value3">N/A</td>
                     </tr>
                     <tr>
-                        <td>단화</td>
-                        <td id="loafers_value">N/A</td>
+                        <td id="category_name4">카테고리명</td>
+                        <td id="category_value4">N/A</td>
+                        <td id="feature_category_value4">N/A</td>
                     </tr>
                     <tr>
-                        <td>슬리퍼</td>
-                        <td id="slippers_value">N/A</td>
+                        <td id="category_name5">카테고리명</td>
+                        <td id="category_value5">N/A</td>
+                        <td id="feature_category_value5">N/A</td>
+                    </tr>
+                    <tr>
+                        <td id="category_name6">카테고리명</td>
+                        <td id="category_value6">N/A</td>
+                        <td id="feature_category_value6">N/A</td>
+                    </tr>
+                    <tr>
+                        <td id="category_name7">카테고리명</td>
+                        <td id="category_value7">N/A</td>
+                        <td id="feature_category_value7">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -162,24 +184,29 @@
                     <tr>
                         <th>나이</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td>10대</td>
                         <td id="10age">N/A</td>
+                        <td id="feature_10age">N/A</td>
                     </tr>
                     <tr>
                         <td>20대</td>
                         <td id="20age">N/A</td>
+                        <td id="feature_20age">N/A</td>
                     </tr>
                     <tr>
                         <td>30대</td>
                         <td id="30age">N/A</td>
+                        <td id="feature_30age">N/A</td>
                     </tr>
                     <tr>
                         <td>40대</td>
                         <td id="40age">N/A</td>
+                        <td id="feature_40age">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -199,6 +226,7 @@
                 </table>
             </div>
         </div>
+
         <div class="tab-row">
             <div class="tab-content" id="tab-content3"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content3-additional">
@@ -207,16 +235,19 @@
                     <tr>
                         <th>성별</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td>남자</td>
                         <td id="male_data">N/A</td>
+                        <td id="feature_male_data">N/A</td>
                     </tr>
                     <tr>
                         <td>여자</td>
                         <td id="female_data">N/A</td>
+                        <td id="feature_female_data">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -236,6 +267,7 @@
                 </table>
             </div>
         </div>
+
         <div class="tab-row">
             <div class="tab-content" id="tab-content4"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content4-additional">
@@ -244,20 +276,24 @@
                     <tr>
                         <th>상위 유저</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td>10%</td>
                         <td id="10percent">N/A</td>
+                        <td id="feature_10percent">N/A</td>
                     </tr>
                     <tr>
                         <td>20%</td>
                         <td id="20percent">N/A</td>
+                        <td id="feature_20percent">N/A</td>
                     </tr>
                     <tr>
                         <td>30%</td>
                         <td id="30percent">N/A</td>
+                        <td id="feature_30percent">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -277,36 +313,43 @@
                 </table>
             </div>
         </div>
+
         <div class="tab-row">
             <div class="tab-content" id="tab-content5"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content5-additional">
                 <table id="data-table6">
                     <thead>
                     <tr>
-                        <th>상위 지역</th>
+                        <th>지역명</th>
                         <th>값</th>
+                        <th>예측</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td id="area_name1">지역명</td>
                         <td id="area_value1">N/A</td>
+                        <td id="feature_area_value1">N/A</td>
                     </tr>
                     <tr>
                         <td id="area_name2">지역명</td>
                         <td id="area_value2">N/A</td>
+                        <td id="feature_area_value2">N/A</td>
                     </tr>
                     <tr>
                         <td id="area_name3">지역명</td>
                         <td id="area_value3">N/A</td>
+                        <td id="feature_area_value3">N/A</td>
                     </tr>
                     <tr>
                         <td id="area_name4">지역명</td>
                         <td id="area_value4">N/A</td>
+                        <td id="feature_area_value4">N/A</td>
                     </tr>
                     <tr>
                         <td id="area_name5">지역명</td>
                         <td id="area_value5">N/A</td>
+                        <td id="feature_area_value5">N/A</td>
                     </tr>
                     </tbody>
                 </table>
@@ -338,3 +381,9 @@
 
 </body>
 </html>
+
+
+
+
+
+
