@@ -95,21 +95,29 @@ async function loadDataAndRender(year) {
 
 // 테이블 데이터 렌더링 함수
 function renderTableData(data) {
-    // 1. Summary 데이터 처리
+
     if (data.summary && data.summary.length > 0) {
-        const overall = data.summary.find(item => item.년도 === '전체') || {};
-        const summary = data.summary[0]; // 첫 번째 데이터 기준
+        const summaryGroupIdMap = {
+            '매출': { actual: 'sales-value', predicted: 'feature-sales-value' },
+            '판관비': { actual: 'admin-cost-value', predicted: 'feature-admin-cost-value' },
+            '당기순이익': { actual: 'net-income-value', predicted: 'feature-net-income-value' },
+        };
 
-        // 실제 데이터 표시
-        updateElementTextContent('sales-value', formatValue(overall['매출'], summary['매출']));
-        updateElementTextContent('admin-cost-value', formatValue(overall['판관비'], summary['판관비']));
-        updateElementTextContent('net-income-value', formatValue(overall['당기순이익'], summary['당기순이익']));
-
-        // 예측 데이터 표시 (ID에 'feature_' 접두사 추가)
-        updateElementTextContent('feature-sales-value', formatValue(overall['예측매출'], summary['예측매출']));
-        updateElementTextContent('feature-admin-cost-value', formatValue(overall['예측판관비'], summary['예측판관비']));
-        updateElementTextContent('feature-net-income-value', formatValue(overall['예측당기순이익'], summary['예측당기순이익']));
+        data.summary.forEach(item => {
+            Object.keys(summaryGroupIdMap).forEach(key => {
+                const elementIds = summaryGroupIdMap[key];
+                if (elementIds) {
+                    const actualValue = item[key]; // 실제 값 (예: 매출, 판관비 등)
+                    const predictedValue = item[`예측${key}`]; // 예측 값
+                    document.getElementById(elementIds.actual).textContent =
+                        actualValue !== undefined ? formatValue(actualValue, null) : 'N/A';
+                    document.getElementById(elementIds.predicted).textContent =
+                        predictedValue !== undefined ? formatValue(predictedValue, null) : 'N/A';
+                }
+            });
+        });
     }
+
     // 2. Category Sales 데이터 처리
     if (data.category_sales && data.category_sales.length > 0) {
         // 데이터를 '실제공급가액' 기준으로 내림차순 정렬
@@ -205,7 +213,7 @@ function renderTableData(data) {
     // 6. Area Sales 데이터 처리
     if (data.area_sales && data.area_sales.length > 0) {
         // 데이터를 '실제공급가액' 기준으로 내림차순 정렬
-        const sortedAreaSales = data.area_sales.sort((a, b) => b['실제공급가액'] - a['실제공급가액']);
+        const sortedAreaSales = data.area_sales.sort((a, b) => b['공급가액'] - a['공급가액']);
 
         // 정렬된 데이터를 기반으로 DOM에 반영
         sortedAreaSales.forEach((item, index) => {
@@ -219,7 +227,7 @@ function renderTableData(data) {
             const predictedElement = document.getElementById(predictedId);
 
             if (actualElement) {
-                actualElement.textContent = formatValue(item['실제공급가액'], null);
+                actualElement.textContent = formatValue(item['공급가액'], null);
             } else {
                 console.warn(`Element with ID '${actualId}' not found.`);
             }
