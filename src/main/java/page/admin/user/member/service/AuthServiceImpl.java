@@ -32,11 +32,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void validateAndSendCodeForFindId(String email) {
-        if (!memberRepository.existsByEmail(email)) {
+        System.out.println("Validating email: " + email); // 디버깅 로그 추가
+        boolean emailExists = memberRepository.existsByEmail(email);
+        System.out.println("Email exists: " + emailExists); // 디버깅 로그 추가
+        if (!emailExists) {
             throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
         }
         sendVerificationEmail(email);
     }
+
+
 
     @Override
     public void validateAndSendCodeForPasswordReset(String email) {

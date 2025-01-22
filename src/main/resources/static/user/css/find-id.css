@@ -108,3 +108,10 @@
     color: red;
     font-size: 12px;
 }
+
+#emailNotFoundMessage {
+    display: block !important; /* 강제로 표시 */
+    color: red !important; /* 강제 색상 적용 */
+    margin-top: 5px;
+}
+
