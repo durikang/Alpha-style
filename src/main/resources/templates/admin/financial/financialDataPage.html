@@ -58,17 +58,19 @@
         </button>
     </section>
 
-
-    <!--    &lt;!&ndash; 날짜 선택 영역 &ndash;&gt;
-        <section id="daterange-section" class="daterange-section">
-            <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" class="daterange-input" />
-        </section>-->
+    <!-- 날짜 선택 영역 (필요 시 주석 해제) -->
+    <!--
+    <section id="daterange-section" class="daterange-section">
+        <input type="text" name="daterange" value="01/01/2020 - 01/15/2020" class="daterange-input" />
+    </section>
+    -->
 
     <section class="content-section">
         <!-- 탭 콘텐츠 -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content-additional">
+                <!-- Summary Table -->
                 <table id="data-table">
                     <thead>
                     <tr>
@@ -95,6 +97,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- Summary Analysis Table -->
                 <table id="analysis-table1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -111,9 +114,12 @@
                 </table>
             </div>
         </div>
+
+        <!-- Category Sales Tab -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content1"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content1-additional">
+                <!-- Category Sales Table -->
                 <table id="data-table2">
                     <thead>
                     <tr>
@@ -160,6 +166,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- Category Sales Analysis Table -->
                 <table id="analysis-table2" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -176,9 +183,12 @@
                 </table>
             </div>
         </div>
+
+        <!-- Age Group Sales Tab -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content2"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content2-additional">
+                <!-- Age Group Sales Table -->
                 <table id="data-table3">
                     <thead>
                     <tr>
@@ -210,6 +220,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- Age Group Sales Analysis Table -->
                 <table id="analysis-table3" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -227,9 +238,11 @@
             </div>
         </div>
 
+        <!-- Gender Sales Tab -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content3"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content3-additional">
+                <!-- Gender Sales Table -->
                 <table id="data-table4">
                     <thead>
                     <tr>
@@ -251,6 +264,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- Gender Sales Analysis Table -->
                 <table id="analysis-table4" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -268,9 +282,11 @@
             </div>
         </div>
 
+        <!-- VIP Sales Tab -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content4"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content4-additional">
+                <!-- VIP Sales Table -->
                 <table id="data-table5">
                     <thead>
                     <tr>
@@ -297,6 +313,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- VIP Sales Analysis Table -->
                 <table id="analysis-table5" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -314,9 +331,11 @@
             </div>
         </div>
 
+        <!-- Area Sales Tab -->
         <div class="tab-row">
             <div class="tab-content" id="tab-content5"><p>선택한 연도의 데이터 분석 결과가 여기에 표시됩니다.</p></div>
             <div class="tab-content" id="tab-content5-additional">
+                <!-- Area Sales Table -->
                 <table id="data-table6">
                     <thead>
                     <tr>
@@ -353,6 +372,7 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- Area Sales Analysis Table -->
                 <table id="analysis-table6" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                     <tr style="background-color: #f2f2f2;">
@@ -372,18 +392,11 @@
     </section>
 </main>
 
-
-
 <!-- Bootstrap 모달 -->
 <div th:replace="~{admin/financial/optionModal.html :: optionModalFragment}"></div>
 <!-- Bootstrap 모달 -->
 <div th:replace="~{admin/financial/uploadModal.html :: uploadModalFragment}"></div>
 
+<script src="graph.js"></script>
 </body>
 </html>
-
-
-
-
-
-
