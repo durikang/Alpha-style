@@ -1,0 +1,212 @@
+/* 기본 스타일링 */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.signup-form {
+    width: 50%;
+    max-width: 600px;
+    min-width: 400px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+.signup-form h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.signup-form h2 {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    color: #555;
+    padding-bottom: 5px;
+}
+
+.signup-form img {
+    display: block;
+    margin: 0 auto 30px auto;
+    width: 150px;
+    height: auto;
+}
+
+.signup-form div {
+    margin-bottom: 20px;
+}
+
+.signup-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.signup-form input,
+.signup-form select,
+.signup-form button {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.signup-form input:focus,
+.signup-form select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.signup-form button {
+    background-color: #4a90e2;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.signup-form button:hover {
+    background-color: #357abd;
+    transform: scale(1.02);
+}
+
+.signup-form .required {
+    color: red;
+    font-size: 12px;
+}
+
+.signup-form .modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+}
+
+/* 플로팅 레이블 스타일링 */
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-group .floating-label {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    font-size: 14px;
+    color: #aaa;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px 15px 15px 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-group input:focus {
+    background-color: #fff;
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.form-group input:focus + .floating-label,
+.form-group input:not(:placeholder-shown) + .floating-label {
+    top: -10px;
+    font-size: 12px;
+    color: #4a90e2;
+}
+
+.form-group input:invalid {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.2);
+}
+
+.form-group input:invalid + .floating-label {
+    color: #ff6b6b;
+}
+
+#authCompleteMessage {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 추가: fadeable 클래스 (단계 전환에만 사용) */
+/*.fadeable {
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+.fadeable.visible {
+    opacity: 1;
+}*/
+
+
+/* 인증 코드 입력 컨테이너 */
+#verificationCodeContainer {
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* 기존 .step 클래스 수정 */
+.step {
+    display: none; /* 기본적으로 숨김 */
+    /*opacity: 0;*/
+    /*transition: opacity 0.5s ease-in-out;*/
+}
+
+/*.step.visible {
+    display: block; !* 보이기 *!
+    !*opacity: 1;     !* 불투명하게 설정 *!*!
+}*/
+
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .signup-form {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .signup-form h1 {
+        font-size: 24px;
+    }
+
+    .signup-form div {
+        margin-bottom: 15px;
+    }
+}

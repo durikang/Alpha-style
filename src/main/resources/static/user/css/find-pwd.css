@@ -1,28 +1,43 @@
 .find-pwd-container {
+    /* 아이디 찾기와 유사하게 박스 스타일 */
+    width: 50%;
     max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 120px auto; /* 위쪽 여백(120px 등 조절) */
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
     text-align: center;
     font-family: Arial, sans-serif;
 }
 
-h1 {
+.find-pwd-container h1 {
+    margin-bottom: 20px;
     font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+
+.find-pwd-container p {
+    font-size: 14px;
+    color: #666;
     margin-bottom: 20px;
 }
 
 .form-group {
     margin-bottom: 15px;
-    text-align: left;
+    text-align: left; /* 라벨과 인풋을 왼쪽 정렬 */
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: #555;
 }
 
-input {
+.form-group input {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -33,13 +48,15 @@ input {
 
 .btn {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    margin: 10px 0 0; /* 버튼과 위 요소 간격 */
+    transition: background-color 0.3s ease;
 }
 
 .btn:hover {
@@ -53,4 +70,5 @@ input {
 .message {
     margin-top: 10px;
     font-size: 14px;
+    color: red; /* 인증 실패 시 빨간색 표시 등 */
 }

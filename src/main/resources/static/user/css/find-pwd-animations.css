@@ -1,22 +1,21 @@
-/* 초기 숨김 처리 */
+/* 초기 숨김 처리(transition 이용) */
 .hidden {
-    display: none;
+    display: none; /* JS로 hidden 제거시 block을 쓸지 flex를 쓸지 결정 가능 */
     opacity: 0;
     transition: opacity 0.5s ease;
 }
 
-/* 단계 표시 효과 */
+/* .show 클래스를 준다면 */
 .show {
     display: block;
     opacity: 1;
 }
 
-/* 페이드 인 효과 */
+/* fade-in 애니메이션 */
 .fade-in {
     animation: fadeIn 0.5s ease forwards;
 }
 
-/* 페이드 아웃 효과 */
 .fade-out {
     animation: fadeOut 0.5s ease forwards;
 }

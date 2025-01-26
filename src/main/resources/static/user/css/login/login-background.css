@@ -1,0 +1,13 @@
+/* login-background.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url("/user/img/login-background-1.jpg"); /* 배경 이미지 경로 */
+    background-size: cover; /* 배경 이미지를 화면 전체에 맞춤 */
+    background-repeat: no-repeat; /* 배경 반복 금지 */
+    background-attachment: fixed; /* 배경 고정 */
+    background-position: center center; /* 배경 중앙 정렬 */
+}

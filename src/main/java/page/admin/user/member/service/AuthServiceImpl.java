@@ -60,6 +60,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public String findUserIdByEmail(String email) {
+        // 'findSingleMemberByEmail'를 호출하여 해당 Member 엔티티를 찾는다.
+        Member member = memberRepository.findSingleMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 이메일입니다."));
+
+        // 찾은 Member의 userId를 리턴
+        return member.getUserId();
+    }
+
+    @Override
     public boolean verifyCode(String email, String code) {
         System.out.println("Verifying code for email: " + email); // 디버깅 로그
         System.out.println("Received code: " + code);             // 디버깅 로그
@@ -117,7 +127,8 @@ public class AuthServiceImpl implements AuthService {
     private void sendVerificationEmail(String email) {
         String code = CodeGenerator.generateCode();
         LocalDateTime expiryTime = LocalDateTime.now().plus(5, ChronoUnit.MINUTES);
-
+        
+        /*만료된 인증코드 찾는 코드*/
         verificationCodeRepository.findByEmail(email).ifPresent(verificationCodeRepository::delete);
 
         VerificationCode verificationCode = new VerificationCode(email, code, expiryTime);

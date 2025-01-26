@@ -13,7 +13,8 @@
 <!-- Slider 프래그먼트 정의 -->
 <div layout:fragment="pageStyles">
     <!-- CSS -->
-    <link rel="stylesheet" th:href="@{/user/css/general-signup.css}">
+    <link rel="stylesheet" th:href="@{/user/css/sign-up/general-signup.css}">
+    <link rel="stylesheet" th:href="@{/user/css/sign-up/general-signup-background.css}">
 
     <!-- JavaScript Modules -->
     <script type="module" th:src="@{/user/js/main-general-signup.js}" defer></script>
@@ -35,7 +36,7 @@
         <h1>회원 가입</h1>
 
         <!-- 단계별 폼 -->
-        <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate onsubmit="return validateForm();">
+        <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate onsubmit="return validateForm();" style="margin-top:350px;">
             <!-- 1단계: 본인 인증 -->
             <div class="step" id="step-1" style="display: block;">
                 <h2>1단계: 본인 인증</h2>

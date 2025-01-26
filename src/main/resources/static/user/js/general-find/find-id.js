@@ -58,8 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
      * 인증 코드 검증
      */
     verifyCodeButton.addEventListener('click', () => {
-        const email = emailField.value;
-        const code = verificationCodeField.value;
+        const email = emailField.value.trim();
+        const code = verificationCodeField.value.trim();
+
+        if (!email || !validateEmail(email)) {
+            codeMessage.textContent = '유효한 이메일을 입력하세요.';
+            codeMessage.style.color = 'red';
+            return;
+        }
 
         if (!code) {
             codeMessage.textContent = '인증 코드를 입력하세요.';
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        fetch(`/auth/find-id/verify-code`, {
+        fetch(`/auth/verify-code-json`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,10 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .then((data) => {
                 if (data.success) {
                     clearInterval(timerInterval); // 타이머 종료
-                    emailDiv.style.display = 'none';
-                    verificationDiv.style.display = 'none';
-                    resultMessage.style.display = 'block';
-                    userIdElement.textContent = data.userId;
+                    document.getElementById('emailDiv').style.display = 'none';
+                    document.getElementById('verificationDiv').style.display = 'none';
+                    const resultMessage = document.getElementById('resultMessage');
+                    const userIdElement = document.getElementById('userId');
+
+                    if (resultMessage && userIdElement) {
+                        resultMessage.style.display = 'block';
+                        userIdElement.textContent = data.userId || '아이디 정보를 가져올 수 없습니다.';
+                    }
                     showAlert(`축하합니다! 아이디 "${data.userId}"를 찾았습니다.`, 'alert-success');
                 } else {
                     codeMessage.textContent = data.message || '인증 실패!';
@@ -92,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showAlert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.', 'alert-error');
             });
     });
+
 
     /**
      * 타이머 시작 함수

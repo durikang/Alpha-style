@@ -1,0 +1,11 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url("/user/img/find-id-background-1.jpg"); /* GIF 배경 경로 */
+    background-size: cover; /* 배경 이미지를 화면에 꽉 차게 */
+    background-repeat: no-repeat; /* 배경 반복 금지 */
+    background-attachment: fixed; /* 배경 고정 */
+    background-position: center center; /* 배경 가운데 정렬 */
+}

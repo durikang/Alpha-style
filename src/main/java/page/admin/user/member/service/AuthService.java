@@ -8,4 +8,7 @@ public interface AuthService {
     void resetPassword(String email, String newPassword); // 비밀번호 재설정
     void cleanupExpiredCodes();
     void validateAndSendCode(String email);
+
+    String findUserIdByEmail(String email);
+
 }
