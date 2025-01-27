@@ -64,6 +64,9 @@ async function loadDataAndRender(year) {
         // JSON 데이터 파싱
         const result = await response.json();
 
+        // 데이터 구조 확인을 위한 로그 추가
+        console.log('백엔드 응답 데이터:', result);
+
         // HTML 콘텐츠 렌더링
         result.html_results.forEach((item, index) => {
             const contentElement = document.getElementById(contentIds[index]);
@@ -281,13 +284,17 @@ function insertDescriptions(data) {
 
         if (descriptionElement) {
             if (section && section.length > 0) {
-                // 첫 번째 항목의 설명을 사용
-                let description = section[0].설명 || 'N/A';
-
-                // 줄바꿈 처리
-                description = description.replace(/\n/g, '<br>');
-
-                descriptionElement.innerHTML = description;
+                if (index === 1) { // Category Sales
+                    // 모든 카테고리의 설명을 하나로 합침
+                    let descriptions = section.map(item => item.설명).filter(desc => desc && desc !== 'N/A').join('<br>');
+                    descriptions = descriptions || 'N/A';
+                    descriptionElement.innerHTML = descriptions;
+                } else {
+                    let description = section[0].설명 || 'N/A';
+                    // 줄바꿈 처리
+                    description = description.replace(/\n/g, '<br>');
+                    descriptionElement.innerHTML = description;
+                }
             } else {
                 descriptionElement.textContent = 'N/A';
             }
@@ -296,6 +303,7 @@ function insertDescriptions(data) {
         }
     });
 }
+
 
 // 값 포맷팅 함수: 실제 공급가액과 예측 공급가액을 처리
 function formatValue(actual, summaryActual) {
