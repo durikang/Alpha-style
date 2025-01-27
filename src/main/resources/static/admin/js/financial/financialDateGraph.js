@@ -304,7 +304,7 @@ function insertDescriptions(data) {
     });
 }
 
-
+#
 // 값 포맷팅 함수: 실제 공급가액과 예측 공급가액을 처리
 function formatValue(actual, summaryActual) {
     if (actual === 'N/A' || actual === null || actual === undefined) {
