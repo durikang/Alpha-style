@@ -67,7 +67,7 @@ main.dashboard-container {
 /* 차트, 최근 활동 섹션 */
 .dashboard-content {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 좌: 차트, 우: 최근활동 */
+    grid-template-columns: auto; /* 좌: 차트, 우: 최근활동 */
     gap: 20px;
 }
 
