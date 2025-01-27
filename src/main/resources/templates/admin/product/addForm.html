@@ -139,7 +139,7 @@
                 <!-- 메인 이미지 -->
                 <div class="main-image-wrapper" id="mainImagePreview" draggable="true">
                     <!-- 등록 페이지이므로, 항상 Placeholder -->
-                    <img src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                    <img src="https://placehold.co/400x500?text=Main+Image"
                          alt="기본 이미지" />
                     <!-- 메인 이미지 파일 업로드 -->
                     <input type="file"
@@ -154,7 +154,7 @@
                     <!-- th:each로 1부터 4까지 반복하여 썸네일 생성 -->
                     <th:block th:each="i : ${#numbers.sequence(1, 4)}">
                         <div class="thumbnail-preview" th:id="'thumb' + ${i}" draggable="true">
-                            <img th:src="'https://via.placeholder.com/80x100.png?text=Thumbnail+' + ${i}"
+                            <img th:src="'https://placehold.co/80x100?text=Thumbnail+' + ${i}"
                                  th:alt="'썸네일 ' + ${i}" />
                             <input type="file"
                                    th:id="'thumbnailInput' + ${i}"

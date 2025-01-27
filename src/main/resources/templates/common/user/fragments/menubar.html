@@ -2,7 +2,7 @@
 <header class="header" th:fragment="menu">
     <div class="logo">
         <span>
-            <a th:href="@{/}">
+            <a th:href="@{/}" rel="nofollow">
                 <!-- logoPath가 없으면 기본 로고 경로 사용 -->
                 <img th:src="${logoPath}" th:src-default="@{/user/img/alpha_Style.png}" alt="logo">
             </a>
