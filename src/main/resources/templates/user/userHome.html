@@ -47,12 +47,14 @@
                 <h2 th:text="${categoryWithItems.mainCategory.mainCategoryName}">카테고리 이름</h2>
                 <div class="item-grid" id="item-grid-${categoryWithItems.mainCategory.id}">
                     <div class="item" th:each="item : ${categoryWithItems.items}">
+                        <!-- 상품 이미지 -->
                         <img th:if="${item.mainImage != null}"
                              th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
                              alt="상품 이미지"
                              style="max-width: 300px; max-height: 300px;" />
+                        <!-- 기본 Placeholder 이미지 -->
                         <img th:unless="${item.mainImage != null}"
-                             src="https://via.placeholder.com/300x300.png?text=No+Image"
+                             src="https://placehold.co/300x300?text=No+Image"
                              alt="기본 이미지"
                              style="max-width: 300px; max-height: 300px;" />
                         <div class="info">
@@ -63,7 +65,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- '더 보기' 버튼 추가 -->
+            </div>
+            <!-- '더 보기' 버튼 추가 -->
                 <button class="btn-load-more" data-category-id="${categoryWithItems.mainCategory.id}" data-offset="4" data-limit="4">더 보기</button>
                 <span class="loader" id="loader-${categoryWithItems.mainCategory.id}" style="display:none;">Loading...</span>
             </div>

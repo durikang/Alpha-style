@@ -22,20 +22,31 @@
         <!-- 왼쪽: 이미지 섹션 -->
         <div class="image-section">
             <div class="main-image-wrapper">
+                <!-- 상품 메인 이미지 -->
                 <img th:if="${item.mainImage != null}"
                      th:src="@{/files/{filename}(filename=${item.mainImage.storeFileName})}"
                      alt="상품 메인 이미지" class="main-image" />
+                <!-- 메인 이미지가 없는 경우 Placeholder -->
                 <img th:unless="${item.mainImage != null}"
-                     src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                     src="https://placehold.co/400x500?text=Main+Image"
                      alt="기본 이미지" class="main-image" />
             </div>
             <div class="thumbnail-gallery">
+                <!-- 썸네일 반복 -->
                 <th:block th:each="thumbnail : ${item.thumbnails}">
                     <img th:src="@{/files/{filename}(filename=${thumbnail.storeFileName})}"
                          th:alt="'썸네일 ' + ${thumbnail.id}" class="thumbnail"/>
                 </th:block>
+                <!-- 썸네일 부족 시 빈 자리 Placeholder 추가 -->
+                <th:block th:if="${item.thumbnails == null || item.thumbnails.size() < 4}">
+                    <th:block th:each="i : ${#numbers.sequence(item.thumbnails != null ? item.thumbnails.size() + 1 : 1, 4)}">
+                        <img src="https://placehold.co/80x100?text=Thumbnail+${i}"
+                             alt="썸네일 ${i}" class="thumbnail" />
+                    </th:block>
+                </th:block>
             </div>
         </div>
+
 
         <!-- 오른쪽: 상세 정보 섹션 -->
         <div class="info-section">

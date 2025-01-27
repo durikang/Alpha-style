@@ -142,7 +142,7 @@
                          th:src="@{'/files/' + ${item.mainImagePath}}"
                          alt="상품 메인 이미지" />
                     <img th:unless="${item.mainImagePath != null}"
-                         src="https://via.placeholder.com/400x500.png?text=Main+Image"
+                         src="https://placehold.co/400x500?text=Main+Image"
                          alt="기본 이미지" />
                     <!-- 메인 이미지 파일 업로드 -->
                     <input type="file" id="mainImageInput" class="file-input" name="newMainImage" accept="image/*">
@@ -164,7 +164,7 @@
                     <th:block th:if="${item.thumbnailPaths == null or item.thumbnailPaths.size() < 4}">
                         <th:block th:each="i : ${#numbers.sequence(item.thumbnailPaths != null ? item.thumbnailPaths.size() + 1 : 1, 4)}">
                             <div class="thumbnail-preview" th:id="'thumb' + ${i}" draggable="true">
-                                <img src="https://via.placeholder.com/80x100.png?text=Thumbnail+${i}"
+                                <img src="https://placehold.co/80x100?text=Thumbnail+${i}"
                                      th:alt="'썸네일 ' + ${i}" />
                                 <!-- 썸네일 파일 업로드 -->
                                 <input type="file" th:id="'thumbnailInput' + ${i}"
