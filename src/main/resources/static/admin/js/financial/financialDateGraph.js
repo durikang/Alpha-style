@@ -256,9 +256,7 @@ function renderTableData(data) {
     // 여기에도 동일한 방식으로 처리
 }
 
-// 설명 필드를 분석 테이블에 삽입하는 함수
 function insertDescriptions(data) {
-    // 설명을 삽입할 요소 ID 목록
     const descriptionIds = [
         'analysis-td1', // Summary
         'analysis-td2', // Category Sales
@@ -268,14 +266,13 @@ function insertDescriptions(data) {
         'analysis-td6'  // Area Sales
     ];
 
-    // 각 섹션의 설명을 해당 ID에 삽입
     const sections = [
-        data.summary,         // Summary
-        data.category_sales, // Category Sales
-        data.age_group_sales,// Age Group Sales
-        data.gender_sales,   // Gender Sales
-        data.vip_sales,      // VIP Sales
-        data.area_sales      // Area Sales
+        data.summary,
+        data.category_sales,
+        data.age_group_sales,
+        data.gender_sales,
+        data.vip_sales,
+        data.area_sales
     ];
 
     sections.forEach((section, index) => {
@@ -284,18 +281,16 @@ function insertDescriptions(data) {
 
         if (descriptionElement) {
             if (section && section.length > 0) {
+                let description;
                 if (index === 1) { // Category Sales
-                    // 모든 카테고리의 설명을 하나로 합침
-                    let descriptions = section.map(item => item.설명).filter(desc => desc && desc !== 'N/A').join('<br>');
-                    descriptions = descriptions || 'N/A';
-                    descriptionElement.innerHTML = descriptions;
+                    description = section.map(item => item.설명).filter(desc => desc && desc !== 'N/A').join('<br>') || 'N/A';
                 } else {
-                    let description = section[0].설명 || 'N/A';
-                    // 줄바꿈 처리
-                    description = description.replace(/\n/g, '<br>');
-                    descriptionElement.innerHTML = description;
+                    description = section[0].설명 || 'N/A';
                 }
+                console.log(`설명 [${descriptionId}]:`, description);
+                descriptionElement.innerHTML = description;
             } else {
+                console.log(`설명 [${descriptionId}]: N/A`);
                 descriptionElement.textContent = 'N/A';
             }
         } else {
@@ -304,7 +299,7 @@ function insertDescriptions(data) {
     });
 }
 
-#
+
 // 값 포맷팅 함수: 실제 공급가액과 예측 공급가액을 처리
 function formatValue(actual, summaryActual) {
     if (actual === 'N/A' || actual === null || actual === undefined) {
