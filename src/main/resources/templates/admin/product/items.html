@@ -173,7 +173,10 @@
     </div>
 
     <!-- 검색 바 포함 (searchBar fragment) -->
-    <div class="search-bar" th:replace="~{common/admin/fragments/searchBar :: searchBar('/admin/product/items','상품 검색',${keyword},null)}"></div>
+    <div class="search-bar"
+         th:replace="~{common/admin/fragments/searchBar ::
+         searchBar('/admin/product/items','상품 검색',${keyword},null)}">
+    </div>
 
     <!-- 상단 등록 버튼들 -->
     <div class="actions">
