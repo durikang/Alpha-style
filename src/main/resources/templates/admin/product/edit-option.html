@@ -7,11 +7,119 @@
 <head>
     <meta charset="UTF-8">
     <title>엔티티 수정</title>
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 컨테이너 스타일 */
+        .edit-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 제목 스타일 */
+        h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* 폼 스타일 */
+        .edit-form-group {
+            margin-bottom: 15px;
+        }
+
+        .edit-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .edit-input,
+        .edit-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .edit-input:focus,
+        .edit-select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        /* 버튼 스타일 */
+        .edit-button-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .edit-button-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* 취소 버튼 스타일 */
+        .edit-cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .edit-cancel-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 오류 메시지 스타일 */
+        .error {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .edit-container {
+                width: 90%;
+                margin: 30px auto;
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+        .edit-container {
+            margin: 12rem auto;
+        }
+    </style>
 </head>
 <body>
 <div class="edit-container">
-    <h2 th:text="'엔티티 수정: ' + ${entityType}">엔티티 수정</h2>
-
     <!-- Region 수정 폼 -->
     <form th:if="${entityType == 'region'}"
           th:action="@{/admin/product/options/regions/{id}(id=${entity.id})}"

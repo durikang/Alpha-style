@@ -27,3 +27,11 @@
 //     params.set('sortDirection', direction);
 //     window.location.search = params.toString();
 // }
+function sortTable(field, direction) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('sortField', field);
+    urlParams.set('sortDirection', direction);
+    // 페이지 번호를 0(첫 페이지)로 초기화하는 것이 좋음
+    urlParams.set('page', '0');
+    window.location.search = urlParams.toString();
+}

@@ -1,73 +1,111 @@
-/* 전체 레이아웃 배경 / 폰트 */
-body {
+/* 초기화(간단 버전) */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
-    font-family: "Noto Sans KR", sans-serif;
+    box-sizing: border-box;
 }
 
+/* 바디 기본 스타일 */
+body {
+    font-family: "Noto Sans KR", sans-serif;
+    background-color: #f6f8fa;
+}
+
+/* 메인 컨텐츠 카드 형태 */
 main.form-page {
-    max-width: 850px;
+    max-width: 980px;
     margin: 40px auto;
     background-color: #fff;
-    padding: 24px;
+    padding: 32px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* 상단 제목 */
+/* 상단 헤더(제목) */
 .page-header {
     text-align: center;
     margin-bottom: 30px;
 }
 .page-header h2 {
-    margin: 0;
-    font-size: 1.6rem;
-    color: #343a40;
+    font-size: 1.8rem;
+    color: #333;
 }
 
 /* 폼 컨테이너 */
 .form-container {
-    margin: 0 auto;
+    width: 100%;
 }
 
-/* 폼 그룹 (라벨 + 입력) */
+/* 그리드 레이아웃 */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2열 */
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+/*
+    주소 부분같이 필드가 많은 경우를 위해
+    필요한 경우 별도의 클래스(address-grid)를 붙여
+    그리드 칼럼 수, 너비 등을 조정 가능
+*/
+.address-grid {
+    grid-template-columns: 1fr 1fr 1fr; /* 필요하다면 3열 등 변경 가능 */
+    gap: 20px;
+}
+
+/* 그리드 내부 form-group */
 .form-group {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
 }
 .form-group label {
-    display: block;
-    margin-bottom: 6px;
     font-weight: 600;
+    margin-bottom: 6px;
     color: #555;
 }
 .form-group input,
 .form-group select {
-    width: 100%;
-    max-width: 500px; /* 입력창 너비 제한 (원한다면 조정) */
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    box-sizing: border-box;
     font-size: 1rem;
+    transition: border-color 0.2s;
 }
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #007bff;
     outline: none;
+    border-color: #007bff;
+}
+
+/* 주소 검색 래퍼 */
+.address-wrapper .address-inputs {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+.address-wrapper input[readonly] {
+    background-color: #fafafa;
+    cursor: not-allowed;
+}
+
+/* 버튼 스타일 */
+.search-btn,
+.btn {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 /* 주소 검색 버튼 */
 .search-btn {
-    margin-left: 10px;
-    padding: 9px 14px;
+    padding: 10px 16px;
     background-color: #007bff;
     color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
+    white-space: nowrap;
 }
 .search-btn:hover {
     background-color: #0056b3;
@@ -75,7 +113,7 @@ main.form-page {
 
 /* 오류 메시지 */
 .error-message {
-    margin-top: 5px;
+    margin-top: 4px;
     color: #d35d5d; /* 빨간계열 색상 */
     font-size: 0.85rem;
 }
@@ -84,23 +122,16 @@ main.form-page {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 30px;
+    gap: 12px;
+    margin-top: 10px;
 }
 
-/* 버튼들 */
+/* 일반 버튼들 */
 .btn {
-    display: inline-block;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
+    padding: 10px 24px;
     color: #fff;
-    cursor: pointer;
+    text-decoration: none;
     text-align: center;
-    border: none;
-    transition: background-color 0.3s;
-    min-width: 100px;
 }
 .btn-save {
     background-color: #28a745;
@@ -115,30 +146,20 @@ main.form-page {
     background-color: #5a6268;
 }
 
-/* 반응형 처리 */
-@media (max-width: 600px) {
-    main.form-page {
-        margin: 20px auto;
-        padding: 16px;
+/* 반응형 */
+@media (max-width: 768px) {
+    /* 화면이 좁아지면 1열로 */
+    .form-grid {
+        grid-template-columns: 1fr;
     }
-    .form-group {
-        margin-bottom: 16px;
+    .address-grid {
+        grid-template-columns: 1fr;
     }
-    .form-group input,
-    .form-group select {
-        max-width: 100%;
-    }
+    /* 버튼도 너비 100% */
     .form-actions {
         flex-direction: column;
-        align-items: stretch;
     }
-    .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    .search-btn {
-        margin-left: 0;
-        margin-top: 10px;
+    .form-actions .btn {
         width: 100%;
     }
 }

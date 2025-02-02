@@ -118,13 +118,15 @@ public class MemberController {
         Member member = new Member();
         member.setUserId(addForm.getUserId());
         member.setUsername(addForm.getUsername());
-        member.setPassword(addForm.getPassword()); // 나중에 암호화 필요
+        member.setPassword(addForm.getPassword()); // 비밀번호 암호화 필요
         member.setEmail(addForm.getEmail());
         member.setMobilePhone(addForm.getMobilePhone());
         member.setAddress(addForm.getAddress());
         member.setSecondaryAddress(addForm.getSecondaryAddress());
         member.setZipCode(addForm.getZipCode());
         member.setRole(addForm.getRole());
+        member.setGender(addForm.getGender());
+
 
 
         Member savedMember;
@@ -140,7 +142,7 @@ public class MemberController {
         // 알림 메시지 설정 및 리다이렉션
         redirectAttributes.addAttribute("userNo", savedMember.getUserNo());
         redirectAttributes.addFlashAttribute("alert", new Alert("사용자가 성공적으로 등록되었습니다.", Alert.AlertType.SUCCESS));
-        return "redirect:/user/users/{userNo}";
+        return "redirect:/admin/user/users/{userNo}";
     }
 
     // 비밀번호 보안 정책 검증 (추후 구현 예정)

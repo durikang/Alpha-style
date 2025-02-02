@@ -18,7 +18,7 @@
 
         main.container {
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 170px auto;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -252,11 +252,16 @@
 </main>
 
 <script>
-    // 예시: row 클릭 시 상세페이지 이동
     document.addEventListener("DOMContentLoaded", function () {
         const rows = document.querySelectorAll(".clickable-row");
+
         rows.forEach(row => {
-            row.addEventListener("click", () => {
+            row.addEventListener("click", (event) => {
+                if (event.target.type === "checkbox") {
+                    event.stopPropagation(); // 체크박스 클릭 시 상세 페이지 이동 방지
+                    return;
+                }
+
                 const detailsUrl = row.getAttribute("data-details-url");
                 if (detailsUrl) {
                     window.location.href = detailsUrl;
@@ -264,9 +269,10 @@
             });
         });
 
-        // 전체 체크박스
+        // 전체 체크박스 기능
         const selectAll = document.getElementById("selectAll");
         const checkboxes = document.querySelectorAll(".select-checkbox");
+
         if (selectAll) {
             selectAll.addEventListener("change", () => {
                 checkboxes.forEach(chk => {
@@ -274,7 +280,48 @@
                 });
             });
         }
+
+        // 삭제 버튼 클릭 이벤트
+        const deleteButton = document.getElementById("deleteSelected");
+        if (deleteButton) {
+            deleteButton.addEventListener("click", function () {
+                const selectedItems = [...checkboxes]
+                    .filter(chk => chk.checked)
+                    .map(chk => parseInt(chk.value));
+
+                if (selectedItems.length === 0) {
+                    alert("삭제할 상품을 선택해주세요.");
+                    return;
+                }
+
+                if (!confirm("정말로 선택한 상품을 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                fetch(deleteButton.getAttribute("data-delete-url"), {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(selectedItems)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw new Error(err.message); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        window.location.reload(); // 페이지 새로고침하여 목록 갱신
+                    })
+                    .catch(error => {
+                        alert("삭제 중 오류가 발생했습니다: " + error.message);
+                    });
+            });
+        }
     });
 </script>
+
 </body>
 </html>

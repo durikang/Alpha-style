@@ -39,9 +39,9 @@ public class FinancialController {
 
         // transactionType을 Integer로 변환
         Integer transactionTypeInt = null;
-        if ("구매".equals(transactionType)) {
+        if ("매입".equals(transactionType)) {
             transactionTypeInt = 1;
-        } else if ("판매".equals(transactionType)) {
+        } else if ("매출".equals(transactionType)) {
             transactionTypeInt = 2;
         }
 

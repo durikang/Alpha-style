@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<!-- Thymeleaf 선언 / FooterFragment 임을 선언-->
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      th:fragment="FooterFragment">
 <!-- 푸터 -->
-<footer id="footer">
+<footer xmlns:th="http://www.thymeleaf.org"
+        th:fragment="FooterFragment"
+        id="footer">
     <section id="footer1">
         <a href="/admin/footer/terms-of-service">이용약관</a> |
         <a href="/admin/footer/privacy-policy">개인정보처리방침</a> |
@@ -17,4 +14,3 @@
         <p>이 사이트는 학습 목적으로 제작되었습니다.</p>
     </section>
 </footer>
-</html>

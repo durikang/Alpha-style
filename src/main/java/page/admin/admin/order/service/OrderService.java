@@ -64,6 +64,8 @@ public interface OrderService {
     // 추가 메서드: (itemId, 기간)에 대한 판매수량 집계
     List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate);
 
+    List<Tuple> analyzeItemSalesByQuarter(Long itemId, LocalDateTime startDate, LocalDateTime endDate);
+
     Page<CustomerPurchaseSummaryDTO> getBuyerOrderSummaries(String keyword, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
 

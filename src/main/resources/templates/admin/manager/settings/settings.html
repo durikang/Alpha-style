@@ -10,6 +10,17 @@
     <link rel="stylesheet" th:href="@{/admin/css/options/options.css}"/> <!-- 옵션 페이지용 CSS -->
     <script th:src="@{/admin/js/options/options.js}" th:inline="none"></script>
     <script th:src="@{/admin/js/options/fileSettingsValidation.js}" th:inline="none"></script> <!-- 새 JS 파일 추가 -->
+    <style>
+        main.container {
+            margin: 18rem auto;
+        }
+        .form-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #6c757d; /* Bootstrap의 muted 텍스트 색상 */
+        }
+    </style>
 </head>
 <body>
 <main class="container">
@@ -50,14 +61,5 @@
     </div>
 </main>
 
-<!-- 에러 메시지 스타일링을 위한 CSS 추가 -->
-<style>
-    .form-text {
-        display: block;
-        margin-top: 5px;
-        font-size: 0.9em;
-        color: #6c757d; /* Bootstrap의 muted 텍스트 색상 */
-    }
-</style>
 </body>
 </html>

@@ -104,7 +104,6 @@ public class MemberServiceImpl implements MemberService {
     public UpdateForm getUpdateFormById(Long userNo) {
         Member member = getMemberById(userNo);
 
-        // 기존 Member 데이터를 UpdateForm으로 변환
         UpdateForm updateForm = new UpdateForm();
         updateForm.setUserNo(member.getUserNo());
         updateForm.setUserId(member.getUserId());
@@ -115,6 +114,9 @@ public class MemberServiceImpl implements MemberService {
         updateForm.setSecondaryAddress(member.getSecondaryAddress());
         updateForm.setZipCode(member.getZipCode());
         updateForm.setRole(member.getRole());
+
+        // 성별도 세팅
+        updateForm.setGender(member.getGender());
 
         return updateForm;
     }
@@ -130,8 +132,10 @@ public class MemberServiceImpl implements MemberService {
         existingMember.setAddress(updateForm.getAddress());
         existingMember.setSecondaryAddress(updateForm.getSecondaryAddress());
         existingMember.setZipCode(updateForm.getZipCode());
-        existingMember.setSecondaryAddress(updateForm.getSecondaryAddress());
         existingMember.setRole(updateForm.getRole());
+
+        // 성별 추가
+        existingMember.setGender(updateForm.getGender());
 
         // 비밀번호가 입력된 경우에만 업데이트
         if (updateForm.getPassword() != null && !updateForm.getPassword().isEmpty()) {

@@ -28,7 +28,7 @@
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </div>
 <div layout:fragment="content">
-    <div class="signup-form" style="margin-top: 100px;">
+    <div class="signup-form" style="margin-top:350px;">
         <!-- 로고 이미지 -->
         <div style="text-align: center; margin-bottom: 20px;">
             <img th:src="@{/user/img/alpha_Style.png}" alt="사이트 로고" style="width: 150px; height: auto;">
@@ -36,7 +36,7 @@
         <h1>회원 가입</h1>
 
         <!-- 단계별 폼 -->
-        <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate onsubmit="return validateForm();" style="margin-top:350px;">
+        <form th:action="@{/user/signup/general}" th:object="${signupForm}" method="post" novalidate onsubmit="return validateForm();" >
             <!-- 1단계: 본인 인증 -->
             <div class="step" id="step-1" style="display: block;">
                 <h2>1단계: 본인 인증</h2>

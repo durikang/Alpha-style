@@ -495,30 +495,28 @@ public class OrderController {
             throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-MM-dd", e);
         }
 
-        // 2) Service 호출 -> (날짜, 수량 합계) 튜플 목록
-        List<Tuple> rows = orderService.analyzeItemSales(itemId, startDate, endDate);
+        List<Tuple> rows = orderService.analyzeItemSalesByQuarter(itemId, startDate, endDate);
 
-        // 3) 결과를 라벨/값 리스트로 변환
         List<String> labels = new ArrayList<>();
         List<Integer> values = new ArrayList<>();
 
         for (Tuple tuple : rows) {
-            String dateStr = tuple.get(0, String.class);
-            Number sumValue = tuple.get(1, Number.class);
-            int totalQty = sumValue != null ? sumValue.intValue() : 0;
+            String quarterLabel = tuple.get(0, String.class);    // "2023-Q1" 등
+            Number total = tuple.get(1, Number.class);           // 수량 합계
 
-            labels.add(dateStr);
-            values.add(totalQty);
+            int sumQty = (total != null) ? total.intValue() : 0;
+            labels.add(quarterLabel);
+            values.add(sumQty);
         }
 
-        // 4) JSON 응답을 위한 맵 생성
         Map<String, Object> result = new HashMap<>();
         result.put("labels", labels);
         result.put("values", values);
-        result.put("title", "Item " + itemId + " 분석 결과 (" + startDateStr + "~" + endDateStr + ")");
+        result.put("title", "Item " + itemId + " 분기별 판매량 분석");
         result.put("chartType", chartType); // 필요하다면
 
-        return result; // -> JSON
+        return result;
+
     }
 
     /**

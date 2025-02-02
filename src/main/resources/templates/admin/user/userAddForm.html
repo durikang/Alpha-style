@@ -60,8 +60,8 @@
                 <label for="gender">성별</label>
                 <select id="gender" th:field="*{gender}" required>
                     <option value="">선택하세요</option>
-                    <option value="male">남</option>
-                    <option value="female">여</option>
+                    <option value="남">남</option>
+                    <option value="여">여</option>
                 </select>
                 <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="error-message"></div>
             </div>
@@ -75,13 +75,6 @@
                 <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error-message"></div>
             </div>
 
-            <!-- 상세 주소 -->
-            <div class="form-group">
-                <label for="secondaryAddress">상세 주소</label>
-                <input type="text" id="secondaryAddress" th:field="*{secondaryAddress}" placeholder="상세 주소를 입력하세요">
-                <div th:if="${#fields.hasErrors('secondaryAddress')}" th:errors="*{secondaryAddress}" class="error-message"></div>
-            </div>
-
             <!-- 우편번호 -->
             <div class="form-group">
                 <label for="zipCode">우편번호</label>
@@ -89,11 +82,18 @@
                 <div th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}" class="error-message"></div>
             </div>
 
+            <!-- 상세 주소 -->
+            <div class="form-group">
+                <label for="secondaryAddress">상세 주소</label>
+                <input type="text" id="secondaryAddress" th:field="*{secondaryAddress}" placeholder="상세 주소를 입력하세요">
+                <div th:if="${#fields.hasErrors('secondaryAddress')}" th:errors="*{secondaryAddress}" class="error-message"></div>
+            </div>
+
             <!-- 역할 -->
             <div class="form-group">
                 <label for="role">역할</label>
                 <select id="role" th:field="*{role}" required>
-                    <option value="customer">Customer</option>
+                    <option value="member">Customer</option>
                     <option value="admin">Admin</option>
                 </select>
                 <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}" class="error-message"></div>

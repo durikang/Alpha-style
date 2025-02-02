@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // 주소 입력 필드 및 관련 필드 클릭 시 이벤트 연결
     const addressFields = [
         document.getElementById("address"),
-        document.getElementById("secondaryAddress"),
         document.getElementById("zipCode")
     ];
 

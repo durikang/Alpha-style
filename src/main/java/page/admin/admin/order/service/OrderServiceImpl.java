@@ -390,11 +390,10 @@ public class OrderServiceImpl implements OrderService {
     public List<Tuple> analyzeItemSales(Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
         QOrder order = QOrder.order;
         QOrderDetail detail = QOrderDetail.orderDetail;
-        QMember member = QMember.member;
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 날짜 조건 필터링
+        // 날짜 필터
         if (startDate != null) {
             builder.and(order.orderDate.goe(startDate));
         }
@@ -402,24 +401,60 @@ public class OrderServiceImpl implements OrderService {
             builder.and(order.orderDate.loe(endDate));
         }
 
+        // ★ 해당 itemId만 필터
+        builder.and(detail.item.itemId.eq(itemId));
+        // 만약 매출(1)만 보고 싶다면 builder.and(detail.transactionType.eq(1)); 등 추가
+
         return queryFactory
                 .select(
                         Expressions.stringTemplate(
-                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate // 일별로 그룹화
+                                "TO_CHAR({0}, 'YYYY-MM-DD')", order.orderDate
                         ).as("formattedDate"),
-                        member.userId.as("userId"), // 회원 ID
-                        member.username.as("username"), // 회원 이름
-                        detail.subtotal.sum().add(detail.vat.sum()).as("totalSales"), // 총 매출 금액
-                        detail.subtotal.avg().add(detail.vat.avg()).as("averageSales") // 평균 매출 금액
+                        detail.quantity.sum().as("totalQuantity")
                 )
                 .from(order)
-                .join(order.orderDetails, detail) // 주문-세부사항 조인
-                .join(order.user, member) // 주문-회원 조인
-                .where(builder) // 필터 적용
-                .groupBy(order.orderDate, member.userId, member.username) // 날짜와 회원별 그룹화
-                .orderBy(order.orderDate.asc()) // 날짜순 정렬
+                .join(order.orderDetails, detail)
+                .where(builder)
+                // ★ "하루별 총합" 이므로 orderDate만 groupBy
+                .groupBy(order.orderDate)
+                .orderBy(order.orderDate.asc())
                 .fetch();
     }
+    @Override
+    public List<Tuple> analyzeItemSalesByQuarter(Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QOrderDetail detail = QOrderDetail.orderDetail;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 날짜 필터
+        if (startDate != null) {
+            builder.and(order.orderDate.goe(startDate));
+        }
+        if (endDate != null) {
+            builder.and(order.orderDate.loe(endDate));
+        }
+
+        builder.and(detail.item.itemId.eq(itemId));
+        var quarterExpr = Expressions.stringTemplate(
+                "TO_CHAR({0}, 'YYYY\"년 \"Q\"분기\"')",
+                order.orderDate
+        );
+
+        return queryFactory
+                .select(
+                        quarterExpr.as("quarterLabel"),        // index 0
+                        detail.quantity.sum().as("totalQty")   // index 1
+                )
+                .from(order)
+                .join(order.orderDetails, detail)
+                .where(builder)
+                .groupBy(quarterExpr)
+                .orderBy(quarterExpr.asc())
+                .fetch();
+    }
+
+
 
 
 

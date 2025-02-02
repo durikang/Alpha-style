@@ -20,8 +20,13 @@
     <script th:src="@{/admin/js/sales/productSalesAnalysis.js}" defer></script>
     <script th:src="@{/admin/js/sales/product-sales-guide.js}" defer></script>
 </head>
+<style>
+    main.container.mt-4 {
+        margin-bottom: 1.5rem !important;
+    }
+</style>
 <body>
-<div class="container">
+<main class="container mt-4">
     <h1>제품별 판매 기록 조회</h1>
 
     <!-- 검색 폼 -->
@@ -170,7 +175,7 @@
 
 
 
-</div>
+</main>
 
 <div th:replace="~{admin/sales/analysisModal.html :: salesChartModalFragment}"></div>
 

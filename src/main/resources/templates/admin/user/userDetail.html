@@ -37,6 +37,10 @@
       <td th:text="${member.mobilePhone}">010-1234-5678</td>
     </tr>
     <tr>
+      <th>성별</th>
+      <td th:text="${member.gender}">남</td>
+    </tr>
+    <tr>
       <th>주소</th>
       <td th:text="${member.address + ' ' + #strings.defaultString(member.secondaryAddress, '')}">
         서울시 강남구 테헤란로 123
